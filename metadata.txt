@@ -10,7 +10,6 @@ tracker=https://github.com/YusufEminoglu/PlanX-Settlement/issues
 repository=https://github.com/YusufEminoglu/PlanX-Settlement
 category=Processing
 hasProcessingProvider=yes
-icon=icon.png
 homepage=https://github.com/YusufEminoglu/PlanX-Settlement
 tags=planx,urban planning,settlement plan,parcel,building footprint,parking,landscape,QGIS,processing
 experimental=True
