@@ -1,0 +1,16 @@
+{
+  "plugin_name": "planX — Settlement Plan Toolset",
+  "step_1": "Block→Parcel Subdivision (ParcelFlux)",
+  "step_2": "Facade Detection (Front/Side/Back)",
+  "step_3": "Building Footprint (Setback + FAR)",
+  "step_3b": "Building Macroform Placement",
+  "step_4": "Building-Parcel Compliance Check",
+  "step_5": "Hard Surface (Walkable Area)",
+  "step_6": "Parametric Parking Layout",
+  "step_7": "Landscape / Tree Placement",
+  "step_8": "Settlement Plan Report",
+  "front_facade": "Front facade",
+  "side_facade": "Side facade",
+  "back_facade": "Back facade",
+  "corner_parcel": "Corner parcel"
+}

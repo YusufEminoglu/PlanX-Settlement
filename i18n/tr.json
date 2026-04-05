@@ -1,0 +1,16 @@
+{
+  "plugin_name": "planX — Yerleşim Planı Araç Seti",
+  "step_1": "Ada→Parsel Bölme (ParcelFlux)",
+  "step_2": "Cephe Tespiti (Ön/Yan/Arka)",
+  "step_3": "Bina Taban Alanı (Setback + TAKS)",
+  "step_3b": "Bina Makroform Yerleştirme",
+  "step_4": "Bina-Parsel Uyum Kontrolü",
+  "step_5": "Sert Zemin (Yürüme Alanı)",
+  "step_6": "Parametrik Otopark Düzeni",
+  "step_7": "Peyzaj / Ağaç Yerleştirme",
+  "step_8": "Yerleşim Planı Raporu",
+  "front_facade": "Ön cephe",
+  "side_facade": "Yan cephe",
+  "back_facade": "Arka cephe",
+  "corner_parcel": "Köşe parseli"
+}

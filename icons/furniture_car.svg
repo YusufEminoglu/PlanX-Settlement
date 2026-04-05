@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 220">
+  <defs>
+    <linearGradient id="bodyGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#455A64" />
+      <stop offset="50%" stop-color="#78909C" />
+      <stop offset="100%" stop-color="#455A64" />
+    </linearGradient>
+    <linearGradient id="glassGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1E2A38" />
+      <stop offset="100%" stop-color="#3A4A5A" />
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-10%" width="140%" height="120%">
+      <feDropShadow dx="2" dy="4" stdDeviation="3" flood-opacity="0.4"/>
+    </filter>
+  </defs>
+
+  <g filter="url(#shadow)">
+    <!-- Lastikler (Tires) -->
+    <rect x="8" y="35" width="10" height="35" rx="3" fill="#111111" />
+    <rect x="82" y="35" width="10" height="35" rx="3" fill="#111111" />
+    <rect x="8" y="145" width="10" height="35" rx="3" fill="#111111" />
+    <rect x="82" y="145" width="10" height="35" rx="3" fill="#111111" />
+    
+    <!-- Ana Gövde (Sedan Car Body 1.8m x 4.5m ratio) -->
+    <path d="M 16 30 Q 50 8 84 30 L 86 190 Q 50 215 14 190 Z" fill="url(#bodyGrad)" />
+    
+    <!-- Kaput çizgileri (Hood detail) -->
+    <path d="M 30 22 L 30 65 M 70 22 L 70 65" stroke="#37474F" stroke-width="1.5" stroke-linecap="round" />
+    
+    <!-- Ön Cam (Windshield) -->
+    <path d="M 20 70 Q 50 60 80 70 L 76 90 Q 50 85 24 90 Z" fill="url(#glassGrad)" stroke="#263238" stroke-width="1" />
+    
+    <!-- Arka Cam (Rear Window) -->
+    <path d="M 25 155 Q 50 162 75 155 L 78 140 Q 50 145 22 140 Z" fill="url(#glassGrad)" stroke="#263238" stroke-width="1" />
+    
+    <!-- Tavan (Roof) -->
+    <rect x="23" y="90" width="54" height="50" rx="5" fill="#546E7A" stroke="#37474F" stroke-width="1" />
+    
+    <!-- Arka Bagaj Çizgileri (Trunk detail) -->
+    <path d="M 25 165 L 25 185 M 75 165 L 75 185" stroke="#37474F" stroke-width="1.5" stroke-linecap="round" />
+
+    <!-- Farlar (Headlights) -->
+    <path d="M 18 25 Q 26 21 32 23 L 30 28 Q 23 27 17 28 Z" fill="#FFF9C4" />
+    <path d="M 82 25 Q 74 21 68 23 L 70 28 Q 77 27 83 28 Z" fill="#FFF9C4" />
+
+    <!-- Stop Lambaları (Taillights) -->
+    <path d="M 16 190 Q 25 198 32 191 L 30 187 Q 23 192 17 186 Z" fill="#E53935" />
+    <path d="M 84 190 Q 75 198 68 191 L 70 187 Q 77 192 83 186 Z" fill="#E53935" />
+
+    <!-- Yan Aynalar (Side Mirrors) -->
+    <path d="M 18 78 Q 10 75 12 85 Z" fill="#455A64" />
+    <path d="M 82 78 Q 90 75 88 85 Z" fill="#455A64" />
+  </g>
+</svg>

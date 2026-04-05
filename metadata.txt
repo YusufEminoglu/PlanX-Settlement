@@ -1,0 +1,19 @@
+[general]
+name=PlanX Settlement Planning Toolset
+qgisMinimumVersion=3.28
+description=PlanX Settlement Planning Tools. A 9-stage sequential workflow toolset capable of generating blocks, parcels, building footprints, parking, and landscapes.
+version=0.1.0
+author=Yusuf Eminoglu
+email=yusuf.eminoglu@deu.edu.tr
+about=Built with a vision of urban resilience, spatial analysis, and optimization-based planning, this toolset automates Settlement Plan generation. It spans 9 consecutive processes, allowing for complete production lines starting from basic block sub-division all the way to building placement, parking layout design, and landscape generation.
+tracker=https://github.com/YusufEminoglu/PlanX-Settlement/issues
+repository=https://github.com/YusufEminoglu/PlanX-Settlement
+category=Processing
+hasProcessingProvider=yes
+icon=icons/icon_main.svg
+homepage=https://github.com/YusufEminoglu/PlanX-Settlement
+tags=planx,urban planning,settlement plan,parcel,building footprint,parking,landscape,QGIS,processing
+experimental=True
+deprecated=False
+changelog=
+    0.1.0 - Initial version: 9-stage settlement plan production pipeline
