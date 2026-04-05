@@ -1,51 +1,56 @@
-# planX — Yerleşim Planı Araç Seti
+# PlanX Settlement Planning Toolset
 
-**Geliştirici:** Araş. Gör. Yusuf Eminoğlu (Dokuz Eylül Üniversitesi, Şehir ve Bölge Planlama Bölümü)  
-**Versiyon:** 0.3.0  
-**QGIS:** ≥ 3.28 (Önerilen: 3.40 LTR veya 3.44 LTR)
+**A 9-stage parametric settlement plan generation pipeline for QGIS — part of the PlanX suite**
 
-## Vizyon
+PlanX Settlement Planning Toolset automates the full production of a settlement plan. Starting from basic block subdivision, it runs through parcel generation, building footprint placement, parking layout design, and landscape generation — all in a sequential, parameter-driven pipeline.
 
-planX ekosisteminin **Yerleşim Planı** üretimine özel tasarlanmış alt bileşeni. UIP çizimleri tamamlandıktan sonra **9 aşamalı sıralı iş akışı** ile parametrik ve gerçekçi bir yerleşim planı üretir.
+---
 
-## 9 Aşamalı İş Akışı
+## 9-Stage Workflow
 
-| # | Adım | Açıklama |
+| # | Tool | Description |
 |---|---|---|
-| 1 | **ParcelFlux** | Ada → Parsel bölme (Genişlik varyasyonu ve Sıra Genişlik Asimetrisi) |
-| 2 | **FacadeDetector** | Cephe tespiti ve sınıflandırması (ön/yan/arka bahçe) |
-| 3 | **CoverageFootprint** | Kenar bazlı setback + TAKS parametreleri ile maksimum inşaat alanı |
-| 3C | **Dynamic Macroform** | Prosedürel 12 farklı gerçekçi mimari form türetimi |
-| 4 | **BuildingOptimizer** | Bina-parsel uyum kontrolü |
-| 5 | **Hard Surface** | Sert zemin / yürüme alanı hesaplaması |
-| 6 | **ParkingGenerator** | Yol ağı bağlantılı, parametrik otopark (90°/60°/45°) motoru |
-| 7 | **LandscapeGenerator** | Araziye uygun bitkilendirme ve ağaç yerleşimi |
-| 8 | **SettlementFinalizer** | Nüfus projeksiyonu ve genel istatistik/raporlama aracı |
+| 1 | **ParcelFlux** | Subdivides blocks into parcels with width variation and row asymmetry |
+| 2 | **FacadeDetector** | Detects and classifies parcel facades (front / side / rear setbacks) |
+| 3 | **CoverageFootprint** | Generates maximum buildable area using edge-based setbacks and floor area ratio (TAKS) |
+| 3B | **Building Macroform** | Places basic building masses on parcels |
+| 3C | **Dynamic Macroform** | Procedurally derives 12 realistic architectural form typologies (I, L, U, T, etc.) |
+| 4 | **BuildingOptimizer** | Validates building-parcel fit and resolves geometric conflicts |
+| 5 | **Hard Surface** | Calculates hard surface and pedestrian circulation areas |
+| 6 | **ParkingGenerator** | Road-network-aware parametric parking engine (90° / 60° / 45° configurations) |
+| 7 | **LandscapeGenerator** | Places trees and vegetation adapted to parcel geometry |
+| 8 | **SettlementFinalizer** | Population projection, statistics summary, and reporting |
 
-## Kurulum
+## Key Capabilities
 
-1. Bu klasörü (veya ZIP dosyasını) QGIS eklentiler dizinine kopyalayın:
-   ```
-   C:\Users\<KULLANICI>\AppData\Roaming\QGIS\QGIS3\profiles\default\python\plugins\
-   ```
-2. QGIS'i yeniden başlatın
-3. **Eklentiler → Eklentileri Yönet** menüsünden aktifleştirin
-4. **İşlem Kutusu** (Processing Toolbox) içinde **planX — Yerleşim Planı Araç Seti** görünecektir
+- **Real-time Parcel Asymmetry** — ParcelFlux distributes widths with organic variation across opposing block rows
+- **Procedural Architectural Forms** — 12 mass typologies with minimum 7 m wing depths, matched to parcel structure
+- **Road-guided Parking** — Engine analyzes road network and connects parking entry lines to nearest road alignment
+- **QGIS 3.40+ Compatible** — Core geometry engine updated for API revisions in recent LTR versions
 
-## Yenilikler (v0.3.0)
+## Installation
 
-### ParcelFlux İle Gerçek Zamanlı Asimetri
-Adanın karşılıklı sıralarındaki parselleri istenilen asimetri katsayısına göre (Örn: Kuzey %10 daha geniş) o bölgeye tamamen rastgele ve organik bir doku vererek böler. 
+1. Download the latest `.zip` from [Releases](https://github.com/YusufEminoglu/PlanX-Settlement/releases).
+2. In QGIS: **Plugins → Manage and Install Plugins → Install from ZIP**.
+3. Activate **PlanX Settlement Planning Toolset** from the plugin list.
+4. Find the tools under **Processing Toolbox → PlanX Settlement Planning Toolset**.
 
-### Dinamik Prosedürel Formlar
-Temel kütleler (I, L, U, T, vb. toplam 12 tip) minimum 7 metrelik doğal mekan kanat derinlikleriyle, parsel yapısına uygun rastgele mimari tipolojiler üretir.
+## Compatibility
 
-### Yol Kılavuzlu Parametrik Otopark
-Verilen yol ağını analiz eden yeni otopark motoru, otoparkı optimize edip "bağlantı ve giriş çizgisi"ni en yakın yol güzergahına bağlar. 
+| Requirement | Value |
+|---|---|
+| QGIS minimum | 3.28 |
+| QGIS recommended | 3.40 LTR or 3.44 LTR |
+| License | GPL-3.0 |
+| Status | Experimental |
 
-### QGIS 3.40+ Tam Uyum 
-API revizyonlarından dolayı oluşan geometri uyumsuzlukları, motor çekirdeği optimizasyonu ile aşılmıştır. 
+## Changelog
 
-## Lisans
+- **0.1.0** — Initial version: 9-stage settlement plan production pipeline
 
-GPL-3.0
+## Author
+
+**Yusuf Eminoglu** — Dokuz Eylül University, Department of City and Regional Planning  
+[GitHub](https://github.com/YusufEminoglu) | geospacephilo@gmail.com
+
+Part of the **[PlanX](https://github.com/YusufEminoglu/PlanX)** urban planning plugin suite.
