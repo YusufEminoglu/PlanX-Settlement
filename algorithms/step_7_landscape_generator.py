@@ -4,55 +4,107 @@
 Geliştirici: Araş.Gör. Yusuf Eminoğlu
 planX Geospatial Advanced Tools — Yerleşim Planı Araç Seti
 """
-import os, sys, random
+
+import random
 from qgis.PyQt.QtCore import QCoreApplication, QVariant
 from qgis.core import (
-    QgsProcessing, QgsProcessingAlgorithm,
-    QgsProcessingParameterFeatureSource, QgsProcessingParameterFeatureSink,
+    QgsProcessing,
+    QgsProcessingAlgorithm,
+    QgsProcessingParameterFeatureSource,
+    QgsProcessingParameterFeatureSink,
     QgsProcessingParameterNumber,
-    QgsFeature, QgsGeometry, QgsWkbTypes, QgsProcessingException,
-    QgsField, QgsFields, QgsFeatureSink, QgsPointXY, QgsSpatialIndex
+    QgsFeature,
+    QgsGeometry,
+    QgsWkbTypes,
+    QgsProcessingException,
+    QgsField,
+    QgsFields,
+    QgsFeatureSink,
+    QgsPointXY,
 )
 
 
 class LandscapeGeneratorAlgorithm(QgsProcessingAlgorithm):
-    INPUT_PARCELS = 'INPUT_PARCELS'
-    INPUT_BUILDINGS = 'INPUT_BUILDINGS'
-    INPUT_GREEN = 'INPUT_GREEN'
-    DENSITY = 'DENSITY'
-    MIN_HEIGHT = 'MIN_HEIGHT'
-    MAX_HEIGHT = 'MAX_HEIGHT'
-    MIN_TREE_BUILDING = 'MIN_TREE_BUILDING'
-    MIN_TREE_TREE = 'MIN_TREE_TREE'
-    OUTPUT = 'OUTPUT'
+    INPUT_PARCELS = "INPUT_PARCELS"
+    INPUT_BUILDINGS = "INPUT_BUILDINGS"
+    INPUT_GREEN = "INPUT_GREEN"
+    DENSITY = "DENSITY"
+    MIN_HEIGHT = "MIN_HEIGHT"
+    MAX_HEIGHT = "MAX_HEIGHT"
+    MIN_TREE_BUILDING = "MIN_TREE_BUILDING"
+    MIN_TREE_TREE = "MIN_TREE_TREE"
+    OUTPUT = "OUTPUT"
 
     def initAlgorithm(self, config=None):
-        self.addParameter(QgsProcessingParameterFeatureSource(
-            self.INPUT_PARCELS, self.tr('Parsel katmanı'),
-            [QgsProcessing.TypeVectorPolygon]))
-        self.addParameter(QgsProcessingParameterFeatureSource(
-            self.INPUT_BUILDINGS, self.tr('Bina katmanı'),
-            [QgsProcessing.TypeVectorPolygon]))
-        self.addParameter(QgsProcessingParameterFeatureSource(
-            self.INPUT_GREEN, self.tr('Yeşil alan katmanı (opsiyonel)'),
-            [QgsProcessing.TypeVectorPolygon], optional=True))
-        self.addParameter(QgsProcessingParameterNumber(
-            self.DENSITY, self.tr('Ağaç yoğunluğu (500m² başına)'),
-            QgsProcessingParameterNumber.Integer, 1, minValue=1, maxValue=10))
-        self.addParameter(QgsProcessingParameterNumber(
-            self.MIN_HEIGHT, self.tr('Min ağaç yüksekliği (m)'),
-            QgsProcessingParameterNumber.Double, 1.0))
-        self.addParameter(QgsProcessingParameterNumber(
-            self.MAX_HEIGHT, self.tr('Max ağaç yüksekliği (m)'),
-            QgsProcessingParameterNumber.Double, 5.0))
-        self.addParameter(QgsProcessingParameterNumber(
-            self.MIN_TREE_BUILDING, self.tr('Min ağaç-bina mesafesi (m)'),
-            QgsProcessingParameterNumber.Double, 2.0, minValue=0.0))
-        self.addParameter(QgsProcessingParameterNumber(
-            self.MIN_TREE_TREE, self.tr('Min ağaç-ağaç mesafesi (m)'),
-            QgsProcessingParameterNumber.Double, 3.0, minValue=0.0))
-        self.addParameter(QgsProcessingParameterFeatureSink(
-            self.OUTPUT, self.tr('Ağaç noktaları')))
+        self.addParameter(
+            QgsProcessingParameterFeatureSource(
+                self.INPUT_PARCELS,
+                self.tr("Parsel katmanı"),
+                [QgsProcessing.TypeVectorPolygon],
+            )
+        )
+        self.addParameter(
+            QgsProcessingParameterFeatureSource(
+                self.INPUT_BUILDINGS,
+                self.tr("Bina katmanı"),
+                [QgsProcessing.TypeVectorPolygon],
+            )
+        )
+        self.addParameter(
+            QgsProcessingParameterFeatureSource(
+                self.INPUT_GREEN,
+                self.tr("Yeşil alan katmanı (opsiyonel)"),
+                [QgsProcessing.TypeVectorPolygon],
+                optional=True,
+            )
+        )
+        self.addParameter(
+            QgsProcessingParameterNumber(
+                self.DENSITY,
+                self.tr("Ağaç yoğunluğu (500m² başına)"),
+                QgsProcessingParameterNumber.Integer,
+                1,
+                minValue=1,
+                maxValue=10,
+            )
+        )
+        self.addParameter(
+            QgsProcessingParameterNumber(
+                self.MIN_HEIGHT,
+                self.tr("Min ağaç yüksekliği (m)"),
+                QgsProcessingParameterNumber.Double,
+                1.0,
+            )
+        )
+        self.addParameter(
+            QgsProcessingParameterNumber(
+                self.MAX_HEIGHT,
+                self.tr("Max ağaç yüksekliği (m)"),
+                QgsProcessingParameterNumber.Double,
+                5.0,
+            )
+        )
+        self.addParameter(
+            QgsProcessingParameterNumber(
+                self.MIN_TREE_BUILDING,
+                self.tr("Min ağaç-bina mesafesi (m)"),
+                QgsProcessingParameterNumber.Double,
+                2.0,
+                minValue=0.0,
+            )
+        )
+        self.addParameter(
+            QgsProcessingParameterNumber(
+                self.MIN_TREE_TREE,
+                self.tr("Min ağaç-ağaç mesafesi (m)"),
+                QgsProcessingParameterNumber.Double,
+                3.0,
+                minValue=0.0,
+            )
+        )
+        self.addParameter(
+            QgsProcessingParameterFeatureSink(self.OUTPUT, self.tr("Ağaç noktaları"))
+        )
 
     def processAlgorithm(self, parameters, context, feedback):
         p_source = self.parameterAsSource(parameters, self.INPUT_PARCELS, context)
@@ -80,13 +132,18 @@ class LandscapeGeneratorAlgorithm(QgsProcessingAlgorithm):
                     all_buildings = all_buildings.combine(bg)
 
         out_fields = QgsFields()
-        out_fields.append(QgsField('source_fid', QVariant.Int))
-        out_fields.append(QgsField('height', QVariant.Double))
-        out_fields.append(QgsField('source_type', QVariant.String, 'string', 20))
+        out_fields.append(QgsField("source_fid", QVariant.Int))
+        out_fields.append(QgsField("height", QVariant.Double))
+        out_fields.append(QgsField("source_type", QVariant.String, "string", 20))
 
         (sink, dest_id) = self.parameterAsSink(
-            parameters, self.OUTPUT, context,
-            out_fields, QgsWkbTypes.Point, p_source.sourceCrs())
+            parameters,
+            self.OUTPUT,
+            context,
+            out_fields,
+            QgsWkbTypes.Point,
+            p_source.sourceCrs(),
+        )
 
         total_trees = 0
 
@@ -132,7 +189,7 @@ class LandscapeGeneratorAlgorithm(QgsProcessingAlgorithm):
         for i, pf in enumerate(p_source.getFeatures()):
             if feedback.isCanceled():
                 break
-            place_trees(pf.geometry(), pf.id(), 'parsel')
+            place_trees(pf.geometry(), pf.id(), "parsel")
             feedback.setProgress(int((i + 1) / total * 50))
 
         # Yeşil alanlara ağaç yerleştir
@@ -141,20 +198,24 @@ class LandscapeGeneratorAlgorithm(QgsProcessingAlgorithm):
             for i, gf in enumerate(g_source.getFeatures()):
                 if feedback.isCanceled():
                     break
-                place_trees(gf.geometry(), gf.id(), 'yesil_alan')
+                place_trees(gf.geometry(), gf.id(), "yesil_alan")
                 feedback.setProgress(50 + int((i + 1) / g_total * 50))
 
         feedback.pushInfo(f"Tamamlandı: {total_trees} ağaç yerleştirildi.")
         return {self.OUTPUT: dest_id}
 
     def name(self):
-        return '7_landscape_generator'
+        return "7_landscape_generator"
+
     def displayName(self):
-        return '7. Peyzaj / Ağaç Yerleştirme'
+        return "7. Peyzaj / Ağaç Yerleştirme"
+
     def group(self):
-        return 'Yerleşim Planı İş Akışı'
+        return "Yerleşim Planı İş Akışı"
+
     def groupId(self):
-        return 'yerlesim_plani_workflow'
+        return "yerlesim_plani_workflow"
+
     def shortHelpString(self):
         return self.tr(
             "━━━ planX — Yerleşim Planı Araç Seti ━━━\n"
@@ -166,8 +227,11 @@ class LandscapeGeneratorAlgorithm(QgsProcessingAlgorithm):
             "• Yeşil alan: Park/rekreasyon alanları (opsiyonel)\n"
             "• Yoğunluk: 500m² başına ağaç sayısı\n"
             "• Min mesafeler: Ağaç→bina ve ağaç→ağaç mesafesi\n\n"
-            "Çıktı: Nokta katmanı (height, source_type öznitelikleri)")
+            "Çıktı: Nokta katmanı (height, source_type öznitelikleri)"
+        )
+
     def createInstance(self):
         return LandscapeGeneratorAlgorithm()
+
     def tr(self, s):
-        return QCoreApplication.translate('Processing', s)
+        return QCoreApplication.translate("Processing", s)

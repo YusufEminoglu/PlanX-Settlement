@@ -6,14 +6,21 @@ Network tabanlı ön/yan/arka cephe sınıflandırması.
 Geliştirici: Araş.Gör. Yusuf Eminoğlu
 planX Geospatial Advanced Tools — Yerleşim Planı Araç Seti
 """
+
 import os, sys
-from qgis.PyQt.QtCore import QCoreApplication, QVariant
+from qgis.PyQt.QtCore import QCoreApplication
 from qgis.core import (
-    QgsProcessing, QgsProcessingAlgorithm,
-    QgsProcessingParameterFeatureSource, QgsProcessingParameterFeatureSink,
+    QgsProcessing,
+    QgsProcessingAlgorithm,
+    QgsProcessingParameterFeatureSource,
+    QgsProcessingParameterFeatureSink,
     QgsProcessingParameterNumber,
-    QgsFeature, QgsGeometry, QgsWkbTypes, QgsProcessingException,
-    QgsField, QgsFields, QgsFeatureSink, QgsPointXY
+    QgsFeature,
+    QgsGeometry,
+    QgsWkbTypes,
+    QgsProcessingException,
+    QgsFeatureSink,
+    QgsPointXY,
 )
 import math
 
@@ -21,28 +28,49 @@ _base = os.path.dirname(os.path.dirname(__file__))
 if _base not in sys.path:
     sys.path.insert(0, _base)
 
-from core.geometry_engine import get_polygon_edges, edge_midpoint, edge_direction_angle, compass_direction
-from core.attribute_manager import facade_attrs_from_classification
+from core.geometry_engine import (
+    get_polygon_edges,
+    edge_midpoint,
+    edge_direction_angle,
+    compass_direction,
+)
 
 
 class FacadeDetectorAlgorithm(QgsProcessingAlgorithm):
-    INPUT_PARCELS = 'INPUT_PARCELS'
-    INPUT_ROADS = 'INPUT_ROADS'
-    THRESHOLD = 'THRESHOLD'
-    OUTPUT = 'OUTPUT'
+    INPUT_PARCELS = "INPUT_PARCELS"
+    INPUT_ROADS = "INPUT_ROADS"
+    THRESHOLD = "THRESHOLD"
+    OUTPUT = "OUTPUT"
 
     def initAlgorithm(self, config=None):
-        self.addParameter(QgsProcessingParameterFeatureSource(
-            self.INPUT_PARCELS, self.tr('Parsel katmanı (Adım 1 çıktısı)'),
-            [QgsProcessing.TypeVectorPolygon]))
-        self.addParameter(QgsProcessingParameterFeatureSource(
-            self.INPUT_ROADS, self.tr('Yol ağı katmanı (çizgi)'),
-            [QgsProcessing.TypeVectorLine]))
-        self.addParameter(QgsProcessingParameterNumber(
-            self.THRESHOLD, self.tr('Ön cephe mesafe eşiği (m) — 0=otomatik'),
-            QgsProcessingParameterNumber.Double, 0.0, minValue=0.0))
-        self.addParameter(QgsProcessingParameterFeatureSink(
-            self.OUTPUT, self.tr('Cephe bilgili parseller')))
+        self.addParameter(
+            QgsProcessingParameterFeatureSource(
+                self.INPUT_PARCELS,
+                self.tr("Parsel katmanı (Adım 1 çıktısı)"),
+                [QgsProcessing.TypeVectorPolygon],
+            )
+        )
+        self.addParameter(
+            QgsProcessingParameterFeatureSource(
+                self.INPUT_ROADS,
+                self.tr("Yol ağı katmanı (çizgi)"),
+                [QgsProcessing.TypeVectorLine],
+            )
+        )
+        self.addParameter(
+            QgsProcessingParameterNumber(
+                self.THRESHOLD,
+                self.tr("Ön cephe mesafe eşiği (m) — 0=otomatik"),
+                QgsProcessingParameterNumber.Double,
+                0.0,
+                minValue=0.0,
+            )
+        )
+        self.addParameter(
+            QgsProcessingParameterFeatureSink(
+                self.OUTPUT, self.tr("Cephe bilgili parseller")
+            )
+        )
 
     def processAlgorithm(self, parameters, context, feedback):
         source = self.parameterAsSource(parameters, self.INPUT_PARCELS, context)
@@ -65,8 +93,13 @@ class FacadeDetectorAlgorithm(QgsProcessingAlgorithm):
         # Çıktı: aynı alanlar
         fields = source.fields()
         (sink, dest_id) = self.parameterAsSink(
-            parameters, self.OUTPUT, context,
-            fields, QgsWkbTypes.MultiPolygon, source.sourceCrs())
+            parameters,
+            self.OUTPUT,
+            context,
+            fields,
+            QgsWkbTypes.MultiPolygon,
+            source.sourceCrs(),
+        )
 
         total = source.featureCount() or 1
         for i, feat in enumerate(source.getFeatures()):
@@ -116,7 +149,8 @@ class FacadeDetectorAlgorithm(QgsProcessingAlgorithm):
                     front_mids = [edge_midpoint(*edges[fi]) for fi in front_indices]
                     avg_front = QgsPointXY(
                         sum(m.x() for m in front_mids) / len(front_mids),
-                        sum(m.y() for m in front_mids) / len(front_mids))
+                        sum(m.y() for m in front_mids) / len(front_mids),
+                    )
                     max_d = 0
                     back_idx = None
                     for idx in remaining:
@@ -149,18 +183,18 @@ class FacadeDetectorAlgorithm(QgsProcessingAlgorithm):
             # facade_front, facade_side, facade_back, facade_count, is_corner, front_direction
             fn = [f.name() for f in fields]
             fi_map = {n: idx for idx, n in enumerate(fn)}
-            if 'facade_front' in fi_map:
-                attrs[fi_map['facade_front']] = ','.join(str(x) for x in front_indices)
-            if 'facade_side' in fi_map:
-                attrs[fi_map['facade_side']] = ','.join(str(x) for x in side_indices)
-            if 'facade_back' in fi_map:
-                attrs[fi_map['facade_back']] = ','.join(str(x) for x in back_indices)
-            if 'facade_count' in fi_map:
-                attrs[fi_map['facade_count']] = len(front_indices)
-            if 'is_corner' in fi_map:
-                attrs[fi_map['is_corner']] = is_corner
-            if 'front_direction' in fi_map:
-                attrs[fi_map['front_direction']] = front_dir
+            if "facade_front" in fi_map:
+                attrs[fi_map["facade_front"]] = ",".join(str(x) for x in front_indices)
+            if "facade_side" in fi_map:
+                attrs[fi_map["facade_side"]] = ",".join(str(x) for x in side_indices)
+            if "facade_back" in fi_map:
+                attrs[fi_map["facade_back"]] = ",".join(str(x) for x in back_indices)
+            if "facade_count" in fi_map:
+                attrs[fi_map["facade_count"]] = len(front_indices)
+            if "is_corner" in fi_map:
+                attrs[fi_map["is_corner"]] = is_corner
+            if "front_direction" in fi_map:
+                attrs[fi_map["front_direction"]] = front_dir
             nf.setAttributes(attrs)
             sink.addFeature(nf, QgsFeatureSink.FastInsert)
             feedback.setProgress(int((i + 1) / total * 100))
@@ -169,13 +203,17 @@ class FacadeDetectorAlgorithm(QgsProcessingAlgorithm):
         return {self.OUTPUT: dest_id}
 
     def name(self):
-        return '2_facade_detector'
+        return "2_facade_detector"
+
     def displayName(self):
-        return '2. Cephe Tespiti (Ön/Yan/Arka)'
+        return "2. Cephe Tespiti (Ön/Yan/Arka)"
+
     def group(self):
-        return 'Yerleşim Planı İş Akışı'
+        return "Yerleşim Planı İş Akışı"
+
     def groupId(self):
-        return 'yerlesim_plani_workflow'
+        return "yerlesim_plani_workflow"
+
     def shortHelpString(self):
         return self.tr(
             "━━━ planX — Yerleşim Planı Araç Seti ━━━\n"
@@ -189,8 +227,11 @@ class FacadeDetectorAlgorithm(QgsProcessingAlgorithm):
             "Köşe parseli kuralları (İmar Yönetmeliği):\n"
             "• 1 ön cephe → 2 yan + 1 arka bahçe\n"
             "• 2 ön cephe (köşe) → 0 yan + 2 arka bahçe\n"
-            "• 3+ ön cephe → 0 yan + 1 arka bahçe")
+            "• 3+ ön cephe → 0 yan + 1 arka bahçe"
+        )
+
     def createInstance(self):
         return FacadeDetectorAlgorithm()
+
     def tr(self, s):
-        return QCoreApplication.translate('Processing', s)
+        return QCoreApplication.translate("Processing", s)
