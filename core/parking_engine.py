@@ -8,14 +8,14 @@ Desteklenen açılar: 90°, 60°, 45°.
 """
 
 import math
-from qgis.core import QgsGeometry, QgsPointXY, QgsRectangle
+from qgis.core import QgsGeometry, QgsPointXY
 
 
 # ── Standart otopark boyutları ──────────────────────────────────────────
 PARKING_PRESETS = {
-    90: {'stall_width': 2.5, 'stall_depth': 5.0, 'aisle_width': 6.0},
-    60: {'stall_width': 2.5, 'stall_depth': 5.5, 'aisle_width': 4.5},
-    45: {'stall_width': 2.5, 'stall_depth': 6.0, 'aisle_width': 3.6},
+    90: {"stall_width": 2.5, "stall_depth": 5.0, "aisle_width": 6.0},
+    60: {"stall_width": 2.5, "stall_depth": 5.5, "aisle_width": 4.5},
+    45: {"stall_width": 2.5, "stall_depth": 6.0, "aisle_width": 3.6},
 }
 
 
@@ -37,12 +37,12 @@ def compute_parking_axis(polygon_geom):
     if not obb or len(obb) < 5:
         bbox = polygon_geom.boundingBox()
         return {
-            'angle': 0.0,
-            'angle_deg': 0.0,
-            'length': bbox.width(),
-            'width': bbox.height(),
-            'center': QgsPointXY(bbox.center()),
-            'obb_geom': polygon_geom
+            "angle": 0.0,
+            "angle_deg": 0.0,
+            "length": bbox.width(),
+            "width": bbox.height(),
+            "center": QgsPointXY(bbox.center()),
+            "obb_geom": polygon_geom,
         }
 
     obb_geom, area, angle, width, height = obb
@@ -50,12 +50,12 @@ def compute_parking_axis(polygon_geom):
     short = min(width, height)
 
     return {
-        'angle': math.radians(angle),
-        'angle_deg': angle,
-        'length': length,
-        'width': short,
-        'center': obb_geom.centroid().asPoint(),
-        'obb_geom': obb_geom
+        "angle": math.radians(angle),
+        "angle_deg": angle,
+        "length": length,
+        "width": short,
+        "center": obb_geom.centroid().asPoint(),
+        "obb_geom": obb_geom,
     }
 
 
@@ -85,9 +85,15 @@ def _create_stall_rect(cx, cy, stall_w, stall_d, rotation_rad):
     return QgsGeometry.fromPolygonXY([rotated])
 
 
-def generate_parking_layout(polygon_geom, stall_width=2.5, stall_depth=5.0,
-                            aisle_width=6.0, parking_angle=90,
-                            stall_gap=0.1, edge_margin=0.5):
+def generate_parking_layout(
+    polygon_geom,
+    stall_width=2.5,
+    stall_depth=5.0,
+    aisle_width=6.0,
+    parking_angle=90,
+    stall_gap=0.1,
+    edge_margin=0.5,
+):
     """
     Poligon içinde parametrik otopark stall düzeni üretir.
 
@@ -119,13 +125,13 @@ def generate_parking_layout(polygon_geom, stall_width=2.5, stall_depth=5.0,
     if edge_margin > 0:
         working_geom = polygon_geom.buffer(-edge_margin, 8)
         if working_geom.isEmpty():
-            return {'stalls': [], 'aisles': [], 'total_stalls': 0, 'efficiency': 0}
+            return {"stalls": [], "aisles": [], "total_stalls": 0, "efficiency": 0}
     else:
         working_geom = polygon_geom
 
     # Ana eksen bilgileri
     axis = compute_parking_axis(working_geom)
-    rotation = axis['angle']
+    rotation = axis["angle"]
 
     # Parking angle → stall döndürme
     parking_rad = math.radians(parking_angle)
@@ -135,9 +141,9 @@ def generate_parking_layout(polygon_geom, stall_width=2.5, stall_depth=5.0,
     module_width = 2 * stall_depth + aisle_width
 
     # OBB'nin uzun ve kısa kenarları
-    long_side = axis['length']
-    short_side = axis['width']
-    center = axis['center']
+    long_side = axis["length"]
+    short_side = axis["width"]
+    center = axis["center"]
 
     # Kaç modül sığar (kısa kenar boyunca)
     n_modules = int(short_side / module_width)
@@ -181,7 +187,7 @@ def generate_parking_layout(polygon_geom, stall_width=2.5, stall_depth=5.0,
             if row == 0:
                 row_offset = -(aisle_width / 2.0 + stall_depth / 2.0)
             else:
-                row_offset = (aisle_width / 2.0 + stall_depth / 2.0)
+                row_offset = aisle_width / 2.0 + stall_depth / 2.0
 
             row_cx = mcx + row_offset * cos_rp
             row_cy = mcy + row_offset * sin_rp
@@ -195,8 +201,12 @@ def generate_parking_layout(polygon_geom, stall_width=2.5, stall_depth=5.0,
                 sy = row_cy + stall_along * sin_r
 
                 stall_geom = _create_stall_rect(
-                    sx, sy, stall_width, stall_depth,
-                    rotation + (math.pi / 2 - parking_rad if parking_angle != 90 else 0)
+                    sx,
+                    sy,
+                    stall_width,
+                    stall_depth,
+                    rotation
+                    + (math.pi / 2 - parking_rad if parking_angle != 90 else 0),
                 )
 
                 # Poligon içinde mi?
@@ -205,18 +215,18 @@ def generate_parking_layout(polygon_geom, stall_width=2.5, stall_depth=5.0,
                 else:
                     intersection = stall_geom.intersection(working_geom)
                     # En az %80 alanı kalıyorsa kabul et
-                    if (not intersection.isEmpty() and
-                            intersection.area() > stall_geom.area() * 0.8):
+                    if (
+                        not intersection.isEmpty()
+                        and intersection.area() > stall_geom.area() * 0.8
+                    ):
                         stalls.append(stall_geom)
 
         # Aisle center line
         aisle_start = QgsPointXY(
-            mcx - (long_side / 2.0) * cos_r,
-            mcy - (long_side / 2.0) * sin_r
+            mcx - (long_side / 2.0) * cos_r, mcy - (long_side / 2.0) * sin_r
         )
         aisle_end = QgsPointXY(
-            mcx + (long_side / 2.0) * cos_r,
-            mcy + (long_side / 2.0) * sin_r
+            mcx + (long_side / 2.0) * cos_r, mcy + (long_side / 2.0) * sin_r
         )
         aisle_line = QgsGeometry.fromPolylineXY([aisle_start, aisle_end])
         aisle_clipped = aisle_line.intersection(working_geom)
@@ -228,8 +238,8 @@ def generate_parking_layout(polygon_geom, stall_width=2.5, stall_depth=5.0,
     efficiency = total_stall_area / total_area if total_area > 0 else 0
 
     return {
-        'stalls': stalls,
-        'aisles': aisle_lines,
-        'total_stalls': len(stalls),
-        'efficiency': round(efficiency, 3)
+        "stalls": stalls,
+        "aisles": aisle_lines,
+        "total_stalls": len(stalls),
+        "efficiency": round(efficiency, 3),
     }

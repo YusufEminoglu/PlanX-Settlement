@@ -14,82 +14,153 @@ import math
 import random
 from qgis.PyQt.QtCore import QCoreApplication, QVariant
 from qgis.core import (
-    QgsProcessing, QgsProcessingAlgorithm,
-    QgsProcessingParameterFeatureSource, QgsProcessingParameterFeatureSink,
-    QgsProcessingParameterNumber, QgsProcessingParameterBoolean,
-    QgsFeature, QgsGeometry, QgsWkbTypes, QgsProcessingException,
-    QgsField, QgsFields, QgsVectorLayer, QgsFeatureSink, QgsPointXY,
-    QgsLineString, QgsProcessingMultiStepFeedback, QgsSpatialIndex
+    QgsProcessing,
+    QgsProcessingAlgorithm,
+    QgsProcessingParameterFeatureSource,
+    QgsProcessingParameterFeatureSink,
+    QgsProcessingParameterNumber,
+    QgsProcessingParameterBoolean,
+    QgsFeature,
+    QgsGeometry,
+    QgsWkbTypes,
+    QgsProcessingException,
+    QgsField,
+    QgsVectorLayer,
+    QgsFeatureSink,
+    QgsPointXY,
+    QgsLineString,
+    QgsProcessingMultiStepFeedback,
+    QgsSpatialIndex,
 )
 
 
 class ParcelFluxAlgorithm(QgsProcessingAlgorithm):
-    INPUT = 'INPUT'
-    OUTPUT = 'OUTPUT'
-    LOT_WIDTH = 'LOT_WIDTH'
-    MIN_AREA = 'MIN_AREA'
-    MAX_AREA = 'MAX_AREA'
-    MERGE_THRESHOLD = 'MERGE_THRESHOLD'
-    UNIFORM_CORNERS = 'UNIFORM_CORNERS'
-    WIDTH_VARIATION = 'WIDTH_VARIATION'
-    FISHBONE_OFFSET = 'FISHBONE_OFFSET'
-    ROW_WIDTH_ASYMMETRY = 'ROW_WIDTH_ASYMMETRY'
-    HLINE_OFFSET = 'HLINE_OFFSET'
+    INPUT = "INPUT"
+    OUTPUT = "OUTPUT"
+    LOT_WIDTH = "LOT_WIDTH"
+    MIN_AREA = "MIN_AREA"
+    MAX_AREA = "MAX_AREA"
+    MERGE_THRESHOLD = "MERGE_THRESHOLD"
+    UNIFORM_CORNERS = "UNIFORM_CORNERS"
+    WIDTH_VARIATION = "WIDTH_VARIATION"
+    FISHBONE_OFFSET = "FISHBONE_OFFSET"
+    ROW_WIDTH_ASYMMETRY = "ROW_WIDTH_ASYMMETRY"
+    HLINE_OFFSET = "HLINE_OFFSET"
 
     def initAlgorithm(self, config=None):
-        self.addParameter(QgsProcessingParameterFeatureSource(
-            self.INPUT, self.tr('Girdi poligon katmanı (imar adası)'),
-            [QgsProcessing.TypeVectorPolygon]))
-        self.addParameter(QgsProcessingParameterNumber(
-            self.LOT_WIDTH,
-            self.tr('Hedef parsel genişliği (m) — 16m konut alanında yaygın'),
-            QgsProcessingParameterNumber.Double, 16.0, minValue=5.0))
-        self.addParameter(QgsProcessingParameterNumber(
-            self.MIN_AREA,
-            self.tr('Minimum parsel alanı (m²) — bundan küçük parseller birleştirilir'),
-            QgsProcessingParameterNumber.Double, 300.0, minValue=0.0))
-        self.addParameter(QgsProcessingParameterNumber(
-            self.MAX_AREA,
-            self.tr('Maksimum parsel alanı (m²) — filtreleme üst sınırı'),
-            QgsProcessingParameterNumber.Double, 2000.0, minValue=0.0))
-        self.addParameter(QgsProcessingParameterNumber(
-            self.MERGE_THRESHOLD,
-            self.tr('Küçük parsel birleştirme eşiği (ort. alanın %) — yüksek değer daha agresif birleştirir'),
-            QgsProcessingParameterNumber.Double, 35.0,
-            minValue=0.0, maxValue=100.0))
-        self.addParameter(QgsProcessingParameterBoolean(
-            self.UNIFORM_CORNERS,
-            self.tr('Köşeleri merkeze göre eşit dağıt — kapatıldığında parsel sıralaması bir kenardan başlar'),
-            defaultValue=True))
-        self.addParameter(QgsProcessingParameterNumber(
-            self.WIDTH_VARIATION,
-            self.tr('Parsel genişliği varyasyonu (%) — 0=sabit, 15=±%15 (18m vs 23m gibi doğal çeşitlilik)'),
-            QgsProcessingParameterNumber.Double, 0.0,
-            minValue=0.0, maxValue=25.0))
-        self.addParameter(QgsProcessingParameterNumber(
-            self.FISHBONE_OFFSET,
-            self.tr('Fishbone sınır offset (%) — bölme çizgilerindeki organik kayma, 0=düz'),
-            QgsProcessingParameterNumber.Double, 0.0,
-            minValue=0.0, maxValue=15.0))
-        self.addParameter(QgsProcessingParameterNumber(
-            self.ROW_WIDTH_ASYMMETRY,
-            self.tr(
-                'Sıra genişlik asimetrisi (%) — ÖN BAHÇE genişlik farkı\n'
-                '0 = tüm parseller aynı genişlikte\n'
-                '10 = ±%10 → 20m lot ise: bir sıra ~22m, karşı sıra ~18m\n'
-                'North cepheli parseller ile South cepheli parsellerin\n'
-                'ön bahçe genişliklerinin farklı olmasını sağlar'),
-            QgsProcessingParameterNumber.Double, 0.0,
-            minValue=0.0, maxValue=25.0))
-        self.addParameter(QgsProcessingParameterNumber(
-            self.HLINE_OFFSET,
-            self.tr(
-                'Ortadan bölen çizgi (h-line) kayması (%) — 0=tam orta\n'
-                'Arka bahçe sınır çizgisini merkezden kaydırır'),
-            QgsProcessingParameterNumber.Double, 0.0,
-            minValue=0.0, maxValue=25.0))
-        self.addParameter(QgsProcessingParameterFeatureSink(
-            self.OUTPUT, self.tr('Çıktı parseller')))
+        self.addParameter(
+            QgsProcessingParameterFeatureSource(
+                self.INPUT,
+                self.tr("Girdi poligon katmanı (imar adası)"),
+                [QgsProcessing.TypeVectorPolygon],
+            )
+        )
+        self.addParameter(
+            QgsProcessingParameterNumber(
+                self.LOT_WIDTH,
+                self.tr("Hedef parsel genişliği (m) — 16m konut alanında yaygın"),
+                QgsProcessingParameterNumber.Double,
+                16.0,
+                minValue=5.0,
+            )
+        )
+        self.addParameter(
+            QgsProcessingParameterNumber(
+                self.MIN_AREA,
+                self.tr(
+                    "Minimum parsel alanı (m²) — bundan küçük parseller birleştirilir"
+                ),
+                QgsProcessingParameterNumber.Double,
+                300.0,
+                minValue=0.0,
+            )
+        )
+        self.addParameter(
+            QgsProcessingParameterNumber(
+                self.MAX_AREA,
+                self.tr("Maksimum parsel alanı (m²) — filtreleme üst sınırı"),
+                QgsProcessingParameterNumber.Double,
+                2000.0,
+                minValue=0.0,
+            )
+        )
+        self.addParameter(
+            QgsProcessingParameterNumber(
+                self.MERGE_THRESHOLD,
+                self.tr(
+                    "Küçük parsel birleştirme eşiği (ort. alanın %) — yüksek değer daha agresif birleştirir"
+                ),
+                QgsProcessingParameterNumber.Double,
+                35.0,
+                minValue=0.0,
+                maxValue=100.0,
+            )
+        )
+        self.addParameter(
+            QgsProcessingParameterBoolean(
+                self.UNIFORM_CORNERS,
+                self.tr(
+                    "Köşeleri merkeze göre eşit dağıt — kapatıldığında parsel sıralaması bir kenardan başlar"
+                ),
+                defaultValue=True,
+            )
+        )
+        self.addParameter(
+            QgsProcessingParameterNumber(
+                self.WIDTH_VARIATION,
+                self.tr(
+                    "Parsel genişliği varyasyonu (%) — 0=sabit, 15=±%15 (18m vs 23m gibi doğal çeşitlilik)"
+                ),
+                QgsProcessingParameterNumber.Double,
+                0.0,
+                minValue=0.0,
+                maxValue=25.0,
+            )
+        )
+        self.addParameter(
+            QgsProcessingParameterNumber(
+                self.FISHBONE_OFFSET,
+                self.tr(
+                    "Fishbone sınır offset (%) — bölme çizgilerindeki organik kayma, 0=düz"
+                ),
+                QgsProcessingParameterNumber.Double,
+                0.0,
+                minValue=0.0,
+                maxValue=15.0,
+            )
+        )
+        self.addParameter(
+            QgsProcessingParameterNumber(
+                self.ROW_WIDTH_ASYMMETRY,
+                self.tr(
+                    "Sıra genişlik asimetrisi (%) — ÖN BAHÇE genişlik farkı\n"
+                    "0 = tüm parseller aynı genişlikte\n"
+                    "10 = ±%10 → 20m lot ise: bir sıra ~22m, karşı sıra ~18m\n"
+                    "North cepheli parseller ile South cepheli parsellerin\n"
+                    "ön bahçe genişliklerinin farklı olmasını sağlar"
+                ),
+                QgsProcessingParameterNumber.Double,
+                0.0,
+                minValue=0.0,
+                maxValue=25.0,
+            )
+        )
+        self.addParameter(
+            QgsProcessingParameterNumber(
+                self.HLINE_OFFSET,
+                self.tr(
+                    "Ortadan bölen çizgi (h-line) kayması (%) — 0=tam orta\n"
+                    "Arka bahçe sınır çizgisini merkezden kaydırır"
+                ),
+                QgsProcessingParameterNumber.Double,
+                0.0,
+                minValue=0.0,
+                maxValue=25.0,
+            )
+        )
+        self.addParameter(
+            QgsProcessingParameterFeatureSink(self.OUTPUT, self.tr("Çıktı parseller"))
+        )
 
     def processAlgorithm(self, parameters, context, feedback):
         feedback = QgsProcessingMultiStepFeedback(30, feedback)
@@ -101,8 +172,12 @@ class ParcelFluxAlgorithm(QgsProcessingAlgorithm):
         lot_width = self.parameterAsDouble(parameters, self.LOT_WIDTH, context)
         min_area = self.parameterAsDouble(parameters, self.MIN_AREA, context)
         max_area = self.parameterAsDouble(parameters, self.MAX_AREA, context)
-        merge_threshold = self.parameterAsDouble(parameters, self.MERGE_THRESHOLD, context) / 100.0
-        uniform_corners = self.parameterAsBool(parameters, self.UNIFORM_CORNERS, context)
+        merge_threshold = (
+            self.parameterAsDouble(parameters, self.MERGE_THRESHOLD, context) / 100.0
+        )
+        uniform_corners = self.parameterAsBool(
+            parameters, self.UNIFORM_CORNERS, context
+        )
         width_var = self.parameterAsDouble(parameters, self.WIDTH_VARIATION, context)
         fishbone = self.parameterAsDouble(parameters, self.FISHBONE_OFFSET, context)
         row_asym = self.parameterAsDouble(parameters, self.ROW_WIDTH_ASYMMETRY, context)
@@ -115,29 +190,37 @@ class ParcelFluxAlgorithm(QgsProcessingAlgorithm):
         feedback.pushInfo(
             f"Girdi: {len(features)} ada | Genişlik: {lot_width}m | "
             f"Genişlik varyasyonu: ±{width_var}% | Fishbone: {fishbone}% | "
-            f"Sıra genişlik asimetrisi: ±{row_asym}% | H-line kayması: ±{hline_off}%")
+            f"Sıra genişlik asimetrisi: ±{row_asym}% | H-line kayması: ±{hline_off}%"
+        )
 
         # Çıktı alanları — orijinal + cephe hazırlık alanları
         fields = source.fields()
-        fields.append(QgsField('aream2', QVariant.Double, 'double', 20, 2))
-        fields.append(QgsField('facade_front', QVariant.String, 'string', 100))
-        fields.append(QgsField('facade_side', QVariant.String, 'string', 100))
-        fields.append(QgsField('facade_back', QVariant.String, 'string', 100))
-        fields.append(QgsField('facade_count', QVariant.Int))
-        fields.append(QgsField('is_corner', QVariant.Bool))
-        fields.append(QgsField('front_direction', QVariant.String, 'string', 20))
+        fields.append(QgsField("aream2", QVariant.Double, "double", 20, 2))
+        fields.append(QgsField("facade_front", QVariant.String, "string", 100))
+        fields.append(QgsField("facade_side", QVariant.String, "string", 100))
+        fields.append(QgsField("facade_back", QVariant.String, "string", 100))
+        fields.append(QgsField("facade_count", QVariant.Int))
+        fields.append(QgsField("is_corner", QVariant.Bool))
+        fields.append(QgsField("front_direction", QVariant.String, "string", 20))
 
         (sink, dest_id) = self.parameterAsSink(
-            parameters, self.OUTPUT, context,
-            fields, QgsWkbTypes.MultiPolygon, source.sourceCrs())
+            parameters,
+            self.OUTPUT,
+            context,
+            fields,
+            QgsWkbTypes.MultiPolygon,
+            source.sourceCrs(),
+        )
         if sink is None:
             raise QgsProcessingException(self.tr("Çıktı katmanı oluşturulamadı."))
 
         # ═══ Poligonları hazırla ═══
         regular_layer = QgsVectorLayer(
-            "Polygon?crs=" + source.sourceCrs().authid(), "regular", "memory")
+            "Polygon?crs=" + source.sourceCrs().authid(), "regular", "memory"
+        )
         irregular_layer = QgsVectorLayer(
-            "Polygon?crs=" + source.sourceCrs().authid(), "irregular", "memory")
+            "Polygon?crs=" + source.sourceCrs().authid(), "irregular", "memory"
+        )
         reg_prov = regular_layer.dataProvider()
         irr_prov = irregular_layer.dataProvider()
         reg_prov.addAttributes(source.fields())
@@ -167,12 +250,18 @@ class ParcelFluxAlgorithm(QgsProcessingAlgorithm):
 
         if has_irregular:
             feedback.pushInfo("Düzensiz poligonlar OBB ile işleniyor...")
-            omb_result = processing.run("native:orientedminimumboundingbox",
-                {'INPUT': irregular_layer, 'OUTPUT': 'memory:'},
-                context=context, feedback=feedback)
-            merged_layer = processing.run("native:mergevectorlayers",
-                {'LAYERS': [regular_layer, omb_result['OUTPUT']], 'OUTPUT': 'memory:'},
-                context=context, feedback=feedback)['OUTPUT']
+            omb_result = processing.run(
+                "native:orientedminimumboundingbox",
+                {"INPUT": irregular_layer, "OUTPUT": "memory:"},
+                context=context,
+                feedback=feedback,
+            )
+            merged_layer = processing.run(
+                "native:mergevectorlayers",
+                {"LAYERS": [regular_layer, omb_result["OUTPUT"]], "OUTPUT": "memory:"},
+                context=context,
+                feedback=feedback,
+            )["OUTPUT"]
         else:
             merged_layer = regular_layer
         feedback.setCurrentStep(5)
@@ -180,9 +269,11 @@ class ParcelFluxAlgorithm(QgsProcessingAlgorithm):
         # ═══ Bölme çizgileri oluştur ═══
         feedback.pushInfo("Bölme çizgileri oluşturuluyor...")
         h_layer = QgsVectorLayer(
-            "LineString?crs=" + source.sourceCrs().authid(), "h", "memory")
+            "LineString?crs=" + source.sourceCrs().authid(), "h", "memory"
+        )
         p_layer = QgsVectorLayer(
-            "LineString?crs=" + source.sourceCrs().authid(), "p", "memory")
+            "LineString?crs=" + source.sourceCrs().authid(), "p", "memory"
+        )
         h_prov = h_layer.dataProvider()
         p_prov = p_layer.dataProvider()
         h_prov.addAttributes([QgsField("polygon_id", QVariant.Int)])
@@ -208,7 +299,6 @@ class ParcelFluxAlgorithm(QgsProcessingAlgorithm):
 
                 # Kısa kenarlar = bölme yönü perpendicular olacak kenarlar
                 shortest_sides = sides[:2]
-                long_side_len = sides[-1][1] if sides else 0
 
                 # ═══ H-line kayması (opsiyonel) ═══
                 if hline_off > 0:
@@ -239,12 +329,16 @@ class ParcelFluxAlgorithm(QgsProcessingAlgorithm):
                 max_width = max(sides[0][1], sides[1][1])
                 line_length = division_line.length()
                 perp_angle = angle + math.pi / 2
-                half_ext = max_width * 0.75  # Yarım uzunluk — daha geniş (önceki 0.6 yetersiz kalıyordu)
+                half_ext = (
+                    max_width * 0.75
+                )  # Yarım uzunluk — daha geniş (önceki 0.6 yetersiz kalıyordu)
 
                 # ═══ Tek sıra / çift sıra tespiti ═══
                 is_single_row = max_width < (lot_width * 1.8)
                 if is_single_row:
-                    feedback.pushInfo(f"  Ada {feature.id()}: tek sıra mod (kısa kenar: {max_width:.1f}m)")
+                    feedback.pushInfo(
+                        f"  Ada {feature.id()}: tek sıra mod (kısa kenar: {max_width:.1f}m)"
+                    )
 
                 # ═══ Sıra genişlik asimetrisi ═══
                 # İki sıra için farklı parsel genişlikleri hesapla
@@ -254,7 +348,8 @@ class ParcelFluxAlgorithm(QgsProcessingAlgorithm):
                     width_side_B = lot_width * (1 - shift_pct)  # Örn: 18m
                     feedback.pushInfo(
                         f"  Ada {feature.id()}: sıra asimetrisi → "
-                        f"A={width_side_A:.1f}m, B={width_side_B:.1f}m")
+                        f"A={width_side_A:.1f}m, B={width_side_B:.1f}m"
+                    )
                 else:
                     width_side_A = lot_width
                     width_side_B = lot_width
@@ -264,11 +359,14 @@ class ParcelFluxAlgorithm(QgsProcessingAlgorithm):
                 def _make_widths(base_w, n_seg):
                     """Genişlik varyasyonlu segment listesi."""
                     if width_var > 0 and n_seg > 1:
-                        ws = [base_w * (1 + rng.uniform(-width_var, width_var) / 100.0)
-                              for _ in range(n_seg)]
-                        rem = line_length - sum(ws)
+                        ws = [
+                            base_w * (1 + rng.uniform(-width_var, width_var) / 100.0)
+                            for _ in range(n_seg)
+                        ]
                         if sum(ws) > 0:
-                            sc = (line_length - (line_length - n_seg * base_w) / 2) / sum(ws)
+                            sc = (
+                                line_length - (line_length - n_seg * base_w) / 2
+                            ) / sum(ws)
                             ws = [w * sc for w in ws]
                         return ws
                     return [base_w] * n_seg
@@ -280,7 +378,9 @@ class ParcelFluxAlgorithm(QgsProcessingAlgorithm):
                     by = pt.y() + fish_off * math.sin(par_angle)
                     ex = bx + direction * half_ext * math.cos(perp_angle)
                     ey = by + direction * half_ext * math.sin(perp_angle)
-                    hl = QgsGeometry.fromPolylineXY([QgsPointXY(bx, by), QgsPointXY(ex, ey)])
+                    hl = QgsGeometry.fromPolylineXY(
+                        [QgsPointXY(bx, by), QgsPointXY(ex, ey)]
+                    )
                     feat = QgsFeature()
                     feat.setGeometry(hl)
                     feat.setAttributes([feature.id()])
@@ -297,7 +397,11 @@ class ParcelFluxAlgorithm(QgsProcessingAlgorithm):
                     for i in range(n_seg_A - 1):
                         cum_A += widths_A[i]
                         pt = division_line.interpolate(cum_A).asPoint()
-                        fish = rng.uniform(-fishbone_max, fishbone_max) if fishbone > 0 else 0
+                        fish = (
+                            rng.uniform(-fishbone_max, fishbone_max)
+                            if fishbone > 0
+                            else 0
+                        )
                         _add_half_line(pt, +1.0, fish)
 
                     # Taraf B (perp_angle karşı yönü, -1)
@@ -309,7 +413,11 @@ class ParcelFluxAlgorithm(QgsProcessingAlgorithm):
                     for i in range(n_seg_B - 1):
                         cum_B += widths_B[i]
                         pt = division_line.interpolate(cum_B).asPoint()
-                        fish = rng.uniform(-fishbone_max, fishbone_max) if fishbone > 0 else 0
+                        fish = (
+                            rng.uniform(-fishbone_max, fishbone_max)
+                            if fishbone > 0
+                            else 0
+                        )
                         _add_half_line(pt, -1.0, fish)
                 else:
                     # ═══ NORMAL MODE: Tek düz çizgi (mevcut davranış) ═══
@@ -343,7 +451,8 @@ class ParcelFluxAlgorithm(QgsProcessingAlgorithm):
                             y2 = point.y() - ext_w / 2 * math.sin(perp_angle)
 
                         pl = QgsGeometry.fromPolylineXY(
-                            [QgsPointXY(x1, y1), QgsPointXY(x2, y2)])
+                            [QgsPointXY(x1, y1), QgsPointXY(x2, y2)]
+                        )
                         pf = QgsFeature()
                         pf.setGeometry(pl)
                         pf.setAttributes([feature.id()])
@@ -352,31 +461,60 @@ class ParcelFluxAlgorithm(QgsProcessingAlgorithm):
         feedback.setCurrentStep(10)
         feedback.pushInfo("Çizgiler uzatılıyor...")
 
-        ext_h = processing.run("native:extendlines",
-            {'INPUT': h_layer, 'START_DISTANCE': 0.05,
-             'END_DISTANCE': 0.05, 'OUTPUT': 'memory:'},
-            context=context, feedback=feedback)['OUTPUT']
-        ext_p = processing.run("native:extendlines",
-            {'INPUT': p_layer, 'START_DISTANCE': 0.05,
-             'END_DISTANCE': 0.05, 'OUTPUT': 'memory:'},
-            context=context, feedback=feedback)['OUTPUT']
+        ext_h = processing.run(
+            "native:extendlines",
+            {
+                "INPUT": h_layer,
+                "START_DISTANCE": 0.05,
+                "END_DISTANCE": 0.05,
+                "OUTPUT": "memory:",
+            },
+            context=context,
+            feedback=feedback,
+        )["OUTPUT"]
+        ext_p = processing.run(
+            "native:extendlines",
+            {
+                "INPUT": p_layer,
+                "START_DISTANCE": 0.05,
+                "END_DISTANCE": 0.05,
+                "OUTPUT": "memory:",
+            },
+            context=context,
+            feedback=feedback,
+        )["OUTPUT"]
 
-        merged_lines = processing.run("native:mergevectorlayers",
-            {'LAYERS': [ext_h, ext_p], 'OUTPUT': 'memory:'},
-            context=context, feedback=feedback)['OUTPUT']
+        merged_lines = processing.run(
+            "native:mergevectorlayers",
+            {"LAYERS": [ext_h, ext_p], "OUTPUT": "memory:"},
+            context=context,
+            feedback=feedback,
+        )["OUTPUT"]
 
-        clipped_lines = processing.run("native:clip",
-            {'INPUT': merged_lines, 'OVERLAY': parameters[self.INPUT],
-             'OUTPUT': 'memory:'},
-            context=context, feedback=feedback)['OUTPUT']
+        clipped_lines = processing.run(
+            "native:clip",
+            {
+                "INPUT": merged_lines,
+                "OVERLAY": parameters[self.INPUT],
+                "OUTPUT": "memory:",
+            },
+            context=context,
+            feedback=feedback,
+        )["OUTPUT"]
 
         feedback.setCurrentStep(18)
         feedback.pushInfo("Poligonlar bölünüyor...")
 
-        split_polygons = processing.run("native:splitwithlines",
-            {'INPUT': parameters[self.INPUT], 'LINES': clipped_lines,
-             'OUTPUT': 'memory:'},
-            context=context, feedback=feedback)['OUTPUT']
+        split_polygons = processing.run(
+            "native:splitwithlines",
+            {
+                "INPUT": parameters[self.INPUT],
+                "LINES": clipped_lines,
+                "OUTPUT": "memory:",
+            },
+            context=context,
+            feedback=feedback,
+        )["OUTPUT"]
 
         feedback.setCurrentStep(22)
 
@@ -442,23 +580,32 @@ class ParcelFluxAlgorithm(QgsProcessingAlgorithm):
                 else:
                     merged.append(f)
                     processed.add(fid)
-            return merged, sum(1 for _ in processed if _ in areas and areas.get(_, 999) < threshold_val) // 2
+            return merged, sum(
+                1 for _ in processed if _ in areas and areas.get(_, 999) < threshold_val
+            ) // 2
 
         fc = split_polygons.featureCount()
-        ta = sum(f.geometry().area() for f in split_polygons.getFeatures() if f.geometry())
+        ta = sum(
+            f.geometry().area() for f in split_polygons.getFeatures() if f.geometry()
+        )
         thresh = merge_threshold * (ta / fc) if fc > 0 else 0
 
         # 3 geçiş — artık üçgenler ve dar şeritler dahil
         current_layer = split_polygons
         for pass_num in range(3):
             m, mc = merge_small(current_layer, thresh, min_area)
-            feedback.pushInfo(f"  Geçiş {pass_num+1}: {mc} parsel birleştirildi.")
+            feedback.pushInfo(f"  Geçiş {pass_num + 1}: {mc} parsel birleştirildi.")
             if mc == 0:
                 break
             temp = QgsVectorLayer(
-                "Polygon?crs=" + source.sourceCrs().authid(), f"pass{pass_num}", "memory")
+                "Polygon?crs=" + source.sourceCrs().authid(),
+                f"pass{pass_num}",
+                "memory",
+            )
             tp = temp.dataProvider()
-            tp.addAttributes(split_polygons.fields() if pass_num == 0 else current_layer.fields())
+            tp.addAttributes(
+                split_polygons.fields() if pass_num == 0 else current_layer.fields()
+            )
             temp.updateFields()
             tp.addFeatures(m)
             current_layer = temp
@@ -468,7 +615,9 @@ class ParcelFluxAlgorithm(QgsProcessingAlgorithm):
             thresh = merge_threshold * (ta2 / fc2) if fc2 > 0 else 0
 
         # Son liste
-        final_features = m if mc > 0 or pass_num == 0 else list(current_layer.getFeatures())
+        final_features = (
+            m if mc > 0 or pass_num == 0 else list(current_layer.getFeatures())
+        )
         feedback.setCurrentStep(28)
 
         # ═══ Çıktı üret ═══
@@ -490,8 +639,8 @@ class ParcelFluxAlgorithm(QgsProcessingAlgorithm):
             src_attrs = feat.attributes()
             while len(src_attrs) < source.fields().count():
                 src_attrs.append(None)
-            src_attrs = src_attrs[:source.fields().count()]
-            attrs = src_attrs + [round(area, 2), '', '', '', 0, False, '']
+            src_attrs = src_attrs[: source.fields().count()]
+            attrs = src_attrs + [round(area, 2), "", "", "", 0, False, ""]
             nf.setAttributes(attrs)
             sink.addFeature(nf, QgsFeatureSink.FastInsert)
             count += 1
@@ -500,16 +649,16 @@ class ParcelFluxAlgorithm(QgsProcessingAlgorithm):
         return {self.OUTPUT: dest_id}
 
     def name(self):
-        return '1_parcel_flux'
+        return "1_parcel_flux"
 
     def displayName(self):
-        return '1. ParcelFlux — Ada→Parsel Bölme'
+        return "1. ParcelFlux — Ada→Parsel Bölme"
 
     def group(self):
-        return 'Yerleşim Planı İş Akışı'
+        return "Yerleşim Planı İş Akışı"
 
     def groupId(self):
-        return 'yerlesim_plani_workflow'
+        return "yerlesim_plani_workflow"
 
     def shortHelpString(self):
         return self.tr(
@@ -534,10 +683,11 @@ class ParcelFluxAlgorithm(QgsProcessingAlgorithm):
             "  İki tarafta FARKLI SAYIDA parsel oluşabilir.\n\n"
             "• H-line kayması: Opsiyonel, arka bahçe sınırını\n"
             "  merkezden kaydırır (derinlik farkı)\n\n"
-            "Çıktı: Cephe sütunları boş gelir → Adım 2'de doldurulur.")
+            "Çıktı: Cephe sütunları boş gelir → Adım 2'de doldurulur."
+        )
 
     def createInstance(self):
         return ParcelFluxAlgorithm()
 
     def tr(self, string):
-        return QCoreApplication.translate('Processing', string)
+        return QCoreApplication.translate("Processing", string)

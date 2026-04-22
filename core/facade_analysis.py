@@ -12,14 +12,13 @@ Planlı Alanlar İmar Yönetmeliği kuralları uygulanır.
 """
 
 import math
-from qgis.core import (
-    QgsGeometry, QgsPointXY, QgsFeatureRequest,
-    QgsSpatialIndex, QgsWkbTypes
-)
+from qgis.core import QgsGeometry, QgsPointXY
 
 from .geometry_engine import (
-    get_polygon_edges, edge_midpoint, edge_direction_angle,
-    compass_direction, edge_length
+    get_polygon_edges,
+    edge_midpoint,
+    edge_direction_angle,
+    compass_direction,
 )
 
 
@@ -62,7 +61,7 @@ def detect_front_facades(parcel_geom, road_layer, threshold=None):
         mid_geom = QgsGeometry.fromPointXY(mid)
 
         # En yakın yol feature'ına mesafe
-        min_dist = float('inf')
+        min_dist = float("inf")
         for road_feat in road_layer.getFeatures():
             road_geom = road_feat.geometry()
             dist = mid_geom.distance(road_geom)
@@ -77,8 +76,7 @@ def detect_front_facades(parcel_geom, road_layer, threshold=None):
     return front_indices
 
 
-def classify_all_edges(parcel_geom, front_indices, parcel_layer=None,
-                       parcel_fid=None):
+def classify_all_edges(parcel_geom, front_indices, parcel_layer=None, parcel_fid=None):
     """
     Parsel kenarlarını ön/yan/arka olarak sınıflandırır.
 
@@ -125,7 +123,7 @@ def classify_all_edges(parcel_geom, front_indices, parcel_layer=None,
             front_midpoints = [edge_midpoint(*edges[i]) for i in front_indices]
             avg_front = QgsPointXY(
                 sum(m.x() for m in front_midpoints) / len(front_midpoints),
-                sum(m.y() for m in front_midpoints) / len(front_midpoints)
+                sum(m.y() for m in front_midpoints) / len(front_midpoints),
             )
 
             # Ön cephe ortalama noktasından en uzak kenar = arka cephe
@@ -163,10 +161,10 @@ def classify_all_edges(parcel_geom, front_indices, parcel_layer=None,
         front_direction = "belirsiz"
 
     return {
-        'front': sorted(front_indices),
-        'side': side_indices,
-        'back': back_indices,
-        'facade_count': n_front,
-        'is_corner': is_corner,
-        'front_direction': front_direction
+        "front": sorted(front_indices),
+        "side": side_indices,
+        "back": back_indices,
+        "facade_count": n_front,
+        "is_corner": is_corner,
+        "front_direction": front_direction,
     }
