@@ -32,20 +32,24 @@ def _load_module(module_name, file_path):
 
 # ── Algoritma tanımları: (dosya_adı, sınıf_adı, ikon_dosyası) ──────────────
 _ALGORITHMS = [
-    ("step_1_parcel_flux",        "ParcelFluxAlgorithm",        "icon_step_1.svg"),
-    ("step_2_facade_detector",    "FacadeDetectorAlgorithm",    "icon_step_2.svg"),
+    ("step_1_parcel_flux", "ParcelFluxAlgorithm", "icon_step_1.svg"),
+    ("step_2_facade_detector", "FacadeDetectorAlgorithm", "icon_step_2.svg"),
     ("step_3_coverage_footprint", "CoverageFootprintAlgorithm", "icon_step_3.svg"),
-    ("step_3b_building_macroform","BuildingMacroformAlgorithm", "icon_step_3b.svg"),
-    ("step_3c_dynamic_macroform", "DynamicMacroformAlgorithm",  "icon_step_3b.svg"),
+    ("step_3b_building_macroform", "BuildingMacroformAlgorithm", "icon_step_3b.svg"),
+    ("step_3c_dynamic_macroform", "DynamicMacroformAlgorithm", "icon_step_3b.svg"),
     ("step_4_building_optimizer", "BuildingOptimizerAlgorithm", "icon_step_4.svg"),
-    ("step_5_hard_surface",       "HardSurfaceAlgorithm",       "icon_step_5.svg"),
-    ("step_6_parking_generator",  "ParkingGeneratorAlgorithm",  "icon_step_6.svg"),
-    ("step_7_landscape_generator","LandscapeGeneratorAlgorithm","icon_step_7.svg"),
-    ("step_8_settlement_finalizer","SettlementFinalizerAlgorithm","icon_step_8.svg"),
-    ("urban_furniture_creator",   "UrbanFurnitureAlgorithm",    "icon_urban_furniture.svg"),
-    ("helper_generate_stairs",    "GenerateStairsAlgorithm",    "icon_helper_stair.svg"),
-    ("helper_generate_ramps",     "GenerateRampsAlgorithm",     "icon_helper_ramp.svg"),
-    ("helper_pedestrian_crossing","PedestrianCrossingAlgorithm","icon_helper_pedestrian.svg"),
+    ("step_5_hard_surface", "HardSurfaceAlgorithm", "icon_step_5.svg"),
+    ("step_6_parking_generator", "ParkingGeneratorAlgorithm", "icon_step_6.svg"),
+    ("step_7_landscape_generator", "LandscapeGeneratorAlgorithm", "icon_step_7.svg"),
+    ("step_8_settlement_finalizer", "SettlementFinalizerAlgorithm", "icon_step_8.svg"),
+    ("urban_furniture_creator", "UrbanFurnitureAlgorithm", "icon_urban_furniture.svg"),
+    ("helper_generate_stairs", "GenerateStairsAlgorithm", "icon_helper_stair.svg"),
+    ("helper_generate_ramps", "GenerateRampsAlgorithm", "icon_helper_ramp.svg"),
+    (
+        "helper_pedestrian_crossing",
+        "PedestrianCrossingAlgorithm",
+        "icon_helper_pedestrian.svg",
+    ),
 ]
 
 
@@ -65,7 +69,9 @@ class PlanXYerlesimProvider(QgsProcessingProvider):
             mod = _load_module(f"planx_yerlesim_{file_stem}", file_path)
 
             if mod is None or not hasattr(mod, class_name):
-                print(f"[planX-Yerleşim] Atlandı: {file_stem} ({class_name} bulunamadı)")
+                print(
+                    f"[planX-Yerleşim] Atlandı: {file_stem} ({class_name} bulunamadı)"
+                )
                 continue
 
             # Dinamik olarak ikon atanmış alt sınıf oluştur
@@ -77,6 +83,7 @@ class PlanXYerlesimProvider(QgsProcessingProvider):
                 class _Wrapped(base):
                     def icon(self):
                         return QIcon(ipath) if os.path.exists(ipath) else QIcon()
+
                 return _Wrapped
 
             wrapped = _make_cls(base_cls, icon_path)

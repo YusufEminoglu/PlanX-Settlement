@@ -4,34 +4,58 @@
 Geliştirici: Araş.Gör. Yusuf Eminoğlu
 planX Geospatial Advanced Tools — Yerleşim Planı Araç Seti
 """
-import os, sys
+
 from qgis.PyQt.QtCore import QCoreApplication, QVariant
 from qgis.core import (
-    QgsProcessing, QgsProcessingAlgorithm,
-    QgsProcessingParameterFeatureSource, QgsProcessingParameterFeatureSink,
-    QgsProcessingParameterField, QgsProcessingParameterNumber,
-    QgsFeature, QgsGeometry, QgsWkbTypes, QgsProcessingException,
-    QgsField, QgsFields, QgsFeatureSink, QgsSpatialIndex
+    QgsProcessing,
+    QgsProcessingAlgorithm,
+    QgsProcessingParameterFeatureSource,
+    QgsProcessingParameterFeatureSink,
+    QgsProcessingParameterField,
+    QgsFeature,
+    QgsWkbTypes,
+    QgsProcessingException,
+    QgsField,
+    QgsFields,
+    QgsFeatureSink,
+    QgsSpatialIndex,
 )
 
+
 class BuildingOptimizerAlgorithm(QgsProcessingAlgorithm):
-    INPUT_PARCELS = 'INPUT_PARCELS'
-    INPUT_BUILDINGS = 'INPUT_BUILDINGS'
-    TAKS_FIELD = 'TAKS_FIELD'
-    OUTPUT = 'OUTPUT'
+    INPUT_PARCELS = "INPUT_PARCELS"
+    INPUT_BUILDINGS = "INPUT_BUILDINGS"
+    TAKS_FIELD = "TAKS_FIELD"
+    OUTPUT = "OUTPUT"
 
     def initAlgorithm(self, config=None):
-        self.addParameter(QgsProcessingParameterFeatureSource(
-            self.INPUT_PARCELS, self.tr('Parsel katmanı'),
-            [QgsProcessing.TypeVectorPolygon]))
-        self.addParameter(QgsProcessingParameterFeatureSource(
-            self.INPUT_BUILDINGS, self.tr('Bina katmanı'),
-            [QgsProcessing.TypeVectorPolygon]))
-        self.addParameter(QgsProcessingParameterField(
-            self.TAKS_FIELD, self.tr('TAKS sütunu'),
-            parentLayerParameterName=self.INPUT_PARCELS, optional=True))
-        self.addParameter(QgsProcessingParameterFeatureSink(
-            self.OUTPUT, self.tr('Kontrol rapor katmanı')))
+        self.addParameter(
+            QgsProcessingParameterFeatureSource(
+                self.INPUT_PARCELS,
+                self.tr("Parsel katmanı"),
+                [QgsProcessing.TypeVectorPolygon],
+            )
+        )
+        self.addParameter(
+            QgsProcessingParameterFeatureSource(
+                self.INPUT_BUILDINGS,
+                self.tr("Bina katmanı"),
+                [QgsProcessing.TypeVectorPolygon],
+            )
+        )
+        self.addParameter(
+            QgsProcessingParameterField(
+                self.TAKS_FIELD,
+                self.tr("TAKS sütunu"),
+                parentLayerParameterName=self.INPUT_PARCELS,
+                optional=True,
+            )
+        )
+        self.addParameter(
+            QgsProcessingParameterFeatureSink(
+                self.OUTPUT, self.tr("Kontrol rapor katmanı")
+            )
+        )
 
     def processAlgorithm(self, parameters, context, feedback):
         p_source = self.parameterAsSource(parameters, self.INPUT_PARCELS, context)
@@ -41,18 +65,25 @@ class BuildingOptimizerAlgorithm(QgsProcessingAlgorithm):
             raise QgsProcessingException(self.tr("Katmanlar yüklenemedi."))
 
         out_fields = QgsFields()
-        out_fields.append(QgsField('parcel_fid', QVariant.Int))
-        out_fields.append(QgsField('parcel_area_m2', QVariant.Double, 'double', 20, 2))
-        out_fields.append(QgsField('building_area_m2', QVariant.Double, 'double', 20, 2))
-        out_fields.append(QgsField('taks_actual', QVariant.Double, 'double', 20, 4))
-        out_fields.append(QgsField('taks_target', QVariant.Double, 'double', 20, 4))
-        out_fields.append(QgsField('taks_ok', QVariant.Bool))
-        out_fields.append(QgsField('geom_valid', QVariant.Bool))
-        out_fields.append(QgsField('status', QVariant.String, 'string', 50))
+        out_fields.append(QgsField("parcel_fid", QVariant.Int))
+        out_fields.append(QgsField("parcel_area_m2", QVariant.Double, "double", 20, 2))
+        out_fields.append(
+            QgsField("building_area_m2", QVariant.Double, "double", 20, 2)
+        )
+        out_fields.append(QgsField("taks_actual", QVariant.Double, "double", 20, 4))
+        out_fields.append(QgsField("taks_target", QVariant.Double, "double", 20, 4))
+        out_fields.append(QgsField("taks_ok", QVariant.Bool))
+        out_fields.append(QgsField("geom_valid", QVariant.Bool))
+        out_fields.append(QgsField("status", QVariant.String, "string", 50))
 
         (sink, dest_id) = self.parameterAsSink(
-            parameters, self.OUTPUT, context,
-            out_fields, QgsWkbTypes.MultiPolygon, p_source.sourceCrs())
+            parameters,
+            self.OUTPUT,
+            context,
+            out_fields,
+            QgsWkbTypes.MultiPolygon,
+            p_source.sourceCrs(),
+        )
 
         # Spatial index for buildings
         b_index = QgsSpatialIndex()
@@ -108,10 +139,18 @@ class BuildingOptimizerAlgorithm(QgsProcessingAlgorithm):
 
             nf = QgsFeature(out_fields)
             nf.setGeometry(pg)
-            nf.setAttributes([
-                pf.id(), round(p_area, 2), round(total_b_area, 2),
-                round(taks_actual, 4), round(taks_target, 4),
-                taks_ok, b_valid, status])
+            nf.setAttributes(
+                [
+                    pf.id(),
+                    round(p_area, 2),
+                    round(total_b_area, 2),
+                    round(taks_actual, 4),
+                    round(taks_target, 4),
+                    taks_ok,
+                    b_valid,
+                    status,
+                ]
+            )
             sink.addFeature(nf, QgsFeatureSink.FastInsert)
             feedback.setProgress(int((i + 1) / total * 100))
 
@@ -119,13 +158,17 @@ class BuildingOptimizerAlgorithm(QgsProcessingAlgorithm):
         return {self.OUTPUT: dest_id}
 
     def name(self):
-        return '4_building_optimizer'
+        return "4_building_optimizer"
+
     def displayName(self):
-        return '4. Bina-Parsel Uyum Kontrolü'
+        return "4. Bina-Parsel Uyum Kontrolü"
+
     def group(self):
-        return 'Yerleşim Planı İş Akışı'
+        return "Yerleşim Planı İş Akışı"
+
     def groupId(self):
-        return 'yerlesim_plani_workflow'
+        return "yerlesim_plani_workflow"
+
     def shortHelpString(self):
         return self.tr(
             "━━━ planX — Yerleşim Planı Araç Seti ━━━\n"
@@ -134,8 +177,11 @@ class BuildingOptimizerAlgorithm(QgsProcessingAlgorithm):
             "Kontroller:\n"
             "• bina_alan / parsel_alan ≤ TAKS\n"
             "• Geometri geçerliliği (self-intersection)\n\n"
-            "Çıktı: Her parsel için OK/TAKS_ASIM/GEOM_HATALI durumu")
+            "Çıktı: Her parsel için OK/TAKS_ASIM/GEOM_HATALI durumu"
+        )
+
     def createInstance(self):
         return BuildingOptimizerAlgorithm()
+
     def tr(self, s):
-        return QCoreApplication.translate('Processing', s)
+        return QCoreApplication.translate("Processing", s)

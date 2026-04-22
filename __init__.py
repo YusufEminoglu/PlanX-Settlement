@@ -12,4 +12,5 @@ Author: Arş. Gör. Yusuf Eminoğlu
 
 def classFactory(iface):
     from .main_plugin import PlanXYerlesimPlugin
+
     return PlanXYerlesimPlugin(iface)

@@ -7,17 +7,16 @@ Template bina formlarını (L, U, T, I, kare vb.) buildable bbox'a
 sığdırarak tasarımsal bina yerleştirmesi yapar.
 """
 
-import math
 import random
-from qgis.core import (
-    QgsGeometry, QgsPointXY, QgsVectorLayer, QgsFeature,
-    QgsWkbTypes, QgsRectangle
-)
+from qgis.core import QgsGeometry, QgsVectorLayer
 
 from .geometry_engine import (
-    polygon_aspect_ratio, polygon_compactness,
-    oriented_minimum_bounding_box, rotate_geometry,
-    translate_geometry, scale_geometry_to_area
+    polygon_aspect_ratio,
+    polygon_compactness,
+    oriented_minimum_bounding_box,
+    rotate_geometry,
+    translate_geometry,
+    scale_geometry_to_area,
 )
 
 
@@ -65,16 +64,16 @@ def load_templates(gpkg_path, layer_name=None):
         max_a = 99999
 
         field_names = [f.name() for f in layer.fields()]
-        if 'form_tipi' in field_names:
-            form_type = str(feat['form_tipi'] or "")
-        if 'min_alan_m2' in field_names:
+        if "form_tipi" in field_names:
+            form_type = str(feat["form_tipi"] or "")
+        if "min_alan_m2" in field_names:
             try:
-                min_a = float(feat['min_alan_m2'] or 0)
+                min_a = float(feat["min_alan_m2"] or 0)
             except (TypeError, ValueError):
                 pass
-        if 'max_alan_m2' in field_names:
+        if "max_alan_m2" in field_names:
             try:
-                max_a = float(feat['max_alan_m2'] or 99999)
+                max_a = float(feat["max_alan_m2"] or 99999)
             except (TypeError, ValueError):
                 pass
 
@@ -83,8 +82,9 @@ def load_templates(gpkg_path, layer_name=None):
     return templates
 
 
-def match_template_to_bbox(bbox_geom, templates, diversity="Medium",
-                           target_area=None, rng=None):
+def match_template_to_bbox(
+    bbox_geom, templates, diversity="Medium", target_area=None, rng=None
+):
     """
     Buildable bbox'a en uygun şablon formu seçer.
 
@@ -111,7 +111,6 @@ def match_template_to_bbox(bbox_geom, templates, diversity="Medium",
         rng = random.Random()
 
     bbox_ar = polygon_aspect_ratio(bbox_geom)
-    bbox_area = bbox_geom.area()
 
     # Aspect ratio uyumuna göre skorla
     scored = []
@@ -142,8 +141,7 @@ def match_template_to_bbox(bbox_geom, templates, diversity="Medium",
     return rng.choice(pool)[1]
 
 
-def fit_template_to_bbox(template, bbox_geom, max_utilization=0.95,
-                         rotate_to_fit=True):
+def fit_template_to_bbox(template, bbox_geom, max_utilization=0.95, rotate_to_fit=True):
     """
     Şablon bina formunu buildable bbox'a sığdırır.
 
@@ -179,16 +177,16 @@ def fit_template_to_bbox(template, bbox_geom, max_utilization=0.95,
     result_geom = QgsGeometry(template.geom)
 
     if rotate_to_fit:
-        angle_diff = b_obb['angle'] - t_obb['angle']
-        t_center = t_obb['center']
+        angle_diff = b_obb["angle"] - t_obb["angle"]
+        t_center = t_obb["center"]
         if t_center:
             result_geom = rotate_geometry(result_geom, angle_diff, t_center)
 
     # 2. Ölçekleme: Template'i bbox boyutlarına sığdır
-    t_w = t_obb['width']
-    t_h = t_obb['height']
-    b_w = b_obb['width'] * max_utilization
-    b_h = b_obb['height'] * max_utilization
+    t_w = t_obb["width"]
+    t_h = t_obb["height"]
+    b_w = b_obb["width"] * max_utilization
+    b_h = b_obb["height"] * max_utilization
 
     if t_w <= 0 or t_h <= 0:
         return None
@@ -199,8 +197,7 @@ def fit_template_to_bbox(template, bbox_geom, max_utilization=0.95,
 
     # Centroid etrafında uniform scale
     result_geom = scale_geometry_to_area(
-        result_geom,
-        template.geom.area() * (uniform_scale ** 2)
+        result_geom, template.geom.area() * (uniform_scale**2)
     )
 
     # 3. Öteleme: bbox merkezine taşı

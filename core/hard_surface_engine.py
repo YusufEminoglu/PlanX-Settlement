@@ -6,6 +6,7 @@ Sert zemin (yürüme alanı) üretim motoru.
 Geliştirici: Araş.Gör. Yusuf Eminoğlu
 planX Geospatial Advanced Tools — Yerleşim Planı Araç Seti
 """
+
 from qgis.core import QgsGeometry
 
 

@@ -5,16 +5,24 @@ Adım 6: ParkingGenerator — Parametrik otopark düzeni
 Geliştirici: Araş.Gör. Yusuf Eminoğlu
 planX Geospatial Advanced Tools — Yerleşim Planı Araç Seti
 """
-import os, sys, math
+
+import math
 from qgis.PyQt.QtCore import QCoreApplication, QVariant
 from qgis.core import (
-    QgsProcessing, QgsProcessingAlgorithm,
-    QgsProcessingParameterFeatureSource, QgsProcessingParameterFeatureSink,
-    QgsProcessingParameterNumber, QgsProcessingParameterEnum,
-    QgsProcessingParameterBoolean,
-    QgsFeature, QgsGeometry, QgsWkbTypes, QgsProcessingException,
-    QgsField, QgsFields, QgsFeatureSink, QgsPointXY,
-    QgsSpatialIndex
+    QgsProcessing,
+    QgsProcessingAlgorithm,
+    QgsProcessingParameterFeatureSource,
+    QgsProcessingParameterFeatureSink,
+    QgsProcessingParameterNumber,
+    QgsProcessingParameterEnum,
+    QgsFeature,
+    QgsGeometry,
+    QgsWkbTypes,
+    QgsProcessingException,
+    QgsField,
+    QgsFields,
+    QgsFeatureSink,
+    QgsPointXY,
 )
 
 
@@ -23,8 +31,10 @@ def _create_stall(cx, cy, w, d, rot):
     hw, hd = w / 2.0, d / 2.0
     cos_a, sin_a = math.cos(rot), math.sin(rot)
     corners = [(-hw, -hd), (hw, -hd), (hw, hd), (-hw, hd)]
-    pts = [QgsPointXY(x * cos_a - y * sin_a + cx,
-                      x * sin_a + y * cos_a + cy) for x, y in corners]
+    pts = [
+        QgsPointXY(x * cos_a - y * sin_a + cx, x * sin_a + y * cos_a + cy)
+        for x, y in corners
+    ]
     pts.append(pts[0])
     return QgsGeometry.fromPolygonXY([pts])
 
@@ -39,8 +49,9 @@ def _optimal_rotation(polygon_geom, entrance_point=None):
         # ve aisle'ları o yöne hizala
         if entrance_point is not None:
             center = polygon_geom.centroid().asPoint()
-            to_entrance = math.atan2(entrance_point.y() - center.y(),
-                                     entrance_point.x() - center.x())
+            to_entrance = math.atan2(
+                entrance_point.y() - center.y(), entrance_point.x() - center.x()
+            )
             # OBB açısı ile giriş yönü arasındaki fark
             diff = abs(to_entrance - base_rot) % math.pi
             # Eğer giriş daha çok kısa kenara yakınsa 90° döndür
@@ -52,10 +63,16 @@ def _optimal_rotation(polygon_geom, entrance_point=None):
     return 0.0, bb.width(), bb.height()
 
 
-def generate_optimized_parking(polygon_geom, stall_w=2.5, stall_d=5.0,
-                               aisle_w=6.0, parking_angle_deg=90,
-                               stall_gap=0.01, edge_margin=0.5,
-                               entrance_point=None):
+def generate_optimized_parking(
+    polygon_geom,
+    stall_w=2.5,
+    stall_d=5.0,
+    aisle_w=6.0,
+    parking_angle_deg=90,
+    stall_gap=0.01,
+    edge_margin=0.5,
+    entrance_point=None,
+):
     """
     Poligon şekline göre optimize edilmiş otopark düzeni.
     entrance_point: En yakın yol noktası — aisle'lar bu yöne hizalanır.
@@ -63,7 +80,7 @@ def generate_optimized_parking(polygon_geom, stall_w=2.5, stall_d=5.0,
     if edge_margin > 0:
         work = polygon_geom.buffer(-edge_margin, 16)
         if work.isEmpty():
-            return {'stalls': [], 'aisles': [], 'total_stalls': 0, 'efficiency': 0}
+            return {"stalls": [], "aisles": [], "total_stalls": 0, "efficiency": 0}
     else:
         work = polygon_geom
 
@@ -118,8 +135,11 @@ def generate_optimized_parking(polygon_geom, stall_w=2.5, stall_d=5.0,
 
         # İki stall sırası
         for row in range(2):
-            row_offset = -(aisle_w / 2.0 + effective_depth / 2.0) if row == 0 \
+            row_offset = (
+                -(aisle_w / 2.0 + effective_depth / 2.0)
+                if row == 0
                 else (aisle_w / 2.0 + effective_depth / 2.0)
+            )
             rcx = mcx + row_offset * cos_rp
             rcy = mcy + row_offset * sin_rp
 
@@ -149,57 +169,112 @@ def generate_optimized_parking(polygon_geom, stall_w=2.5, stall_d=5.0,
     eff = t_area / polygon_geom.area() if polygon_geom.area() > 0 else 0
 
     return {
-        'stalls': stalls,
-        'aisles': aisles,
-        'entrance_line': entrance_line,
-        'total_stalls': len(stalls),
-        'efficiency': round(eff, 3)
+        "stalls": stalls,
+        "aisles": aisles,
+        "entrance_line": entrance_line,
+        "total_stalls": len(stalls),
+        "efficiency": round(eff, 3),
     }
 
 
 class ParkingGeneratorAlgorithm(QgsProcessingAlgorithm):
-    INPUT = 'INPUT'
-    INPUT_ROADS = 'INPUT_ROADS'
-    STALL_WIDTH = 'STALL_WIDTH'
-    STALL_DEPTH = 'STALL_DEPTH'
-    AISLE_WIDTH = 'AISLE_WIDTH'
-    PARKING_ANGLE = 'PARKING_ANGLE'
-    STALL_GAP = 'STALL_GAP'
-    EDGE_MARGIN = 'EDGE_MARGIN'
-    OUTPUT_STALLS = 'OUTPUT_STALLS'
-    OUTPUT_AISLES = 'OUTPUT_AISLES'
+    INPUT = "INPUT"
+    INPUT_ROADS = "INPUT_ROADS"
+    STALL_WIDTH = "STALL_WIDTH"
+    STALL_DEPTH = "STALL_DEPTH"
+    AISLE_WIDTH = "AISLE_WIDTH"
+    PARKING_ANGLE = "PARKING_ANGLE"
+    STALL_GAP = "STALL_GAP"
+    EDGE_MARGIN = "EDGE_MARGIN"
+    OUTPUT_STALLS = "OUTPUT_STALLS"
+    OUTPUT_AISLES = "OUTPUT_AISLES"
 
     def initAlgorithm(self, config=None):
-        self.addParameter(QgsProcessingParameterFeatureSource(
-            self.INPUT, self.tr('Otopark alanı katmanı (poligon)'),
-            [QgsProcessing.TypeVectorPolygon]))
-        self.addParameter(QgsProcessingParameterFeatureSource(
-            self.INPUT_ROADS,
-            self.tr('Yol ağı katmanı (çizgi) — otopark girişini en yakın yola hizalar'),
-            [QgsProcessing.TypeVectorLine], optional=True))
-        self.addParameter(QgsProcessingParameterNumber(
-            self.STALL_WIDTH, self.tr('Otopark yeri genişliği (m) — standart: 2.5'),
-            QgsProcessingParameterNumber.Double, 2.5, minValue=2.0, maxValue=4.0))
-        self.addParameter(QgsProcessingParameterNumber(
-            self.STALL_DEPTH, self.tr('Otopark yeri derinliği (m) — standart: 5.0'),
-            QgsProcessingParameterNumber.Double, 5.0, minValue=4.0, maxValue=7.0))
-        self.addParameter(QgsProcessingParameterNumber(
-            self.AISLE_WIDTH, self.tr('Araç yolu genişliği (m) — 90° için min 6.0'),
-            QgsProcessingParameterNumber.Double, 6.0, minValue=3.0, maxValue=8.0))
-        self.addParameter(QgsProcessingParameterEnum(
-            self.PARKING_ANGLE, self.tr('Park açısı'),
-            options=['90° (en verimli)', '60° (kolay manevra)', '45° (tek yön)'],
-            defaultValue=0))
-        self.addParameter(QgsProcessingParameterNumber(
-            self.STALL_GAP, self.tr('Stall arası boşluk (m) — önerilen: 0.01'),
-            QgsProcessingParameterNumber.Double, 0.01, minValue=0.0, maxValue=0.5))
-        self.addParameter(QgsProcessingParameterNumber(
-            self.EDGE_MARGIN, self.tr('Kenar boşluğu (m)'),
-            QgsProcessingParameterNumber.Double, 0.5, minValue=0.0, maxValue=3.0))
-        self.addParameter(QgsProcessingParameterFeatureSink(
-            self.OUTPUT_STALLS, self.tr('Otopark yerleri (poligon)')))
-        self.addParameter(QgsProcessingParameterFeatureSink(
-            self.OUTPUT_AISLES, self.tr('Araç yolları (çizgi)')))
+        self.addParameter(
+            QgsProcessingParameterFeatureSource(
+                self.INPUT,
+                self.tr("Otopark alanı katmanı (poligon)"),
+                [QgsProcessing.TypeVectorPolygon],
+            )
+        )
+        self.addParameter(
+            QgsProcessingParameterFeatureSource(
+                self.INPUT_ROADS,
+                self.tr(
+                    "Yol ağı katmanı (çizgi) — otopark girişini en yakın yola hizalar"
+                ),
+                [QgsProcessing.TypeVectorLine],
+                optional=True,
+            )
+        )
+        self.addParameter(
+            QgsProcessingParameterNumber(
+                self.STALL_WIDTH,
+                self.tr("Otopark yeri genişliği (m) — standart: 2.5"),
+                QgsProcessingParameterNumber.Double,
+                2.5,
+                minValue=2.0,
+                maxValue=4.0,
+            )
+        )
+        self.addParameter(
+            QgsProcessingParameterNumber(
+                self.STALL_DEPTH,
+                self.tr("Otopark yeri derinliği (m) — standart: 5.0"),
+                QgsProcessingParameterNumber.Double,
+                5.0,
+                minValue=4.0,
+                maxValue=7.0,
+            )
+        )
+        self.addParameter(
+            QgsProcessingParameterNumber(
+                self.AISLE_WIDTH,
+                self.tr("Araç yolu genişliği (m) — 90° için min 6.0"),
+                QgsProcessingParameterNumber.Double,
+                6.0,
+                minValue=3.0,
+                maxValue=8.0,
+            )
+        )
+        self.addParameter(
+            QgsProcessingParameterEnum(
+                self.PARKING_ANGLE,
+                self.tr("Park açısı"),
+                options=["90° (en verimli)", "60° (kolay manevra)", "45° (tek yön)"],
+                defaultValue=0,
+            )
+        )
+        self.addParameter(
+            QgsProcessingParameterNumber(
+                self.STALL_GAP,
+                self.tr("Stall arası boşluk (m) — önerilen: 0.01"),
+                QgsProcessingParameterNumber.Double,
+                0.01,
+                minValue=0.0,
+                maxValue=0.5,
+            )
+        )
+        self.addParameter(
+            QgsProcessingParameterNumber(
+                self.EDGE_MARGIN,
+                self.tr("Kenar boşluğu (m)"),
+                QgsProcessingParameterNumber.Double,
+                0.5,
+                minValue=0.0,
+                maxValue=3.0,
+            )
+        )
+        self.addParameter(
+            QgsProcessingParameterFeatureSink(
+                self.OUTPUT_STALLS, self.tr("Otopark yerleri (poligon)")
+            )
+        )
+        self.addParameter(
+            QgsProcessingParameterFeatureSink(
+                self.OUTPUT_AISLES, self.tr("Araç yolları (çizgi)")
+            )
+        )
 
     def processAlgorithm(self, parameters, context, feedback):
         source = self.parameterAsSource(parameters, self.INPUT, context)
@@ -224,24 +299,36 @@ class ParkingGeneratorAlgorithm(QgsProcessingAlgorithm):
                 rg = rf.geometry()
                 if not rg.isEmpty():
                     road_geoms.append(rg)
-            feedback.pushInfo(f"Yol ağı: {len(road_geoms)} çizgi yüklendi → giriş hizalaması aktif")
+            feedback.pushInfo(
+                f"Yol ağı: {len(road_geoms)} çizgi yüklendi → giriş hizalaması aktif"
+            )
         else:
             feedback.pushInfo("⚠️ Yol ağı verilmedi — OBB yönüne göre hizalanacak")
 
         s_fields = QgsFields()
-        s_fields.append(QgsField('area_fid', QVariant.Int))
-        s_fields.append(QgsField('stall_id', QVariant.Int))
-        s_fields.append(QgsField('stall_area_m2', QVariant.Double, 'double', 20, 2))
+        s_fields.append(QgsField("area_fid", QVariant.Int))
+        s_fields.append(QgsField("stall_id", QVariant.Int))
+        s_fields.append(QgsField("stall_area_m2", QVariant.Double, "double", 20, 2))
 
         (s_sink, s_dest) = self.parameterAsSink(
-            parameters, self.OUTPUT_STALLS, context,
-            s_fields, QgsWkbTypes.Polygon, source.sourceCrs())
+            parameters,
+            self.OUTPUT_STALLS,
+            context,
+            s_fields,
+            QgsWkbTypes.Polygon,
+            source.sourceCrs(),
+        )
 
         a_fields = QgsFields()
-        a_fields.append(QgsField('area_fid', QVariant.Int))
+        a_fields.append(QgsField("area_fid", QVariant.Int))
         (a_sink, a_dest) = self.parameterAsSink(
-            parameters, self.OUTPUT_AISLES, context,
-            a_fields, QgsWkbTypes.LineString, source.sourceCrs())
+            parameters,
+            self.OUTPUT_AISLES,
+            context,
+            a_fields,
+            QgsWkbTypes.LineString,
+            source.sourceCrs(),
+        )
 
         total_stalls = 0
         total = source.featureCount() or 1
@@ -256,7 +343,7 @@ class ParkingGeneratorAlgorithm(QgsProcessingAlgorithm):
             # En yakın yol noktasını bul
             entrance = None
             if road_geoms:
-                min_dist = float('inf')
+                min_dist = float("inf")
                 for rg in road_geoms:
                     d = geom.distance(rg)
                     if d < min_dist:
@@ -266,45 +353,57 @@ class ParkingGeneratorAlgorithm(QgsProcessingAlgorithm):
                             entrance = nearest_on_road.asPoint()
 
             result = generate_optimized_parking(
-                geom, stall_w, stall_d, aisle_w, parking_angle, gap, margin,
-                entrance_point=entrance)
+                geom,
+                stall_w,
+                stall_d,
+                aisle_w,
+                parking_angle,
+                gap,
+                margin,
+                entrance_point=entrance,
+            )
 
-            for si, sg in enumerate(result['stalls']):
+            for si, sg in enumerate(result["stalls"]):
                 sf = QgsFeature(s_fields)
                 sf.setGeometry(sg)
                 sf.setAttributes([feat.id(), si + 1, round(sg.area(), 2)])
                 s_sink.addFeature(sf, QgsFeatureSink.FastInsert)
 
-            for ag in result['aisles']:
+            for ag in result["aisles"]:
                 af = QgsFeature(a_fields)
                 af.setGeometry(ag)
                 af.setAttributes([feat.id()])
                 a_sink.addFeature(af, QgsFeatureSink.FastInsert)
 
             # Giriş çizgisi
-            if result.get('entrance_line') and not result['entrance_line'].isEmpty():
+            if result.get("entrance_line") and not result["entrance_line"].isEmpty():
                 ef = QgsFeature(a_fields)
-                ef.setGeometry(result['entrance_line'])
+                ef.setGeometry(result["entrance_line"])
                 ef.setAttributes([feat.id()])
                 a_sink.addFeature(ef, QgsFeatureSink.FastInsert)
 
-            total_stalls += result['total_stalls']
+            total_stalls += result["total_stalls"]
             feedback.pushInfo(
                 f"Alan {feat.id()}: {result['total_stalls']} yer, "
-                f"verimlilik: {result['efficiency']*100:.1f}%")
+                f"verimlilik: {result['efficiency'] * 100:.1f}%"
+            )
             feedback.setProgress(int((i + 1) / total * 100))
 
         feedback.pushInfo(f"Toplam: {total_stalls} otopark yeri üretildi.")
         return {self.OUTPUT_STALLS: s_dest, self.OUTPUT_AISLES: a_dest}
 
     def name(self):
-        return '6_parking_generator'
+        return "6_parking_generator"
+
     def displayName(self):
-        return '6. Parametrik Otopark Düzeni'
+        return "6. Parametrik Otopark Düzeni"
+
     def group(self):
-        return 'Yerleşim Planı İş Akışı'
+        return "Yerleşim Planı İş Akışı"
+
     def groupId(self):
-        return 'yerlesim_plani_workflow'
+        return "yerlesim_plani_workflow"
+
     def shortHelpString(self):
         return self.tr(
             "━━━ planX — Yerleşim Planı Araç Seti ━━━\n"
@@ -320,8 +419,11 @@ class ParkingGeneratorAlgorithm(QgsProcessingAlgorithm):
             "• 45°: tek yön, aisle 3.6m\n\n"
             "Çıktılar:\n"
             "• Otopark yerleri: Her stall bir poligon\n"
-            "• Araç yolları: Aisle çizgileri + giriş bağlantısı")
+            "• Araç yolları: Aisle çizgileri + giriş bağlantısı"
+        )
+
     def createInstance(self):
         return ParkingGeneratorAlgorithm()
+
     def tr(self, s):
-        return QCoreApplication.translate('Processing', s)
+        return QCoreApplication.translate("Processing", s)

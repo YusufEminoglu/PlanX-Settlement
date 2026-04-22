@@ -7,10 +7,7 @@ Tüm algoritmalar ve motorlar tarafından kullanılan temel geometri işlemleri.
 """
 
 import math
-from qgis.core import (
-    QgsGeometry, QgsPointXY, QgsLineString, QgsWkbTypes,
-    QgsRectangle, QgsVector
-)
+from qgis.core import QgsGeometry, QgsPointXY
 
 
 def get_polygon_edges(geom):
@@ -152,10 +149,14 @@ def negative_buffer_per_edge(geom, edge_setbacks):
         hp = [
             QgsPointXY(offset_p1.x() - ux * extend, offset_p1.y() - uy * extend),
             QgsPointXY(offset_p2.x() + ux * extend, offset_p2.y() + uy * extend),
-            QgsPointXY(offset_p2.x() + ux * extend - nx * extend,
-                        offset_p2.y() + uy * extend - ny * extend),
-            QgsPointXY(offset_p1.x() - ux * extend - nx * extend,
-                        offset_p1.y() - uy * extend - ny * extend),
+            QgsPointXY(
+                offset_p2.x() + ux * extend - nx * extend,
+                offset_p2.y() + uy * extend - ny * extend,
+            ),
+            QgsPointXY(
+                offset_p1.x() - ux * extend - nx * extend,
+                offset_p1.y() - uy * extend - ny * extend,
+            ),
         ]
         halfplane = QgsGeometry.fromPolygonXY([hp])
         result = result.intersection(halfplane)
@@ -183,12 +184,12 @@ def oriented_minimum_bounding_box(geom):
     # obb -> (QgsGeometry, area, angle, width, height)
     if obb and len(obb) >= 5:
         return {
-            'geometry': obb[0],
-            'area': obb[1],
-            'angle': obb[2],
-            'width': obb[3],
-            'height': obb[4],
-            'center': obb[0].centroid().asPoint() if not obb[0].isEmpty() else None
+            "geometry": obb[0],
+            "area": obb[1],
+            "angle": obb[2],
+            "width": obb[3],
+            "height": obb[4],
+            "center": obb[0].centroid().asPoint() if not obb[0].isEmpty() else None,
         }
     return None
 
@@ -196,8 +197,8 @@ def oriented_minimum_bounding_box(geom):
 def polygon_aspect_ratio(geom):
     """Poligonun en/boy oranını hesaplar (OBB kullanarak)."""
     obb = oriented_minimum_bounding_box(geom)
-    if obb and obb['width'] > 0 and obb['height'] > 0:
-        w, h = sorted([obb['width'], obb['height']])
+    if obb and obb["width"] > 0 and obb["height"] > 0:
+        w, h = sorted([obb["width"], obb["height"]])
         return h / w  # Her zaman >= 1
     return 1.0
 
@@ -236,8 +237,9 @@ def scale_geometry_to_area(geom, target_area):
                 scaled_ring = [
                     QgsPointXY(
                         centroid.x() + scale_factor * (pt.x() - centroid.x()),
-                        centroid.y() + scale_factor * (pt.y() - centroid.y())
-                    ) for pt in ring
+                        centroid.y() + scale_factor * (pt.y() - centroid.y()),
+                    )
+                    for pt in ring
                 ]
                 scaled_poly.append(scaled_ring)
             scaled.append(scaled_poly)
@@ -249,8 +251,9 @@ def scale_geometry_to_area(geom, target_area):
             scaled_ring = [
                 QgsPointXY(
                     centroid.x() + scale_factor * (pt.x() - centroid.x()),
-                    centroid.y() + scale_factor * (pt.y() - centroid.y())
-                ) for pt in ring
+                    centroid.y() + scale_factor * (pt.y() - centroid.y()),
+                )
+                for pt in ring
             ]
             scaled_poly.append(scaled_ring)
         return QgsGeometry.fromPolygonXY(scaled_poly)

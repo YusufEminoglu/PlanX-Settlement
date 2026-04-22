@@ -12,8 +12,9 @@ import math
 from qgis.core import QgsGeometry, QgsPointXY
 
 
-def apply_fishbone_offset(perpendicular_points, center_line_geom,
-                          randomness_pct, lot_width, seed=None):
+def apply_fishbone_offset(
+    perpendicular_points, center_line_geom, randomness_pct, lot_width, seed=None
+):
     """
     Perpendicular bölme noktalarına fishbone offset uygular.
 
@@ -56,8 +57,9 @@ def apply_fishbone_offset(perpendicular_points, center_line_geom,
     return result
 
 
-def offset_perpendicular_line(base_point, perp_angle, half_width,
-                              left_offset, right_offset):
+def offset_perpendicular_line(
+    base_point, perp_angle, half_width, left_offset, right_offset
+):
     """
     Bir bölme noktasından perpendicular çizgi oluşturur,
     sol ve sağ tarafta bağımsız offset uygulayarak.
@@ -87,23 +89,16 @@ def offset_perpendicular_line(base_point, perp_angle, half_width,
     right_end_x = right_base_x + half_width * math.cos(perp_angle)
     right_end_y = right_base_y + half_width * math.sin(perp_angle)
 
-    left_line = QgsGeometry.fromPolylineXY([
-        base_point,
-        QgsPointXY(left_end_x, left_end_y)
-    ])
-    right_line = QgsGeometry.fromPolylineXY([
-        base_point,
-        QgsPointXY(right_end_x, right_end_y)
-    ])
 
     # Birleştirilmiş tek çizgi oluştur (sol uç → merkez kayık → sağ uç)
-    full_line = QgsGeometry.fromPolylineXY([
-        QgsPointXY(left_end_x, left_end_y),
-        QgsPointXY(
-            (left_base_x + right_base_x) / 2,
-            (left_base_y + right_base_y) / 2
-        ),
-        QgsPointXY(right_end_x, right_end_y)
-    ])
+    full_line = QgsGeometry.fromPolylineXY(
+        [
+            QgsPointXY(left_end_x, left_end_y),
+            QgsPointXY(
+                (left_base_x + right_base_x) / 2, (left_base_y + right_base_y) / 2
+            ),
+            QgsPointXY(right_end_x, right_end_y),
+        ]
+    )
 
     return full_line

@@ -11,30 +11,45 @@ Gerçekçi mimari kısıtlar:
 Geliştirici: Araş.Gör. Yusuf Eminoğlu
 planX Geospatial Advanced Tools — Yerleşim Planı Araç Seti
 """
-import os, sys, math, random
+
+import random
 from qgis.PyQt.QtCore import QCoreApplication, QVariant
 from qgis.core import (
-    QgsProcessing, QgsProcessingAlgorithm,
-    QgsProcessingParameterFeatureSource, QgsProcessingParameterFeatureSink,
-    QgsProcessingParameterEnum, QgsProcessingParameterNumber,
-    QgsFeature, QgsGeometry, QgsWkbTypes, QgsProcessingException,
-    QgsField, QgsFields, QgsFeatureSink, QgsPointXY
+    QgsProcessing,
+    QgsProcessingAlgorithm,
+    QgsProcessingParameterFeatureSource,
+    QgsProcessingParameterFeatureSink,
+    QgsProcessingParameterEnum,
+    QgsProcessingParameterNumber,
+    QgsFeature,
+    QgsGeometry,
+    QgsProcessingException,
+    QgsField,
+    QgsFields,
+    QgsFeatureSink,
+    QgsPointXY,
 )
 
 # ═══════════════════════════════════════════════════════════════════════
 # MİMARİ KISITLAR
 # ═══════════════════════════════════════════════════════════════════════
-MIN_WING_DEPTH = 7.0    # Minimum kanat derinliği (m) — yapısal zorunluluk
-MIN_WING_WIDTH = 5.0    # Minimum kanat genişliği (m)
+MIN_WING_DEPTH = 7.0  # Minimum kanat derinliği (m) — yapısal zorunluluk
+MIN_WING_WIDTH = 5.0  # Minimum kanat genişliği (m)
 
 # ═══════════════════════════════════════════════════════════════════════
 # YARDIMCI FONKSİYONLAR
 # ═══════════════════════════════════════════════════════════════════════
 
+
 def _rect(x, y, w, h):
     """Dikdörtgen poligon (sol-alt köşe tabanlı)."""
-    pts = [QgsPointXY(x, y), QgsPointXY(x + w, y),
-           QgsPointXY(x + w, y + h), QgsPointXY(x, y + h), QgsPointXY(x, y)]
+    pts = [
+        QgsPointXY(x, y),
+        QgsPointXY(x + w, y),
+        QgsPointXY(x + w, y + h),
+        QgsPointXY(x, y + h),
+        QgsPointXY(x, y),
+    ]
     return QgsGeometry.fromPolygonXY([pts])
 
 
@@ -46,6 +61,7 @@ def _can_fit(w, h, min_depth=MIN_WING_DEPTH):
 # ═══════════════════════════════════════════════════════════════════════
 # FORM ÜRETİCİLER — Her biri (w, h, rng) alır, (geom, type_name) döner
 # ═══════════════════════════════════════════════════════════════════════
+
 
 def gen_dikdortgen(w, h, rng):
     """Basit dikdörtgen — hafif içe daralmalarla."""
@@ -202,30 +218,40 @@ def gen_artı(w, h, rng):
 
 # ── Form haritası ────────────────────────────────────────────────────
 _FORM_GENERATORS = {
-    'dikdortgen': gen_dikdortgen,
-    'L': gen_L,
-    'L_ters': gen_L_ters,
-    'U': gen_U,
-    'T': gen_T,
-    'T_ters': gen_T_ters,
-    'Z': gen_Z,
-    'H': gen_H,
-    'C': gen_C,
-    'avlu': gen_avlu,
-    'E': gen_E,
-    'arti': gen_artı,
+    "dikdortgen": gen_dikdortgen,
+    "L": gen_L,
+    "L_ters": gen_L_ters,
+    "U": gen_U,
+    "T": gen_T,
+    "T_ters": gen_T_ters,
+    "Z": gen_Z,
+    "H": gen_H,
+    "C": gen_C,
+    "avlu": gen_avlu,
+    "E": gen_E,
+    "arti": gen_artı,
 }
 
 _FORM_NAMES = list(_FORM_GENERATORS.keys())
 _FORM_LABELS = [
-    'Dikdörtgen (I)',  'L',  'Ters L',  'U',
-    'T',  'Ters T',  'Z (kaydırmalı)',  'H',
-    'C (parantez)',  'Avlulu (O)',  'E (tarak)',  '+ (artı)'
+    "Dikdörtgen (I)",
+    "L",
+    "Ters L",
+    "U",
+    "T",
+    "Ters T",
+    "Z (kaydırmalı)",
+    "H",
+    "C (parantez)",
+    "Avlulu (O)",
+    "E (tarak)",
+    "+ (artı)",
 ]
 
 
-def generate_dynamic_form(bbox_geom, form_type="rastgele",
-                          allowed_forms=None, rng=None):
+def generate_dynamic_form(
+    bbox_geom, form_type="rastgele", allowed_forms=None, rng=None
+):
     """
     Buildable bbox içine prosedürel bina formu üretir.
     Tüm kanatlar ≥ 7m derinlikte olur.
@@ -255,13 +281,13 @@ def generate_dynamic_form(bbox_geom, form_type="rastgele",
         # Boyut uyumlu formları filtrele
         feasible = []
         for f in pool:
-            if f in ('avlu', 'H', 'E') and (w < 20 or h < 20):
+            if f in ("avlu", "H", "E") and (w < 20 or h < 20):
                 continue  # Küçük parsellere karmaşık form uygulanmaz
-            if f in ('U', 'C') and (w < 15 or h < 15):
+            if f in ("U", "C") and (w < 15 or h < 15):
                 continue
             feasible.append(f)
         if not feasible:
-            feasible = ['dikdortgen']
+            feasible = ["dikdortgen"]
         chosen = rng.choice(feasible)
 
     gen_func = _FORM_GENERATORS.get(chosen, gen_dikdortgen)
@@ -275,8 +301,7 @@ def generate_dynamic_form(bbox_geom, form_type="rastgele",
     if abs(angle) > 0.1:
         form_geom.rotate(angle, form_center)
     new_center = form_geom.centroid().asPoint()
-    form_geom.translate(center.x() - new_center.x(),
-                        center.y() - new_center.y())
+    form_geom.translate(center.x() - new_center.x(), center.y() - new_center.y())
 
     # Bbox ile kırp
     form_geom = form_geom.intersection(bbox_geom)
@@ -291,41 +316,68 @@ def generate_dynamic_form(bbox_geom, form_type="rastgele",
 # PROCESSING ALGORİTMASI
 # ═══════════════════════════════════════════════════════════════════════
 
-class DynamicMacroformAlgorithm(QgsProcessingAlgorithm):
-    INPUT_BUILDINGS = 'INPUT_BUILDINGS'
-    FORM_TYPE = 'FORM_TYPE'
-    ALLOWED_FORMS = 'ALLOWED_FORMS'
-    DIVERSITY = 'DIVERSITY'
-    RANDOM_SEED = 'RANDOM_SEED'
-    OUTPUT = 'OUTPUT'
 
-    _TYPE_OPTIONS = ['Rastgele (karışık)', 'Belirli formlar (aşağıdan seçin)']
+class DynamicMacroformAlgorithm(QgsProcessingAlgorithm):
+    INPUT_BUILDINGS = "INPUT_BUILDINGS"
+    FORM_TYPE = "FORM_TYPE"
+    ALLOWED_FORMS = "ALLOWED_FORMS"
+    DIVERSITY = "DIVERSITY"
+    RANDOM_SEED = "RANDOM_SEED"
+    OUTPUT = "OUTPUT"
+
+    _TYPE_OPTIONS = ["Rastgele (karışık)", "Belirli formlar (aşağıdan seçin)"]
 
     def initAlgorithm(self, config=None):
-        self.addParameter(QgsProcessingParameterFeatureSource(
-            self.INPUT_BUILDINGS,
-            self.tr('Bina taban alanı katmanı (Adım 3 çıktısı — buildable bbox)'),
-            [QgsProcessing.TypeVectorPolygon]))
-        self.addParameter(QgsProcessingParameterEnum(
-            self.FORM_TYPE,
-            self.tr('Form seçim modu'),
-            options=self._TYPE_OPTIONS, defaultValue=0))
-        self.addParameter(QgsProcessingParameterEnum(
-            self.ALLOWED_FORMS,
-            self.tr('İzin verilen formlar (tikleyerek seçin)'),
-            options=_FORM_LABELS,
-            allowMultiple=True,
-            defaultValue=list(range(len(_FORM_LABELS)))))
-        self.addParameter(QgsProcessingParameterNumber(
-            self.DIVERSITY,
-            self.tr('Çeşitlilik — ardışık parsellerde aynı form tekrarlanmasın (1-5)'),
-            QgsProcessingParameterNumber.Integer, 3, minValue=1, maxValue=5))
-        self.addParameter(QgsProcessingParameterNumber(
-            self.RANDOM_SEED,
-            self.tr('Rastgele tohum (0=tamamen rastgele, >0=tekrarlanabilir)'),
-            QgsProcessingParameterNumber.Integer, 0, minValue=0))
-        self.addParameter(QgsProcessingParameterFeatureSink(
-            self.OUTPUT, self.tr('Dinamik formlu binalar')))
+        self.addParameter(
+            QgsProcessingParameterFeatureSource(
+                self.INPUT_BUILDINGS,
+                self.tr("Bina taban alanı katmanı (Adım 3 çıktısı — buildable bbox)"),
+                [QgsProcessing.TypeVectorPolygon],
+            )
+        )
+        self.addParameter(
+            QgsProcessingParameterEnum(
+                self.FORM_TYPE,
+                self.tr("Form seçim modu"),
+                options=self._TYPE_OPTIONS,
+                defaultValue=0,
+            )
+        )
+        self.addParameter(
+            QgsProcessingParameterEnum(
+                self.ALLOWED_FORMS,
+                self.tr("İzin verilen formlar (tikleyerek seçin)"),
+                options=_FORM_LABELS,
+                allowMultiple=True,
+                defaultValue=list(range(len(_FORM_LABELS))),
+            )
+        )
+        self.addParameter(
+            QgsProcessingParameterNumber(
+                self.DIVERSITY,
+                self.tr(
+                    "Çeşitlilik — ardışık parsellerde aynı form tekrarlanmasın (1-5)"
+                ),
+                QgsProcessingParameterNumber.Integer,
+                3,
+                minValue=1,
+                maxValue=5,
+            )
+        )
+        self.addParameter(
+            QgsProcessingParameterNumber(
+                self.RANDOM_SEED,
+                self.tr("Rastgele tohum (0=tamamen rastgele, >0=tekrarlanabilir)"),
+                QgsProcessingParameterNumber.Integer,
+                0,
+                minValue=0,
+            )
+        )
+        self.addParameter(
+            QgsProcessingParameterFeatureSink(
+                self.OUTPUT, self.tr("Dinamik formlu binalar")
+            )
+        )
 
     def processAlgorithm(self, parameters, context, feedback):
         b_source = self.parameterAsSource(parameters, self.INPUT_BUILDINGS, context)
@@ -348,13 +400,18 @@ class DynamicMacroformAlgorithm(QgsProcessingAlgorithm):
         out_fields = QgsFields()
         for f in b_source.fields():
             out_fields.append(f)
-        out_fields.append(QgsField('form_tipi', QVariant.String, 'string', 20))
-        out_fields.append(QgsField('form_alan_m2', QVariant.Double, 'double', 20, 2))
-        out_fields.append(QgsField('bbox_doluluk', QVariant.Double, 'double', 20, 4))
+        out_fields.append(QgsField("form_tipi", QVariant.String, "string", 20))
+        out_fields.append(QgsField("form_alan_m2", QVariant.Double, "double", 20, 2))
+        out_fields.append(QgsField("bbox_doluluk", QVariant.Double, "double", 20, 4))
 
         (sink, dest_id) = self.parameterAsSink(
-            parameters, self.OUTPUT, context,
-            out_fields, b_source.wkbType(), b_source.sourceCrs())
+            parameters,
+            self.OUTPUT,
+            context,
+            out_fields,
+            b_source.wkbType(),
+            b_source.sourceCrs(),
+        )
 
         total = b_source.featureCount() or 1
         placed = 0
@@ -370,8 +427,11 @@ class DynamicMacroformAlgorithm(QgsProcessingAlgorithm):
 
             # Çeşitlilik kontrolü
             if diversity > 1 and len(last_forms) > 0:
-                pool = [f for f in allowed
-                        if f not in last_forms[-min(diversity, len(last_forms)):]]
+                pool = [
+                    f
+                    for f in allowed
+                    if f not in last_forms[-min(diversity, len(last_forms)) :]
+                ]
                 if not pool:
                     pool = allowed[:]
             else:
@@ -379,7 +439,8 @@ class DynamicMacroformAlgorithm(QgsProcessingAlgorithm):
 
             form_type = rng.choice(pool)
             form_geom, actual_type = generate_dynamic_form(
-                bbox_geom, form_type, allowed, rng)
+                bbox_geom, form_type, allowed, rng
+            )
 
             if form_geom.isEmpty():
                 continue
@@ -394,7 +455,10 @@ class DynamicMacroformAlgorithm(QgsProcessingAlgorithm):
             nf = QgsFeature(out_fields)
             nf.setGeometry(form_geom)
             attrs = list(feat.attributes()) + [
-                actual_type, round(form_area, 2), round(doluluk, 4)]
+                actual_type,
+                round(form_area, 2),
+                round(doluluk, 4),
+            ]
             nf.setAttributes(attrs)
             sink.addFeature(nf, QgsFeatureSink.FastInsert)
             placed += 1
@@ -408,13 +472,17 @@ class DynamicMacroformAlgorithm(QgsProcessingAlgorithm):
         return {self.OUTPUT: dest_id}
 
     def name(self):
-        return '3c_dynamic_macroform'
+        return "3c_dynamic_macroform"
+
     def displayName(self):
-        return '3C. Dinamik Bina Formu (Prosedürel)'
+        return "3C. Dinamik Bina Formu (Prosedürel)"
+
     def group(self):
-        return 'Yerleşim Planı İş Akışı'
+        return "Yerleşim Planı İş Akışı"
+
     def groupId(self):
-        return 'yerlesim_plani_workflow'
+        return "yerlesim_plani_workflow"
+
     def shortHelpString(self):
         return self.tr(
             "━━━ planX — Yerleşim Planı Araç Seti ━━━\n"
@@ -435,8 +503,11 @@ class DynamicMacroformAlgorithm(QgsProcessingAlgorithm):
             "Kısıtlar:\n"
             "• Tüm kanatlar ≥ 7m derinlikte\n"
             "• Küçük parsellere karmaşık formlar uygulanmaz\n"
-            "• Çeşitlilik parametresi ardışık tekrarı önler")
+            "• Çeşitlilik parametresi ardışık tekrarı önler"
+        )
+
     def createInstance(self):
         return DynamicMacroformAlgorithm()
+
     def tr(self, s):
-        return QCoreApplication.translate('Processing', s)
+        return QCoreApplication.translate("Processing", s)
