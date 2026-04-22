@@ -13,8 +13,9 @@ from qgis.core import QgsGeometry, QgsPointXY
 from .geometry_engine import get_polygon_edges, negative_buffer_per_edge
 
 
-def calculate_edge_setbacks(facade_classification, setback_front,
-                            setback_side, setback_back):
+def calculate_edge_setbacks(
+    facade_classification, setback_front, setback_side, setback_back
+):
     """
     Cephe sınıflandırmasından kenar bazlı setback listesi üretir.
 
@@ -29,20 +30,21 @@ def calculate_edge_setbacks(facade_classification, setback_front,
     """
     setbacks = {}
 
-    for idx in facade_classification.get('front', []):
+    for idx in facade_classification.get("front", []):
         setbacks[idx] = setback_front
 
-    for idx in facade_classification.get('side', []):
+    for idx in facade_classification.get("side", []):
         setbacks[idx] = setback_side
 
-    for idx in facade_classification.get('back', []):
+    for idx in facade_classification.get("back", []):
         setbacks[idx] = setback_back
 
     return setbacks
 
 
-def compute_buildable_area(parcel_geom, facade_classification,
-                           setback_front, setback_side, setback_back):
+def compute_buildable_area(
+    parcel_geom, facade_classification, setback_front, setback_side, setback_back
+):
     """
     Parsel geometrisi ve cephe bilgilerinden yapılaşabilir alanı hesaplar.
 
@@ -116,8 +118,9 @@ def apply_taks_constraint(buildable_geom, parcel_area, taks_ratio):
                 s_ring = [
                     QgsPointXY(
                         centroid.x() + scale_factor * (pt.x() - centroid.x()),
-                        centroid.y() + scale_factor * (pt.y() - centroid.y())
-                    ) for pt in ring
+                        centroid.y() + scale_factor * (pt.y() - centroid.y()),
+                    )
+                    for pt in ring
                 ]
                 s_poly.append(s_ring)
             scaled.append(s_poly)
@@ -129,16 +132,23 @@ def apply_taks_constraint(buildable_geom, parcel_area, taks_ratio):
             s_ring = [
                 QgsPointXY(
                     centroid.x() + scale_factor * (pt.x() - centroid.x()),
-                    centroid.y() + scale_factor * (pt.y() - centroid.y())
-                ) for pt in ring
+                    centroid.y() + scale_factor * (pt.y() - centroid.y()),
+                )
+                for pt in ring
             ]
             s_poly.append(s_ring)
         return QgsGeometry.fromPolygonXY(s_poly)
 
 
-def validate_setbacks(building_geom, parcel_geom, facade_classification,
-                      setback_front, setback_side, setback_back,
-                      tolerance=0.1):
+def validate_setbacks(
+    building_geom,
+    parcel_geom,
+    facade_classification,
+    setback_front,
+    setback_side,
+    setback_back,
+    tolerance=0.1,
+):
     """
     Bina geometrisinin setback kurallarına uygunluğunu doğrular.
 
@@ -161,14 +171,13 @@ def validate_setbacks(building_geom, parcel_geom, facade_classification,
 
         actual_dist = building_geom.distance(edge_geom)
         if actual_dist < required - tolerance:
-            violations.append({
-                'edge_index': i,
-                'required': required,
-                'actual': round(actual_dist, 2),
-                'deficit': round(required - actual_dist, 2)
-            })
+            violations.append(
+                {
+                    "edge_index": i,
+                    "required": required,
+                    "actual": round(actual_dist, 2),
+                    "deficit": round(required - actual_dist, 2),
+                }
+            )
 
-    return {
-        'valid': len(violations) == 0,
-        'violations': violations
-    }
+    return {"valid": len(violations) == 0, "violations": violations}

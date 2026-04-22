@@ -5,44 +5,68 @@ Adım 5: Hard Surface — Sert zemin (yürüme alanı) üretimi
 Geliştirici: Araş.Gör. Yusuf Eminoğlu
 planX Geospatial Advanced Tools — Yerleşim Planı Araç Seti
 """
+
 import os, sys
 from qgis.PyQt.QtCore import QCoreApplication, QVariant
 from qgis.core import (
-    QgsProcessing, QgsProcessingAlgorithm,
-    QgsProcessingParameterFeatureSource, QgsProcessingParameterFeatureSink,
+    QgsProcessing,
+    QgsProcessingAlgorithm,
+    QgsProcessingParameterFeatureSource,
+    QgsProcessingParameterFeatureSink,
     QgsProcessingParameterNumber,
-    QgsFeature, QgsGeometry, QgsWkbTypes, QgsProcessingException,
-    QgsField, QgsFields, QgsFeatureSink, QgsSpatialIndex
+    QgsFeature,
+    QgsGeometry,
+    QgsWkbTypes,
+    QgsProcessingException,
+    QgsField,
+    QgsFields,
+    QgsFeatureSink,
+    QgsSpatialIndex,
 )
 
 _base = os.path.dirname(os.path.dirname(__file__))
 if _base not in sys.path:
     sys.path.insert(0, _base)
-from core.hard_surface_engine import generate_hard_surface, calculate_hard_surface_ratio
 
 
 class HardSurfaceAlgorithm(QgsProcessingAlgorithm):
-    INPUT_BUILDINGS = 'INPUT_BUILDINGS'
-    INPUT_PARCELS = 'INPUT_PARCELS'
-    BUFFER_DIST = 'BUFFER_DIST'
-    OUTPUT = 'OUTPUT'
+    INPUT_BUILDINGS = "INPUT_BUILDINGS"
+    INPUT_PARCELS = "INPUT_PARCELS"
+    BUFFER_DIST = "BUFFER_DIST"
+    OUTPUT = "OUTPUT"
 
     def initAlgorithm(self, config=None):
-        self.addParameter(QgsProcessingParameterFeatureSource(
-            self.INPUT_BUILDINGS,
-            self.tr('Bina katmanı (Adım 3 veya 3B çıktısı)'),
-            [QgsProcessing.TypeVectorPolygon]))
-        self.addParameter(QgsProcessingParameterFeatureSource(
-            self.INPUT_PARCELS,
-            self.tr('Parsel katmanı (Adım 2 çıktısı)'),
-            [QgsProcessing.TypeVectorPolygon]))
-        self.addParameter(QgsProcessingParameterNumber(
-            self.BUFFER_DIST,
-            self.tr('Buffer mesafesi (m) — bina etrafındaki yürüme alanı genişliği'),
-            QgsProcessingParameterNumber.Double, 3.0,
-            minValue=1.0, maxValue=6.0))
-        self.addParameter(QgsProcessingParameterFeatureSink(
-            self.OUTPUT, self.tr('Sert zemin katmanı')))
+        self.addParameter(
+            QgsProcessingParameterFeatureSource(
+                self.INPUT_BUILDINGS,
+                self.tr("Bina katmanı (Adım 3 veya 3B çıktısı)"),
+                [QgsProcessing.TypeVectorPolygon],
+            )
+        )
+        self.addParameter(
+            QgsProcessingParameterFeatureSource(
+                self.INPUT_PARCELS,
+                self.tr("Parsel katmanı (Adım 2 çıktısı)"),
+                [QgsProcessing.TypeVectorPolygon],
+            )
+        )
+        self.addParameter(
+            QgsProcessingParameterNumber(
+                self.BUFFER_DIST,
+                self.tr(
+                    "Buffer mesafesi (m) — bina etrafındaki yürüme alanı genişliği"
+                ),
+                QgsProcessingParameterNumber.Double,
+                3.0,
+                minValue=1.0,
+                maxValue=6.0,
+            )
+        )
+        self.addParameter(
+            QgsProcessingParameterFeatureSink(
+                self.OUTPUT, self.tr("Sert zemin katmanı")
+            )
+        )
 
     def processAlgorithm(self, parameters, context, feedback):
         b_source = self.parameterAsSource(parameters, self.INPUT_BUILDINGS, context)
@@ -53,13 +77,18 @@ class HardSurfaceAlgorithm(QgsProcessingAlgorithm):
             raise QgsProcessingException(self.tr("Katmanlar yüklenemedi."))
 
         out_fields = QgsFields()
-        out_fields.append(QgsField('parcel_fid', QVariant.Int))
-        out_fields.append(QgsField('hs_area_m2', QVariant.Double, 'double', 20, 2))
-        out_fields.append(QgsField('hs_ratio', QVariant.Double, 'double', 20, 4))
+        out_fields.append(QgsField("parcel_fid", QVariant.Int))
+        out_fields.append(QgsField("hs_area_m2", QVariant.Double, "double", 20, 2))
+        out_fields.append(QgsField("hs_ratio", QVariant.Double, "double", 20, 4))
 
         (sink, dest_id) = self.parameterAsSink(
-            parameters, self.OUTPUT, context,
-            out_fields, QgsWkbTypes.MultiPolygon, p_source.sourceCrs())
+            parameters,
+            self.OUTPUT,
+            context,
+            out_fields,
+            QgsWkbTypes.MultiPolygon,
+            p_source.sourceCrs(),
+        )
 
         b_index = QgsSpatialIndex()
         b_feats = {}
@@ -125,13 +154,17 @@ class HardSurfaceAlgorithm(QgsProcessingAlgorithm):
         return {self.OUTPUT: dest_id}
 
     def name(self):
-        return '5_hard_surface'
+        return "5_hard_surface"
+
     def displayName(self):
-        return '5. Sert Zemin (Yürüme Alanı)'
+        return "5. Sert Zemin (Yürüme Alanı)"
+
     def group(self):
-        return 'Yerleşim Planı İş Akışı'
+        return "Yerleşim Planı İş Akışı"
+
     def groupId(self):
-        return 'yerlesim_plani_workflow'
+        return "yerlesim_plani_workflow"
+
     def shortHelpString(self):
         return self.tr(
             "━━━ planX — Yerleşim Planı Araç Seti ━━━\n"
@@ -145,8 +178,11 @@ class HardSurfaceAlgorithm(QgsProcessingAlgorithm):
             "Çıktı alanları:\n"
             "• parcel_fid: Kaynak parsel ID\n"
             "• hs_area_m2: Sert zemin alanı (m²)\n"
-            "• hs_ratio: Sert zemin / parsel oranı")
+            "• hs_ratio: Sert zemin / parsel oranı"
+        )
+
     def createInstance(self):
         return HardSurfaceAlgorithm()
+
     def tr(self, s):
-        return QCoreApplication.translate('Processing', s)
+        return QCoreApplication.translate("Processing", s)
