@@ -17,11 +17,11 @@ qgisMaximumVersion=3.99
 experimental=False
 deprecated=False
 changelog=
-    0.5.2 - Release local workflow updates, Step 3 footprint variants, parking-axis helpers, metadata standardization, stable Hub release refresh.
-    0.5.1 - Workflow steps renumbered: 3.1 FAR, 3.2 Ayrık, 3.3 Blok, 3.4 Bitişik, 4.1 Makroform, 4.2 DynamicForm, 5 VeriKontrol, 6-9 remaining
+    PlanX Settlement Planning Toolset 0.5.2 - Released the current local workflow updates, Step 3 footprint variants, parking-axis helpers, standardized Plugin Hub metadata, and refreshed the stable release package.
+    PlanX Settlement Planning Toolset 0.5.1 - Renumbered the workflow as 3.1 FAR, 3.2 Detached, 3.3 Block, 3.4 Attached, 4.1 Macroform, 4.2 DynamicForm, 5 Data Check, and 6-9 remaining stages.
         - Step 4.1 Macroform: TEMPLATE_FILE replaced by TEMPLATE_LAYER (open layer selector) + SELECTED_ONLY checkbox
         - Each Step 3.x variant now has a distinct icon
-    0.5.0 - Coverage footprint workflow revised into separate detached, attached, block and FAR generators with ada-based grouping.
-        - Step 1 now stores ada and parcel identifiers for downstream grouping logic.
-        - Added separate attached / block coverage algorithms and rebuilt FAR generation around ada groups.
-    0.1.0 - Initial version: 9-stage settlement plan production pipeline
+    PlanX Settlement Planning Toolset 0.5.0 - Revised the coverage footprint workflow into separate detached, attached, block, and FAR generators with block-based grouping.
+        - Step 1 now stores block and parcel identifiers for downstream grouping logic.
+        - Added separate attached and block coverage algorithms and rebuilt FAR generation around block groups.
+    PlanX Settlement Planning Toolset 0.1.0 - Initial 9-stage settlement plan production pipeline.
