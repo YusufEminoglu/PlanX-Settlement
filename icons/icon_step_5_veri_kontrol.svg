@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+  <!-- Kontrol listesi zemin -->
+  <rect x="3" y="3" width="18" height="18" rx="1.5" fill="#16A34A0A"/>
+  <!-- Checkmark (OK) -->
+  <polyline points="6,12 9,15 14,9" stroke="#16A34A" stroke-width="2" fill="none"/>
+  <!-- Uyarı üçgeni (sağ alt - hatalı) -->
+  <path d="M16 16 l3 0 l-1.5 -2.6 Z" fill="#DC2626" stroke="#DC2626" stroke-width="0.5" opacity="0.85"/>
+  <!-- Bina ikonu (küçük, üstte) -->
+  <rect x="8" y="4" width="8" height="5" rx="0.5" fill="#16A34A1A"/>
+  <!-- Parsel ikonu (altta) -->
+  <rect x="5" y="4" width="14" height="7" rx="0.5" stroke-dasharray="2 1.5" opacity="0.4"/>
+  <!-- "5" numarası -->
+  <text x="19" y="6" text-anchor="middle" font-family="sans-serif" font-size="4.5" font-weight="bold" fill="#16A34A" stroke="none">5</text>
+</svg>

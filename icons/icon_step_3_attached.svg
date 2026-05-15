@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#EA580C" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+  <!-- Parsel dış sınır -->
+  <rect x="2" y="2" width="20" height="20" rx="1" stroke-dasharray="3 2" opacity="0.35"/>
+  <!-- Sol bina (bitişik) -->
+  <rect x="4" y="5" width="7" height="14" rx="0.5" fill="#EA580C18"/>
+  <!-- Sağ bina (bitişik, ortak kenar) -->
+  <rect x="11" y="5" width="9" height="14" rx="0.5" fill="#EA580C28"/>
+  <!-- Bitişik ortak kenar vurgusu -->
+  <line x1="11" y1="5" x2="11" y2="19" stroke-width="2.2" opacity="0.7"/>
+  <!-- "B" etiketi -->
+  <text x="12" y="14.5" text-anchor="middle" font-family="sans-serif" font-size="6" font-weight="bold" fill="#EA580C" stroke="none">B</text>
+</svg>

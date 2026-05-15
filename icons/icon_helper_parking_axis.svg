@@ -1,0 +1,7 @@
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Bir aks (kesik kesik mavi çizgi) -->
+  <line x1="4" y1="20" x2="20" y2="4" stroke="#2563eb" stroke-width="2" stroke-dasharray="4 2"/>
+  <!-- P ikonu sembolü -->
+  <rect x="5" y="4" width="10" height="10" rx="2" fill="#3b82f6"/>
+  <path d="M8 6H11C12.1046 6 13 6.89543 13 8C13 9.10457 12.1046 10 11 10H8V14" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

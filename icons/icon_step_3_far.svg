@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#0891B2" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+  <!-- Ada dış sınır -->
+  <rect x="2" y="2" width="20" height="20" rx="1" stroke-dasharray="3 2" opacity="0.35"/>
+  <!-- Bina 1 (sol) — yapısal kütle -->
+  <rect x="4" y="8" width="6" height="12" rx="0.5" fill="#0891B228"/>
+  <!-- Bina 2 (sağ) — daha yüksek -->
+  <rect x="14" y="4" width="6" height="16" rx="0.5" fill="#0891B240"/>
+  <!-- Kat çizgileri sol bina -->
+  <line x1="4" y1="12" x2="10" y2="12" stroke-width="0.8" opacity="0.5"/>
+  <line x1="4" y1="16" x2="10" y2="16" stroke-width="0.8" opacity="0.5"/>
+  <!-- Kat çizgileri sağ bina -->
+  <line x1="14" y1="8" x2="20" y2="8" stroke-width="0.8" opacity="0.5"/>
+  <line x1="14" y1="12" x2="20" y2="12" stroke-width="0.8" opacity="0.5"/>
+  <line x1="14" y1="16" x2="20" y2="16" stroke-width="0.8" opacity="0.5"/>
+  <!-- FAR yazısı -->
+  <text x="12" y="22" text-anchor="middle" font-family="sans-serif" font-size="4.5" font-weight="bold" fill="#0891B2" stroke="none">FAR</text>
+</svg>

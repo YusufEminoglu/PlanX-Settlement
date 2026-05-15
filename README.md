@@ -12,7 +12,10 @@ PlanX Settlement Planning Toolset automates the full production of a settlement 
 |---|---|---|
 | 1 | **ParcelFlux** | Subdivides blocks into parcels with width variation and row asymmetry |
 | 2 | **FacadeDetector** | Detects and classifies parcel facades (front / side / rear setbacks) |
-| 3 | **CoverageFootprint** | Generates maximum buildable area using edge-based setbacks and floor area ratio (TAKS) |
+| 3A | **CoverageFootprint Detached** | Generates parcel footprints for detached layout using edge-based setbacks and TAKS |
+| 3B | **CoverageFootprint Attached** | Generates attached-layout row footprints by grouping side-neighbor parcels inside the same block |
+| 3C | **CoverageFootprint Block** | Generates twin / triple block-layout footprints by grouping parcels with shared block IDs |
+| 3D | **CoverageFootprint FAR** | Generates island-scale footprints from emsal and yençok values with fixed approach distances and inter-building spacing |
 | 3B | **Building Macroform** | Places basic building masses on parcels |
 | 3C | **Dynamic Macroform** | Procedurally derives 12 realistic architectural form typologies (I, L, U, T, etc.) |
 | 4 | **BuildingOptimizer** | Validates building-parcel fit and resolves geometric conflicts |
@@ -46,11 +49,13 @@ PlanX Settlement Planning Toolset automates the full production of a settlement 
 
 ## Changelog
 
+- **0.5.2** — Release refresh for the current local workflow updates, Step 3 variants, parking-axis helpers, and standardized Plugin Hub metadata.
+- **0.5.0** — Step 3 was split into detached / attached / block / FAR generators and Step 1 now stores block-level IDs for grouped footprint logic.
 - **0.1.0** — Initial version: 9-stage settlement plan production pipeline
 
 ## Author
 
 **Yusuf Eminoglu** — Dokuz Eylül University, Department of City and Regional Planning  
-[GitHub](https://github.com/YusufEminoglu) | geospacephilo@gmail.com
+[GitHub](https://github.com/YusufEminoglu) | yusuf.eminoglu@deu.edu.tr
 
 Part of the **[PlanX](https://github.com/YusufEminoglu/PlanX)** urban planning plugin suite.

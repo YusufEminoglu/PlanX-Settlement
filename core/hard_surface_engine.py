@@ -3,7 +3,7 @@
 planX — Hard Surface Engine
 Sert zemin (yürüme alanı) üretim motoru.
 
-Geliştirici: Araş.Gör. Yusuf Eminoğlu
+Geliştirici: Yusuf Eminoglu
 planX Geospatial Advanced Tools — Yerleşim Planı Araç Seti
 """
 

@@ -4,7 +4,7 @@ Kentsel Donatı Katmanı Oluşturucu
 Yerleşim planında kullanılacak kent mobilyaları için hazır stillenmiş
 nokta katmanı üretir. Öğrenci bu katmanı açıp elemanları haritaya yerleştirir.
 
-Geliştirici: Araş.Gör. Yusuf Eminoğlu
+Geliştirici: Yusuf Eminoglu
 planX Geospatial Advanced Tools — Yerleşim Planı Araç Seti
 """
 
@@ -238,7 +238,7 @@ class UrbanFurnitureAlgorithm(QgsProcessingAlgorithm):
     def shortHelpString(self):
         return self.tr(
             "━━━ planX — Yerleşim Planı Araç Seti ━━━\n"
-            "Geliştirici: Araş.Gör. Yusuf Eminoğlu\n\n"
+            "Geliştirici: Yusuf Eminoglu\n\n"
             "Yerleşim planında kullanılacak kent mobilyaları için\n"
             "hazır stillenmiş nokta katmanı oluşturur.\n\n"
             "İçerdiği donatılar:\n"
