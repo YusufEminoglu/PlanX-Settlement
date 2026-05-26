@@ -66,7 +66,12 @@ class GenerateRampsAlgorithm(QgsProcessingAlgorithm):
 
             # Yön ve başlangıç noktasını tespit et
             if geom.type() == QgsWkbTypes.LineGeometry:
-                polyline = geom.asPolyline()
+                # Multipart-safe: ilk parçayı al (önceki kod multi-line için sessizce skip ediyordu).
+                if geom.isMultipart():
+                    parts = geom.asMultiPolyline()
+                    polyline = list(parts[0]) if parts and parts[0] else []
+                else:
+                    polyline = geom.asPolyline()
                 if not polyline or len(polyline) < 2:
                     continue
                 p1 = polyline[0]
