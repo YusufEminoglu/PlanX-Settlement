@@ -2,7 +2,7 @@
 name=PlanX Settlement Planning Toolset
 qgisMinimumVersion=3.28
 description=PlanX Settlement Planning Tools. A 9-stage sequential workflow toolset capable of generating blocks, parcels, building footprints, parking, and landscapes.
-version=0.5.7
+version=0.5.8
 author=Yusuf Eminoglu
 email=yusuf.eminoglu@deu.edu.tr
 about=Built with a vision of urban resilience, spatial analysis, and optimization-based planning, this toolset automates Settlement Plan generation. It spans 9 consecutive processes, allowing for complete production lines starting from basic block sub-division all the way to building placement, parking layout design, and landscape generation. Developed with feedback from educational workflows at Dokuz Eylul University, Department of City and Regional Planning.

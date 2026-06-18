@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.5.8] - 2026-06-18
+
+- docs: add CITATION.cff for Zenodo DOI integration
+
 ## [0.5.7] - 2026-05-30
 
 - Revised plugin icon
