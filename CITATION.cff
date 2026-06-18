@@ -1,0 +1,13 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+  - family-names: "Eminoğlu"
+    given-names: "Yusuf"
+    email: "yusuf.eminoglu@deu.edu.tr"
+    orcid: "https://orcid.org/0009-0005-6000-2934"
+title: "PlanX Settlement Planning Toolset"
+version: "0.5.7"
+# doi: "" # Zenodo DOI numarası alındıktan sonra buraya eklenebilir
+date-released: "2026-06-18"
+url: "https://github.com/YusufEminoglu/PlanX-Settlement"
+abstract: "PlanX Settlement Planning Tools. A 9-stage sequential workflow toolset capable of generating blocks, parcels, building footprints, parking, and landscapes."
