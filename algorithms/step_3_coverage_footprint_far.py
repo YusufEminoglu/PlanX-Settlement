@@ -16,7 +16,7 @@ Yençok (Hmax) → kat adedi → TAKS = E / kat adedi (≤ 1.0)
 Geliştirici: Yusuf Eminoglu
 planX Geospatial Advanced Tools — Yerleşim Planı Araç Seti
 """
-import os, sys, math, random
+import os, sys, math
 from qgis.PyQt.QtCore import QCoreApplication, QVariant
 from qgis.core import (
     QgsFeature, QgsFeatureSink, QgsFields, QgsField,
@@ -30,6 +30,8 @@ from qgis.core import (
 _base = os.path.dirname(os.path.dirname(__file__))
 if _base not in sys.path:
     sys.path.insert(0, _base)
+
+from core.parcel_randomizer import _LCG
 
 from core.footprint_engine import compute_far_side_yard, compute_floor_count_from_height
 from core.geometry_engine import oriented_minimum_bounding_box, scale_geometry_to_area, get_polygon_edges
@@ -280,7 +282,7 @@ class CoverageFootprintFarAlgorithm(QgsProcessingAlgorithm):
         else:
             allowed = _FORM_NAMES[:]
 
-        rng = random.Random(seed if seed > 0 else None)
+        rng = _LCG(seed if seed > 0 else 42)
 
         out_fields = QgsFields()
         for f in source.fields():

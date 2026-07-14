@@ -7,8 +7,10 @@ Template bina formlarını (L, U, T, I, kare vb.) buildable bbox'a
 sığdırarak tasarımsal bina yerleştirmesi yapar.
 """
 
-import random
 from qgis.core import QgsGeometry, QgsVectorLayer
+
+
+from .parcel_randomizer import _LCG
 
 from .geometry_engine import (
     polygon_aspect_ratio,
@@ -108,7 +110,8 @@ def match_template_to_bbox(
         return None
 
     if rng is None:
-        rng = random.Random()
+        import time
+        rng = _LCG(int(time.time() * 1000000))
 
     bbox_ar = polygon_aspect_ratio(bbox_geom)
 

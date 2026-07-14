@@ -4,7 +4,7 @@
 Geliştirici: Yusuf Eminoglu
 planX Geospatial Advanced Tools — Yerleşim Planı Araç Seti
 """
-import os, sys, random
+import os, sys
 from qgis.PyQt.QtCore import QCoreApplication, QVariant
 from qgis.core import (
     QgsProcessing, QgsProcessingAlgorithm,
@@ -13,6 +13,12 @@ from qgis.core import (
     QgsFeature, QgsGeometry, QgsWkbTypes, QgsProcessingException,
     QgsField, QgsFields, QgsFeatureSink, QgsPointXY, QgsSpatialIndex
 )
+
+_base = os.path.dirname(os.path.dirname(__file__))
+if _base not in sys.path:
+    sys.path.insert(0, _base)
+
+from core.parcel_randomizer import _LCG
 
 
 class LandscapeGeneratorAlgorithm(QgsProcessingAlgorithm):
@@ -64,6 +70,8 @@ class LandscapeGeneratorAlgorithm(QgsProcessingAlgorithm):
         min_tb = self.parameterAsDouble(parameters, self.MIN_TREE_BUILDING, context)
         min_tt = self.parameterAsDouble(parameters, self.MIN_TREE_TREE, context)
 
+        rng = _LCG(42)
+
         if not p_source or not b_source:
             raise QgsProcessingException(self.tr("Katmanlar yüklenemedi."))
 
@@ -107,8 +115,8 @@ class LandscapeGeneratorAlgorithm(QgsProcessingAlgorithm):
 
             for _ in range(count):
                 for _attempt in range(500):
-                    x = random.uniform(bbox.xMinimum(), bbox.xMaximum())
-                    y = random.uniform(bbox.yMinimum(), bbox.yMaximum())
+                    x = rng.uniform(bbox.xMinimum(), bbox.xMaximum())
+                    y = rng.uniform(bbox.yMinimum(), bbox.yMaximum())
                     pt = QgsPointXY(x, y)
                     pt_g = QgsGeometry.fromPointXY(pt)
                     if not available.contains(pt_g):
@@ -120,7 +128,7 @@ class LandscapeGeneratorAlgorithm(QgsProcessingAlgorithm):
                 else:
                     continue
 
-                h = random.uniform(minH, maxH)
+                h = rng.uniform(minH, maxH)
                 nf = QgsFeature(out_fields)
                 nf.setGeometry(QgsGeometry.fromPointXY(placed[-1]))
                 nf.setAttributes([fid, round(h, 1), source_type])

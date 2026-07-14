@@ -11,8 +11,28 @@ planX Geospatial Advanced Tools — Yerleşim Planı Araç Seti
 
 import processing
 import math
-import random
 from qgis.PyQt.QtCore import QCoreApplication, QVariant
+
+
+class _LCG:
+    """Deterministic pseudo-random number generator.
+
+    A self-contained 64-bit linear congruential generator (Knuth's MMIX
+    constants) providing uniform random distributions. Not for cryptographic use.
+    """
+
+    __slots__ = ("_s",)
+    _A = 6364136223846793005
+    _C = 1442695040888963407
+    _M = (1 << 64) - 1
+
+    def __init__(self, seed: int = 0):
+        self._s = (int(seed) * 2 + 0x9E3779B97F4A7C15) & self._M
+
+    def uniform(self, lo: float, hi: float) -> float:
+        self._s = (self._A * self._s + self._C) & self._M
+        frac = (self._s >> 11) / float(1 << 53)  # top 53 bits -> [0, 1)
+        return lo + (hi - lo) * frac
 from qgis.core import (
     QgsProcessing, QgsProcessingAlgorithm,
     QgsProcessingParameterFeatureSource, QgsProcessingParameterFeatureSink,
@@ -152,6 +172,7 @@ class ParcelFluxAlgorithm(QgsProcessingAlgorithm):
         fields.append(QgsField('facade_count', QVariant.Int))
         fields.append(QgsField('is_corner', QVariant.Bool))
         fields.append(QgsField('front_direction', QVariant.String, 'string', 20))
+        fields.append(QgsField('wd_ratio', QVariant.Double, 'double', 10, 2))
 
         (sink, dest_id) = self.parameterAsSink(
             parameters, self.OUTPUT, context,
@@ -216,7 +237,7 @@ class ParcelFluxAlgorithm(QgsProcessingAlgorithm):
         h_layer.updateFields()
         p_layer.updateFields()
 
-        rng = random.Random(42)
+        rng = _LCG(42)
 
         for feature in merged_layer.getFeatures():
             geom = feature.geometry()
@@ -518,7 +539,7 @@ class ParcelFluxAlgorithm(QgsProcessingAlgorithm):
             while len(src_attrs) < working_layer.fields().count():
                 src_attrs.append(None)
             src_attrs = src_attrs[:working_layer.fields().count()]
-            attrs = src_attrs + [parcel_counter, round(area, 2), '', '', '', 0, False, '']
+            attrs = src_attrs + [parcel_counter, round(area, 2), '', '', '', 0, False, '', 0.0]
             nf.setAttributes(attrs)
             sink.addFeature(nf, QgsFeatureSink.FastInsert)
             count += 1

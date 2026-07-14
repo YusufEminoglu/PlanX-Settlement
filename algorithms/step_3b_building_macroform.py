@@ -5,7 +5,7 @@ Adım 4.1: Bina Makroform Yerleştirme — Şablon katmandan bina formu sığdı
 Geliştirici: Yusuf Eminoglu
 planX Geospatial Advanced Tools — Yerleşim Planı Araç Seti
 """
-import os, sys, random
+import os, sys
 from qgis.PyQt.QtCore import QCoreApplication, QVariant
 from qgis.core import (
     QgsProcessing, QgsProcessingAlgorithm,
@@ -20,6 +20,8 @@ from qgis.core import (
 _base = os.path.dirname(os.path.dirname(__file__))
 if _base not in sys.path:
     sys.path.insert(0, _base)
+
+from core.parcel_randomizer import _LCG
 
 from core.macroform_engine import TemplateBuilding, match_template_to_bbox, fit_template_to_bbox
 from core.geometry_engine import polygon_aspect_ratio, polygon_compactness, oriented_minimum_bounding_box
@@ -165,7 +167,7 @@ class BuildingMacroformAlgorithm(QgsProcessingAlgorithm):
         feedback.pushInfo(f"{len(templates)} şablon form yüklendi"
                           + (" (seçili nesnelerden)" if selected_only else "") + ".")
 
-        rng = random.Random(seed if seed > 0 else None)
+        rng = _LCG(seed if seed > 0 else 42)
 
         # Çıktı alanları
         out_fields = QgsFields()

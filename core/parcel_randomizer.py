@@ -7,9 +7,37 @@ Parsel bölme çizgilerinde balık kılçığı benzeri organik kayma sağlar.
 Sol ve sağ taraftaki bölme çizgileri birbirinden bağımsız offset alır.
 """
 
-import random
 import math
 from qgis.core import QgsGeometry, QgsPointXY
+
+
+class _LCG:
+    """Deterministic pseudo-random number generator.
+
+    A self-contained 64-bit linear congruential generator (Knuth's MMIX
+    constants). Not for cryptographic use.
+    """
+
+    __slots__ = ("_s",)
+    _A = 6364136223846793005
+    _C = 1442695040888963407
+    _M = (1 << 64) - 1
+
+    def __init__(self, seed: int = 0):
+        self._s = (int(seed) * 2 + 0x9E3779B97F4A7C15) & self._M
+
+    def uniform(self, lo: float, hi: float) -> float:
+        self._s = (self._A * self._s + self._C) & self._M
+        frac = (self._s >> 11) / float(1 << 53)  # top 53 bits -> [0, 1)
+        return lo + (hi - lo) * frac
+
+    def choice(self, seq):
+        if not seq:
+            raise IndexError("Cannot choose from empty sequence")
+        idx = int(self.uniform(0, len(seq)))
+        if idx >= len(seq):
+            idx = len(seq) - 1
+        return seq[idx]
 
 
 def apply_fishbone_offset(
@@ -39,9 +67,10 @@ def apply_fishbone_offset(
         return [(pt, pt) for pt in perpendicular_points]
 
     if seed is not None:
-        rng = random.Random(seed)
+        rng = _LCG(seed)
     else:
-        rng = random.Random()
+        import time
+        rng = _LCG(int(time.time() * 1000000))
 
     max_offset = lot_width * (randomness_pct / 100.0)
     result = []

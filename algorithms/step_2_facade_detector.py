@@ -195,6 +195,14 @@ class FacadeDetectorAlgorithm(QgsProcessingAlgorithm):
                 attrs[fi_map["is_corner"]] = is_corner
             if "front_direction" in fi_map:
                 attrs[fi_map["front_direction"]] = front_dir
+            if "wd_ratio" in fi_map:
+                if front_indices:
+                    front_len = sum(edges[fi][0].distance(edges[fi][1]) for fi in front_indices)
+                    area = geom.area()
+                    wd_ratio = (front_len ** 2) / area if area > 0.01 else 0.0
+                    attrs[fi_map["wd_ratio"]] = round(wd_ratio, 2)
+                else:
+                    attrs[fi_map["wd_ratio"]] = 0.0
             nf.setAttributes(attrs)
             sink.addFeature(nf, QgsFeatureSink.FastInsert)
             feedback.setProgress(int((i + 1) / total * 100))

@@ -11,7 +11,7 @@ Gerçekçi mimari kısıtlar:
 Geliştirici: Yusuf Eminoglu
 planX Geospatial Advanced Tools — Yerleşim Planı Araç Seti
 """
-import os, sys, math, random
+import os, sys, math
 from qgis.PyQt.QtCore import QCoreApplication, QVariant
 from qgis.core import (
     QgsProcessing, QgsProcessingAlgorithm,
@@ -20,6 +20,12 @@ from qgis.core import (
     QgsFeature, QgsGeometry, QgsWkbTypes, QgsProcessingException,
     QgsField, QgsFields, QgsFeatureSink, QgsPointXY
 )
+
+_base = os.path.dirname(os.path.dirname(__file__))
+if _base not in sys.path:
+    sys.path.insert(0, _base)
+
+from core.parcel_randomizer import _LCG
 
 # ═══════════════════════════════════════════════════════════════════════
 # MİMARİ KISITLAR
@@ -231,7 +237,7 @@ def generate_dynamic_form(bbox_geom, form_type="rastgele",
     Tüm kanatlar ≥ 7m derinlikte olur.
     """
     if rng is None:
-        rng = random.Random()
+        rng = _LCG(42)
 
     obb = bbox_geom.orientedMinimumBoundingBox()
     if not obb or len(obb) < 5:
@@ -343,7 +349,7 @@ class DynamicMacroformAlgorithm(QgsProcessingAlgorithm):
         else:
             allowed = _FORM_NAMES[:]
 
-        rng = random.Random(seed if seed > 0 else None)
+        rng = _LCG(seed if seed > 0 else 42)
 
         out_fields = QgsFields()
         for f in b_source.fields():
