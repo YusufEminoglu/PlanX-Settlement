@@ -16,6 +16,11 @@
 
 ---
 
+## 📖 Documentation
+
+**[Comprehensive Academic Reference Manual](https://yusufeminoglu.github.io/PlanX-Settlement/)** — complete documentation of every feature, parameter, and workflow. Hosted on GitHub Pages.
+
+
 ## Why this toolset?
 
 Producing a complete settlement plan by hand — subdividing blocks, placing footprints, fitting parking, adding landscape — takes days of repetitive geometry work. This toolset automates the full production line as a sequential, parameter-driven Processing pipeline: start from zoning blocks, end with a populated, reported settlement plan.
