@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.5.10] - 2026-08-07
+
+- Add comprehensive academic reference manual: 19 algorithms, 76 equations
+
 ## [0.5.9] - 2026-07-14
 
 - Add width-to-depth facade ratio field and resolve all security scan warnings
