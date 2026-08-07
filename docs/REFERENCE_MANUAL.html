@@ -1,0 +1,1923 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>planX Yerlesim Plani Arac Seti &mdash; Academic Reference Manual</title>
+<meta name="description" content="Comprehensive academic reference manual for the planX Settlement Plan Toolset - 20 QGIS Processing algorithms for urban settlement planning from island subdivision to landscape design.">
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<script>
+MathJax = {
+  tex: {
+    inlineMath: [['$','$'], ['\\(','\\)']],
+    displayMath: [['$$','$$'], ['\\[','\\]']],
+    processEscapes: true
+  },
+  options: {
+    ignoreHtmlClass: 'no-mathjax',
+    processHtmlClass: 'math'
+  }
+};
+</script>
+<style>
+/* ═══════════════════════════════════════════════════════════
+   CSS Variables (Light & Dark modes)
+   ═══════════════════════════════════════════════════════════ */
+:root {
+  --bg: #fafaf9;
+  --bg-card: #ffffff;
+  --bg-sidebar: #f5f5f4;
+  --text: #1c1917;
+  --text-secondary: #57534e;
+  --text-muted: #a8a29e;
+  --border: #e7e5e4;
+  --accent: #1e40af;
+  --accent-light: #dbeafe;
+  --accent-hover: #1e3a8a;
+  --code-bg: #f9fafb;
+  --table-stripe: #fafaf9;
+  --table-header: #f5f5f4;
+  --shadow: 0 1px 3px rgba(0,0,0,0.08);
+  --shadow-lg: 0 4px 12px rgba(0,0,0,0.1);
+  --toc-active: #eff6ff;
+  --success: #16a34a;
+  --warning: #d97706;
+  --danger: #dc2626;
+  --math-bg: #f8fafc;
+}
+[data-theme="dark"] {
+  --bg: #1c1917;
+  --bg-card: #292524;
+  --bg-sidebar: #1c1917;
+  --text: #e7e5e4;
+  --text-secondary: #d6d3d1;
+  --text-muted: #78716c;
+  --border: #44403c;
+  --accent: #60a5fa;
+  --accent-light: #1e3a5f;
+  --accent-hover: #93bbfd;
+  --code-bg: #1c1917;
+  --table-stripe: #292524;
+  --table-header: #1c1917;
+  --shadow: 0 1px 3px rgba(0,0,0,0.4);
+  --shadow-lg: 0 4px 12px rgba(0,0,0,0.5);
+  --toc-active: #1e3a5f;
+  --math-bg: #1e293b;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Base & Layout
+   ═══════════════════════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; font-size: 16px; }
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.7;
+  display: flex;
+  min-height: 100vh;
+}
+body.sidebar-collapsed .sidebar { width: 0; padding: 0; overflow: hidden; }
+body.sidebar-collapsed .main-content { margin-left: 0; }
+body.sidebar-collapsed .sidebar-toggle { left: 8px; }
+
+/* ═══════════════════════════════════════════════════════════
+   Sidebar TOC
+   ═══════════════════════════════════════════════════════════ */
+.sidebar {
+  position: fixed; top: 0; left: 0; bottom: 0;
+  width: 300px; background: var(--bg-sidebar);
+  border-right: 1px solid var(--border);
+  overflow-y: auto; overflow-x: hidden;
+  padding: 20px 16px 40px;
+  transition: width 0.3s ease, padding 0.3s ease;
+  z-index: 100; font-size: 0.85rem;
+}
+.sidebar h2 {
+  font-size: 0.9rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.05em; color: var(--text-secondary);
+  margin-bottom: 12px; padding-bottom: 6px;
+  border-bottom: 2px solid var(--accent);
+}
+.sidebar h2:not(:first-child) { margin-top: 20px; }
+.sidebar a {
+  display: block; padding: 4px 8px; border-radius: 4px;
+  color: var(--text-secondary); text-decoration: none;
+  transition: background 0.15s, color 0.15s;
+  border-left: 2px solid transparent;
+}
+.sidebar a:hover { background: var(--toc-active); color: var(--accent); }
+.sidebar a.active { background: var(--toc-active); color: var(--accent); font-weight: 600; border-left-color: var(--accent); }
+.sidebar .toc-sub { padding-left: 16px; font-size: 0.8rem; }
+.sidebar-toggle {
+  position: fixed; top: 12px; left: 308px; z-index: 110;
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: 6px; padding: 6px 10px; cursor: pointer;
+  color: var(--text); font-size: 0.85rem; transition: left 0.3s ease;
+}
+.sidebar-toggle:hover { background: var(--accent-light); }
+
+/* ═══════════════════════════════════════════════════════════
+   Main Content
+   ═══════════════════════════════════════════════════════════ */
+.main-content {
+  margin-left: 300px; flex: 1; min-width: 0;
+  padding: 32px 40px 80px; max-width: 1100px;
+  transition: margin-left 0.3s ease;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Top Bar
+   ═══════════════════════════════════════════════════════════ */
+.top-bar {
+  display: flex; align-items: center; gap: 16px;
+  margin-bottom: 24px; flex-wrap: wrap;
+}
+.top-bar button, .top-bar input {
+  padding: 8px 14px; border: 1px solid var(--border);
+  border-radius: 6px; font-size: 0.85rem;
+  background: var(--bg-card); color: var(--text);
+  cursor: pointer; transition: background 0.15s;
+}
+.top-bar button:hover { background: var(--accent-light); }
+.top-bar input[type="text"] {
+  flex: 1; min-width: 200px; max-width: 400px; cursor: text;
+}
+.top-bar input::placeholder { color: var(--text-muted); }
+.search-stats { font-size: 0.8rem; color: var(--text-muted); min-width: 80px; }
+
+/* ═══════════════════════════════════════════════════════════
+   Typography
+   ═══════════════════════════════════════════════════════════ */
+h1 { font-size: 2rem; font-weight: 800; margin-bottom: 8px; color: var(--accent); }
+h2 { font-size: 1.5rem; font-weight: 700; margin: 48px 0 16px; padding-bottom: 8px; border-bottom: 2px solid var(--border); }
+h3 { font-size: 1.15rem; font-weight: 700; margin: 32px 0 12px; color: var(--text-secondary); }
+h4 { font-size: 1rem; font-weight: 600; margin: 20px 0 8px; }
+p { margin-bottom: 12px; text-align: justify; }
+.subtitle { font-size: 1.05rem; color: var(--text-secondary); margin-bottom: 24px; }
+
+/* ═══════════════════════════════════════════════════════════
+   Cards, Tables, Code
+   ═══════════════════════════════════════════════════════════ */
+.card {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: 8px; padding: 20px 24px; margin: 16px 0;
+  box-shadow: var(--shadow);
+}
+.card h3 { margin-top: 0; }
+table {
+  width: 100%; border-collapse: collapse; margin: 16px 0;
+  font-size: 0.88rem;
+}
+thead { background: var(--table-header); }
+th, td {
+  padding: 8px 12px; text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+th { font-weight: 700; color: var(--text-secondary); white-space: nowrap; }
+tr:nth-child(even) td { background: var(--table-stripe); }
+code {
+  font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+  background: var(--code-bg); padding: 1px 5px; border-radius: 3px;
+  font-size: 0.85em; border: 1px solid var(--border);
+}
+.math-block {
+  background: var(--math-bg); padding: 16px 24px; border-radius: 8px;
+  margin: 12px 0; overflow-x: auto;
+  border-left: 4px solid var(--accent);
+}
+.badge {
+  display: inline-block; padding: 2px 8px; border-radius: 12px;
+  font-size: 0.75rem; font-weight: 600;
+}
+.badge-step { background: var(--accent-light); color: var(--accent); }
+.badge-helper { background: #fef3c7; color: #92400e; }
+.badge-green { background: #dcfce7; color: #166534; }
+.badge-red { background: #fee2e2; color: #991b1b; }
+.ref-list { font-size: 0.82rem; }
+.ref-list li { margin-bottom: 4px; word-break: break-all; }
+.interpretation { background: #ecfdf5; border: 1px solid #a7f3d0; padding: 14px 18px; border-radius: 6px; margin: 12px 0; }
+[data-theme="dark"] .interpretation { background: #064e3b; border-color: #065f46; }
+.highlight { background: #fef08a; padding: 0 3px; border-radius: 2px; }
+[data-theme="dark"] .highlight { background: #854d0e; }
+.search-hidden { display: none !important; }
+
+/* ═══════════════════════════════════════════════════════════
+   Responsive
+   ═══════════════════════════════════════════════════════════ */
+@media (max-width: 900px) {
+  .sidebar { width: 260px; }
+  .main-content { margin-left: 260px; padding: 20px; }
+  .sidebar-toggle { left: 268px; }
+}
+@media (max-width: 700px) {
+  body { flex-direction: column; }
+  .sidebar { position: static; width: 100%; max-height: 200px; border-right: none; border-bottom: 1px solid var(--border); }
+  .main-content { margin-left: 0; }
+  .sidebar-toggle { display: none; }
+  body.sidebar-collapsed .sidebar { max-height: 0; padding: 0; }
+  body.sidebar-collapsed .sidebar-toggle { display: block; position: static; margin: 8px; }
+}
+@media print {
+  .sidebar, .sidebar-toggle, .top-bar { display: none !important; }
+  .main-content { margin-left: 0 !important; }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Algorithm section separator
+   ═══════════════════════════════════════════════════════════ */
+.alg-hero {
+  display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap;
+}
+.alg-id {
+  font-size: 2.5rem; font-weight: 900; color: var(--accent); opacity: 0.15;
+  line-height: 1; user-select: none; min-width: 60px;
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════
+     Sidebar
+     ═══════════════════════════════════════════════════════ -->
+<aside class="sidebar" id="sidebar">
+  <h2>Manual</h2>
+  <a href="#overview">Overview</a>
+  <a href="#architecture">System Architecture</a>
+  <a href="#theoretical">Theoretical Foundations</a>
+
+  <h2>Core Workflow</h2>
+  <a href="#alg-step-1">1. ParcelFlux</a>
+  <a href="#alg-step-2">2. Facade Detector</a>
+  <a href="#alg-step-3-far">3.1 FAR Coverage</a>
+  <a href="#alg-step-3-detached">3.2 Detached Coverage</a>
+  <a href="#alg-step-3-block">3.3 Block Coverage</a>
+  <a href="#alg-step-3-attached">3.4 Attached Coverage</a>
+  <a href="#alg-step-3b">3B. Building Macroform</a>
+  <a href="#alg-step-3c">3C. Dynamic Macroform</a>
+  <a href="#alg-step-4">4. Building Optimizer</a>
+  <a href="#alg-step-5">5. Hard Surface</a>
+  <a href="#alg-step-6">6. Parking Generator</a>
+  <a href="#alg-step-7">7. Landscape Generator</a>
+  <a href="#alg-step-8">8. Settlement Finalizer</a>
+
+  <h2>Helper Tools</h2>
+  <a href="#alg-helper-furniture">Urban Furniture</a>
+  <a href="#alg-helper-stairs">Stairs Generator</a>
+  <a href="#alg-helper-ramps">Ramps Generator</a>
+  <a href="#alg-helper-crossing">Pedestrian Crossing</a>
+  <a href="#alg-helper-axis-layer">Parking Axis Layer</a>
+  <a href="#alg-helper-axis-gen">Axis Parking Generator</a>
+
+  <h2>Appendices</h2>
+  <a href="#appendix-terms">Glossary of Turkish Terms</a>
+  <a href="#appendix-planning">Turkish Planning Controls</a>
+  <a href="#appendix-refs">Collected References</a>
+</aside>
+
+<button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()" title="Toggle sidebar">&larr; &rarr;</button>
+
+<!-- ═══════════════════════════════════════════════════════
+     Main Content
+     ═══════════════════════════════════════════════════════ -->
+<main class="main-content">
+
+<!-- ── Top Bar ── -->
+<div class="top-bar">
+  <button onclick="toggleTheme()" title="Toggle dark/light mode" id="themeBtn">&#9788;</button>
+  <input type="text" id="searchBox" placeholder="Search algorithms, parameters, concepts&hellip;" oninput="searchManual()">
+  <span class="search-stats" id="searchStats"></span>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     OVERVIEW
+     ═══════════════════════════════════════════════════════ -->
+<h1>planX &mdash; Yerlesim Plani Arac Seti</h1>
+<p class="subtitle">Academic Reference Manual &mdash; 20 Processing Algorithms for Settlement Planning<br>
+<strong>Developer:</strong> Yusuf Eminoglu &nbsp;|&nbsp; <strong>Provider ID:</strong> <code>planx_yerlesim</code><br>
+<strong>Workflow:</strong> Ada (Island) &rarr; Parsel (Parcel) &rarr; Bina (Building) &rarr; Peyzaj (Landscape)</p>
+
+<section id="overview" class="card">
+<h3>Scope and Purpose</h3>
+<p>The <strong>planX Settlement Plan Toolset</strong> is a QGIS Processing plugin that implements a complete computational settlement planning workflow. It provides 20 algorithms organised into a sequential pipeline&mdash;from island subdivision through parcel formation, building footprint generation under four zoning typologies (<em>nizam</em>), macroform placement, surface analysis, parking layout, landscape design, and final quantitative reporting. An additional suite of six helper tools supports urban furniture cataloguing, accessibility geometry (stairs/ramps), pedestrian crossings, and axis-based parking generation.</p>
+<p>This manual documents each algorithm with its theoretical foundations, mathematical formulations, parameter specifications, output schemas, interpretation guidance, and scholarly references. It is intended for urban planners, GIS analysts, computational design researchers, and students of parametric urbanism.</p>
+</section>
+
+<section id="architecture" class="card">
+<h3>System Architecture</h3>
+<p>The toolset is organised as a single QGIS Processing Provider (<code>PlanXYerlesimProvider</code>) that registers 20 algorithms across three logical groups:</p>
+<table>
+  <thead><tr><th>Group</th><th>Group ID</th><th>Algorithms</th></tr></thead>
+  <tbody>
+    <tr><td>Yerlesim Plani Is Akisi (Settlement Plan Workflow)</td><td><code>yerlesim_plani_workflow</code></td><td>Steps 1&ndash;8 (14 algorithms)</td></tr>
+    <tr><td>Yerlesim Plani Yardimcilar (Settlement Plan Helpers)</td><td><code>yerlesim_plani_yardimcilar</code></td><td>Urban Furniture, Stairs, Ramps, Pedestrian Crossing (4 algorithms)</td></tr>
+    <tr><td>Otopark Araclari (Parking Tools)</td><td><code>parking_helpers</code></td><td>Parking Axis Layer, Axis Parking Generator (2 algorithms)</td></tr>
+  </tbody>
+</table>
+<p>The plugin's core logic is distributed across a modular engine architecture in the <code>core/</code> directory, comprising <code>geometry_engine</code> (edge extraction, OBB, scaling, aspect ratio), <code>footprint_engine</code> (nizam configuration, facade-aware setback, target-area fitting), <code>macroform_engine</code> (template matching), <code>parcel_randomizer</code> (LCG-based deterministic randomness), and <code>hard_surface_engine</code> (buffer-and-clip surface generation).</p>
+</section>
+
+<section id="theoretical" class="card">
+<h3>Theoretical Foundations</h3>
+<p>The toolset operationalises several interconnected theoretical frameworks from urban morphology, parametric design, and spatial analysis:</p>
+<ul style="padding-left:20px; margin-bottom:12px;">
+  <li><strong>Conzenian urban morphology</strong> (Conzen 1960, 1969): the plan unit as the fundamental analytical category, comprising the street system, plot pattern, and building arrangement. The parcel subdivision and building footprint algorithms implement this tripartite framework computationally.</li>
+  <li><strong>Space syntax</strong> (Hillier &amp; Hanson 1984; Hillier 1996): the facade detection algorithm operationalises the concept of spatial integration by analysing parcel edge proximity to the movement network (road axes), determining front/back relationships through configurational rather than purely geometric criteria.</li>
+  <li><strong>Parametric urbanism</strong> (Schumacher 2009; Beir&amp;atilde;o et al. 2012): the building form generation uses procedural rule-based generation with explicit constraint satisfaction (minimum wing depth 7m, setback compliance, TAKS/FAR density caps).</li>
+  <li><strong>Turkish planning legislation</strong> (Imar Kanunu No. 3194; Planli Alanlar Imar Yonetmeligi): the four <em>nizam</em> (zoning/building arrangement) types&mdash;Ayr&#305;k (detached), Blok (block/semi-detached), Biti&#351;ik (attached/row), and Emsal (FAR-based perimeter block)&mdash;are directly encoded in the setback and coverage algorithms.</li>
+  <li><strong>Parking standards</strong> (Shoup 2005; ITE 2010; Turkish Otopark Yonetmeligi 2026): parking generation follows geometric tessellation principles with concentric-ring packing and stall geometry derived from vehicle turning radii and aisle width standards.</li>
+  <li><strong>Universal design</strong> (Preiser &amp; Ostroff 2001; ADA Standards 2010; TS 12576): ramps and stairs embed accessibility constraints through parametric slope, width, and tread geometry.</li>
+</ul>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     ALGORITHM 1: ParcelFlux
+     ═══════════════════════════════════════════════════════ -->
+<section id="alg-step-1" class="alg-section">
+<div class="alg-hero"><span class="alg-id">01</span><h2>1. ParcelFlux &mdash; Island-to-Parcel Subdivision</h2></div>
+<span class="badge badge-step">Step 1</span> <code>1_parcel_flux</code> &nbsp; Class: <code>ParcelFluxAlgorithm</code>
+
+<h3>Theoretical Background</h3>
+<p>Parcel subdivision is the foundational operation in settlement morphology, translating development islands (<em>imar adas&#305;</em>) into individual plots (<em>parsel</em>) that form the basic operational unit of planning control. The algorithm implements a <strong>medial-axis subdivision</strong> strategy: each island polygon is divided by a centreline oriented along the long axis (the <em>h-line</em>), with perpendicular division lines placed at regular intervals corresponding to the target parcel width. This approach generalises the classical strip-parcelling method documented by Conzen (1960) in his study of Alnwick's burgage plots, extended with parametric controls for organic variation.</p>
+<p>The algorithm addresses several well-known challenges in automatic parcel generation: (1) irregular island shapes are pre-processed through oriented minimum bounding box (OBB) normalisation; (2) single-row detection prevents over-subdivision of narrow islands where the short edge is less than 1.8 times the target width; (3) residual sliver polygons are merged through a three-pass spatial adjacency optimisation; (4) optional width variation, fishbone offset, and row-width asymmetry introduce controlled organic irregularity that avoids the mechanical appearance of purely geometric subdivision (Marshall 2009).</p>
+
+<h3>Mathematical Formulation</h3>
+<div class="math-block">
+<strong>Parcel Count (Normal Mode):</strong>
+$$n = \left\lfloor \frac{L}{w} \right\rfloor,\quad n \geq 1$$
+where $L$ is the division line length (island long-axis projection) and $w$ is the target parcel width. The remainder $r = L - n \cdot w$ is distributed symmetrically when <em>uniform corners</em> is enabled.
+
+<strong>Start Offset (Uniform Corners):</strong>
+$$s_0 = \frac{L - n \cdot w}{2}$$
+
+<strong>Width Variation (per segment $i$):</strong>
+$$w_i = w \cdot \left(1 + \frac{\delta_i}{100}\right), \quad \delta_i \sim U\!\left(-\text{var}, +\text{var}\right)$$
+with rescaling to maintain total length:
+$$w_i \leftarrow w_i \cdot \frac{L - \frac{1}{2}(L - n \cdot w)}{\sum w_i}$$
+
+<strong>Row Width Asymmetry (Split Mode):</strong>
+$$w_A = w \cdot (1 + s / 100),\qquad w_B = w \cdot (1 - s / 100)$$
+$$s \sim U(-\text{row\_asym},\, +\text{row\_asym})$$
+$$n_A = \lfloor L / w_A \rfloor,\quad n_B = \lfloor L / w_B \rfloor$$
+
+<strong>H-line Offset Ratio:</strong>
+$$r_h = 0.5 + \delta_h,\quad \delta_h \sim U(-h_{\text{off}}/100,\, +h_{\text{off}}/100)$$
+
+<strong>Fishbone Offset (per division point):</strong>
+$$f_i \sim U(-f_{\max},\, +f_{\max}),\quad f_{\max} = w \cdot \frac{\text{fishbone}}{100}$$
+Applied as a tangential displacement along the division line before extending the perpendicular cut.
+</div>
+
+<h3>Parameters</h3>
+<table>
+<thead><tr><th>Parameter</th><th>ID</th><th>Type</th><th>Default</th><th>Range</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td>Girdi poligon katman&#305;</td><td><code>INPUT</code></td><td>Polygon source</td><td>&mdash;</td><td>&mdash;</td><td>Development island polygons</td></tr>
+<tr><td>Hedef parsel genisligi</td><td><code>LOT_WIDTH</code></td><td>Double</td><td>16.0</td><td>5.0+</td><td>Target parcel frontage width (m); 16m common in Turkish residential zones</td></tr>
+<tr><td>Minimum parsel alan&#305;</td><td><code>MIN_AREA</code></td><td>Double</td><td>300.0</td><td>0+</td><td>Minimum parcel area in m&sup2;; smaller parcels are candidates for merging</td></tr>
+<tr><td>Maksimum parsel alan&#305;</td><td><code>MAX_AREA</code></td><td>Double</td><td>2000.0</td><td>0+</td><td>Maximum parcel area filter upper bound</td></tr>
+<tr><td>Birlestirme esigi</td><td><code>MERGE_THRESHOLD</code></td><td>Double</td><td>35.0</td><td>0&ndash;100</td><td>Merge threshold as % of mean parcel area; higher = more aggressive merging</td></tr>
+<tr><td>Koseleri esit dagit</td><td><code>UNIFORM_CORNERS</code></td><td>Boolean</td><td>True</td><td>&mdash;</td><td>When enabled, distributes remainder symmetrically; when disabled, parcels start from one edge</td></tr>
+<tr><td>Genislik varyasyonu</td><td><code>WIDTH_VARIATION</code></td><td>Double</td><td>0.0</td><td>0&ndash;25</td><td>Width variation &plusmn;%; 0 = constant, 15 = natural diversity (e.g. 18m&ndash;23m range)</td></tr>
+<tr><td>Fishbone sinir offset</td><td><code>FISHBONE_OFFSET</code></td><td>Double</td><td>0.0</td><td>0&ndash;15</td><td>Organic tangential shift at division line endpoints (%)</td></tr>
+<tr><td>Sira genislik asimetrisi</td><td><code>ROW_WIDTH_ASYMMETRY</code></td><td>Double</td><td>0.0</td><td>0&ndash;25</td><td>Front-garden width difference between opposing rows; e.g. north-facing vs south-facing parcels</td></tr>
+<tr><td>H-line kaymasi</td><td><code>HLINE_OFFSET</code></td><td>Double</td><td>0.0</td><td>0&ndash;25</td><td>Offset of the medial dividing line from the centre (rear garden depth variation)</td></tr>
+</tbody>
+</table>
+
+<h3>Outputs</h3>
+<table>
+<thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>parcel_id</code> / <code>planx_parcel_id</code></td><td>Int</td><td>Sequential parcel identifier (1-based)</td></tr>
+<tr><td><code>aream2</code></td><td>Double (20,2)</td><td>Parcel area in square metres</td></tr>
+<tr><td><code>facade_front</code></td><td>String (100)</td><td>Comma-separated front facade edge indices (populated in Step 2)</td></tr>
+<tr><td><code>facade_side</code></td><td>String (100)</td><td>Side facade edge indices (populated in Step 2)</td></tr>
+<tr><td><code>facade_back</code></td><td>String (100)</td><td>Back facade edge indices (populated in Step 2)</td></tr>
+<tr><td><code>facade_count</code></td><td>Int</td><td>Number of front facades (populated in Step 2)</td></tr>
+<tr><td><code>is_corner</code></td><td>Bool</td><td>Corner parcel flag (populated in Step 2)</td></tr>
+<tr><td><code>front_direction</code></td><td>String (20)</td><td>Compass direction of front facade (populated in Step 2)</td></tr>
+<tr><td><code>wd_ratio</code></td><td>Double (10,2)</td><td>Width/Depth ratio (populated in Step 2)</td></tr>
+<tr><td>(Original fields)</td><td>&mdash;</td><td>All input layer fields are preserved in output</td></tr>
+</tbody>
+</table>
+
+<h3>Interpretation Guidance</h3>
+<div class="interpretation">
+<p><strong>Narrow islands (single-row):</strong> When <code>max_width &lt; 1.8 &times; lot_width</code>, the algorithm switches to single-row mode automatically. The feedback panel reports this. If you see unexpected single-row classifications, reduce the lot width or increase the fishbone offset to generate more nuanced subdivision.</p>
+<p><strong>Residual slivers:</strong> Polygons with area &lt; 5 m&sup2; are discarded. The three-pass merging algorithm targets slivers with the longest shared boundary. If many parcels are being merged, reduce <code>MERGE_THRESHOLD</code> or increase target width.</p>
+<p><strong>Row-width asymmetry:</strong> The most distinctive parameter. At 10% with 20m base width, one row receives ~22m parcels while the opposing row receives ~18m. This creates differentiated front-garden depths appropriate for solar-orientation-based planning (south-facing parcels narrower but deeper).</p>
+</div>
+
+<h3>References</h3>
+<ol class="ref-list">
+<li>Conzen, M.R.G. (1960). <em>Alnwick, Northumberland: A Study in Town-Plan Analysis</em>. Institute of British Geographers, Publication No. 27. London: George Philip. DOI: <a href="https://doi.org/10.2307/621094">10.2307/621094</a></li>
+<li>Marshall, S. (2009). <em>Cities, Design and Evolution</em>. Routledge. DOI: <a href="https://doi.org/10.4324/9780203886427">10.4324/9780203886427</a></li>
+<li>Kropf, K. (2017). <em>The Handbook of Urban Morphology</em>. Wiley. DOI: <a href="https://doi.org/10.1002/9781118747711">10.1002/9781118747711</a></li>
+<li>Parish, Y.I.H. &amp; M&uuml;ller, P. (2001). Procedural Modeling of Cities. <em>Proceedings of SIGGRAPH 2001</em>, pp. 301&ndash;308. DOI: <a href="https://doi.org/10.1145/383259.383292">10.1145/383259.383292</a></li>
+<li>Moudon, A.V. (1997). Urban morphology as an emerging interdisciplinary field. <em>Urban Morphology</em>, 1(1), 3&ndash;10. DOI: <a href="https://doi.org/10.51347/jum.v1i1.4047">10.51347/jum.v1i1.4047</a></li>
+<li>Oliveira, V. (2016). <em>Urban Morphology: An Introduction to the Study of the Physical Form of Cities</em>. Springer. DOI: <a href="https://doi.org/10.1007/978-3-319-32083-0">10.1007/978-3-319-32083-0</a></li>
+<li>Vanegas, C.A., Aliaga, D.G., Benes, B. &amp; Waddell, P. (2009). Visualization of Simulated Urban Spaces. <em>Computers &amp; Graphics</em>, 33(5), 609&ndash;617. DOI: <a href="https://doi.org/10.1016/j.cag.2009.06.005">10.1016/j.cag.2009.06.005</a></li>
+</ol>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     ALGORITHM 2: FacadeDetector
+     ═══════════════════════════════════════════════════════ -->
+<section id="alg-step-2" class="alg-section">
+<div class="alg-hero"><span class="alg-id">02</span><h2>2. Facade Detector &mdash; Network-Based Front/Side/Back Classification</h2></div>
+<span class="badge badge-step">Step 2</span> <code>2_facade_detector</code> &nbsp; Class: <code>FacadeDetectorAlgorithm</code>
+
+<h3>Theoretical Background</h3>
+<p>Facade detection is a critical intermediary step that establishes the spatial relationship between each parcel edge and the movement network. In planning regulation, the classification of a parcel edge as <em>front</em> (facing a public road), <em>side</em> (lateral boundary), or <em>back</em> (rear boundary) determines the applicable setback distances and thus directly constrains building footprint geometry. The algorithm operationalises principles from <strong>space syntax</strong> theory (Hillier &amp; Hanson 1984), where the configurational relationship between private parcels and public movement channels is the primary determinant of spatial integration.</p>
+<p>The distance-based classification uses an <strong>adaptive threshold</strong>: when no explicit threshold is provided, it is calculated as 60% of the parcel's minimum bounding rectangle dimension&mdash;a heuristic derived from the empirical observation that parcels with standard depth-to-width ratios (typically 1:1.5 to 1:3 in Turkish residential zones) have front edges within approximately half to two-thirds of their depth from the road. Corner parcels are identified when two or more edges fall within the threshold distance, triggering the special setback rules mandated by Article 18 of the Turkish Planned Areas Zoning Regulation, where corner parcels have zero side yards and two rear yards instead of the standard one-side-two configuration.</p>
+
+<h3>Mathematical Formulation</h3>
+<div class="math-block">
+<strong>Adaptive Distance Threshold:</strong>
+$$d_{\text{thresh}} =
+\begin{cases}
+\min(w_{\text{OBB}}, h_{\text{OBB}}) \times 0.6, & \text{if OBB available} \\[4pt]
+\sqrt{A} \times 0.5, & \text{otherwise}
+\end{cases}$$
+where $w_{\text{OBB}}, h_{\text{OBB}}$ are the width and height of the oriented minimum bounding box, and $A$ is the parcel area.
+
+<strong>Edge-to-Network Distance:</strong>
+$$d(e_i) = \min_{r \in R} \text{dist}(m_i, r)$$
+where $m_i = \left(\frac{p_{1x}+p_{2x}}{2}, \frac{p_{1y}+p_{2y}}{2}\right)$ is the midpoint of edge $i$, and $R$ is the set of road network geometries.
+
+<strong>Front Edge Set:</strong>
+$$F = \{e_i \mid d(e_i) &lt; d_{\text{thresh}}\}$$
+
+<strong>Corner Parcel Condition:</strong>
+$$\text{is\_corner} = \begin{cases} \text{true}, & |F| \geq 2 \\ \text{false}, & \text{otherwise} \end{cases}$$
+
+<strong>Back Edge Identification (non-corner):</strong>
+$$b = \underset{e_i \notin F}{\arg\max}\; \text{dist}(c_F, m_i)$$
+where $c_F$ is the average midpoint of all front edges.
+
+<strong>Compass Direction of Front Facade Normal:</strong>
+$$\alpha_i = \text{atan2}(p_{2y} - p_{1y},\, p_{2x} - p_{1x})$$
+$$\text{normal}_i = (\alpha_i + 90^\circ) \bmod 360^\circ$$
+
+<strong>Width/Depth Ratio:</strong>
+$$r_{wd} = \frac{(\sum_{e_i \in F} L_i)^2}{A}$$
+where $L_i$ is the length of front edge $i$ and $A$ is parcel area.
+</div>
+
+<h3>Parameters</h3>
+<table>
+<thead><tr><th>Parameter</th><th>ID</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td>Parsel katman&#305;</td><td><code>INPUT_PARCELS</code></td><td>Polygon source</td><td>&mdash;</td><td>Step 1 output with empty facade fields</td></tr>
+<tr><td>Yol ag&#305; katman&#305;</td><td><code>INPUT_ROADS</code></td><td>Line source</td><td>&mdash;</td><td>Road centreline network</td></tr>
+<tr><td>On cephe mesafe esigi</td><td><code>THRESHOLD</code></td><td>Double</td><td>0.0</td><td>Front facade distance threshold (m); 0 = automatic (60% of min OBB dimension)</td></tr>
+</tbody>
+</table>
+
+<h3>Outputs</h3>
+<table>
+<thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>facade_front</code></td><td>String (100)</td><td>Comma-separated indices of front edges</td></tr>
+<tr><td><code>facade_side</code></td><td>String (100)</td><td>Comma-separated indices of side edges</td></tr>
+<tr><td><code>facade_back</code></td><td>String (100)</td><td>Comma-separated indices of back edges</td></tr>
+<tr><td><code>facade_count</code></td><td>Int</td><td>Number of front-facing edges</td></tr>
+<tr><td><code>is_corner</code></td><td>Bool</td><td>True if parcel has 2+ front facades (corner lot)</td></tr>
+<tr><td><code>front_direction</code></td><td>String (20)</td><td>Compass direction (N, NE, E, SE, S, SW, W, NW) or "coklu" if multiple</td></tr>
+<tr><td><code>wd_ratio</code></td><td>Double (10,2)</td><td>Width/depth ratio</td></tr>
+</tbody>
+</table>
+
+<h3>Interpretation Guidance</h3>
+<div class="interpretation">
+<p><strong>Zero threshold (automatic):</strong> Recommended for most cases. The adaptive formula handles parcels from 100 m&sup2; to over 2000 m&sup2;. If you observe misclassification (front edges not detected or rear edges incorrectly labelled as front), set an explicit threshold based on your local road setback regulations.</p>
+<p><strong>Corner parcel rules:</strong> When <code>is_corner = True</code>, the building footprint algorithms (Steps 3.2&ndash;3.4) apply special setback logic: two rear yards and zero side yards, in accordance with Turkish planning regulations. Verify corner detection by checking that parcels at street intersections have <code>facade_count &ge; 2</code>.</p>
+<p><strong>Road network density:</strong> Sparse road networks with large gaps between axes may cause parcels far from any road to have no front edges classified. Consider densifying the road centreline network or increasing the threshold.</p>
+</div>
+
+<h3>References</h3>
+<ol class="ref-list">
+<li>Hillier, B. &amp; Hanson, J. (1984). <em>The Social Logic of Space</em>. Cambridge University Press. DOI: <a href="https://doi.org/10.1017/CBO9780511597237">10.1017/CBO9780511597237</a></li>
+<li>Hillier, B. (1996). <em>Space is the Machine: A Configurational Theory of Architecture</em>. Cambridge University Press.</li>
+<li>Batty, M. (2013). <em>The New Science of Cities</em>. MIT Press. DOI: <a href="https://doi.org/10.7551/mitpress/9399.001.0001">10.7551/mitpress/9399.001.0001</a></li>
+<li>Peponis, J., Bafna, S. &amp; Zhang, Z. (2008). The connectivity of streets: reach and directional distance. <em>Environment and Planning B</em>, 35(5), 881&ndash;901. DOI: <a href="https://doi.org/10.1068/b33088">10.1068/b33088</a></li>
+<li>Turner, A. (2007). From Axial to Road-Centre Lines. <em>Environment and Planning B</em>, 34(3), 539&ndash;555. DOI: <a href="https://doi.org/10.1068/b32067">10.1068/b32067</a></li>
+<li>Porta, S., Crucitti, P. &amp; Latora, V. (2006). The network analysis of urban streets: a primal approach. <em>Environment and Planning B</em>, 33(5), 705&ndash;725. DOI: <a href="https://doi.org/10.1068/b32045">10.1068/b32045</a></li>
+<li>Sevtsuk, A. &amp; Mekonnen, M. (2012). Urban network analysis. <em>Revue Internationale de G&eacute;omatique</em>, 22(2), 287&ndash;305.</li>
+</ol>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     ALGORITHM 3.1: FAR Coverage (Emsal)
+     ═══════════════════════════════════════════════════════ -->
+<section id="alg-step-3-far" class="alg-section">
+<div class="alg-hero"><span class="alg-id">3.1</span><h2>3.1. Emsal Cozumu (FAR-Based Perimeter Block)</h2></div>
+<span class="badge badge-step">Step 3</span> <code>3_1_emsal_ada</code> &nbsp; Class: <code>CoverageFootprintFarAlgorithm</code>
+
+<h3>Theoretical Background</h3>
+<p>Floor Area Ratio (FAR)&mdash;<em>Emsal</em> or <em>KAKS</em> in Turkish planning terminology&mdash;is the primary bulk control in zoning ordinances worldwide. Unlike TAKS (Building Coverage Ratio), which controls only the ground-plane footprint, FAR regulates total built volume by relating total floor area to site area. This algorithm solves the <strong>perimeter block</strong> typology, characteristic of European urbanism from the 19th-century <em>Gr&uuml;nderzeit</em> blocks to contemporary courtyard housing (Lehnerer 2009).</p>
+<p>The algorithm decomposes the FAR constraint into a TAKS target using the building height: $TAKS = FAR / n_{floors}$, where $n_{floors}$ is derived from the maximum height $H_{max}$ divided by estimated floor-to-floor height (typically 3.1m for residential). Building masses are then distributed along the buildable perimeter (the island polygon offset inward by the fixed setback distance), segmented into individual building blocks separated by twice the side-yard distance, and filled with procedural architectural forms (L, U, T, I, courtyard, etc.) that respect a minimum structural depth of 9m. This represents a <strong>constraint-based generative design</strong> approach (Beirao et al. 2012) where legal and structural constraints drive formal outcomes.</p>
+
+<h3>Mathematical Formulation</h3>
+<div class="math-block">
+<strong>Floor Count from Building Height:</strong>
+$$n_f = \left\lfloor \frac{H_{\max}}{h_{\text{floor}}} \right\rfloor,\quad n_f \geq 1$$
+with $h_{\text{floor}} = 3.1\text{m}$ (default).
+
+<strong>TAKS Target from FAR:</strong>
+$$\text{TAKS}_{\text{target}} = \min\!\left(1.0,\; \frac{\text{FAR}}{\max(n_f, 1)}\right)$$
+
+<strong>Buildable Area (Setback Reduction):</strong>
+$$A_{\text{buildable}} = \text{Area}\!\left(\text{Island} \ominus d_{\text{setback}}\right)$$
+where $\ominus$ denotes morphological erosion (negative buffer) by the fixed setback distance.
+
+<strong>Target Building Footprint Area:</strong>
+$$A_{\text{target}} = A_{\text{buildable}} \times \text{TAKS}_{\text{target}}$$
+
+<strong>Side Yard Distance (FAR-based):</strong>
+$$d_{\text{side}} = f(n_f)$$
+Computed by <code>compute_far_side_yard</code> as a function of floor count, increasing with height to maintain fire safety and daylight access.
+
+<strong>Per-Edge Building Count:</strong>
+$$n_i = \min\!\left( \left\lfloor \frac{L_i \cdot n_{\text{forms}}}{\sum L_j} \right\rfloor,\; \left\lfloor \frac{L_i}{5 + 2 d_{\text{side}}} \right\rfloor \right)$$
+where $L_i$ is the length of valid edge $i$ and $n_{\text{forms}}$ is the requested total building count.
+
+<strong>Building Width (per segment):</strong>
+$$b_{\text{width}} = \frac{L_i - 2 d_{\text{side}} - (n_i - 1) \cdot 2 d_{\text{side}}}{n_i},\quad b_{\text{width}} \geq 5\text{m}$$
+
+<strong>Calculated Building Depth:</strong>
+$$d_{\text{calc}} = \max\!\left(d_{\min},\; \min\!\left(\frac{A_{\text{target}}}{\sum L_{\text{eff}} \cdot 0.65},\; 35\right)\right)$$
+with $d_{\min} = 9\text{m}$, maximum depth 35m, and 0.65 representing the average bbox fill ratio of procedural forms.
+</div>
+
+<h3>Parameters</h3>
+<table>
+<thead><tr><th>Parameter</th><th>ID</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td>Ada katman&#305;</td><td><code>INPUT</code></td><td>Polygon source</td><td>&mdash;</td><td>Island polygons (each feature = 1 island)</td></tr>
+<tr><td>Emsal (FAR) sutunu</td><td><code>FAR_FIELD</code></td><td>Field</td><td>&mdash;</td><td>Floor Area Ratio field (total construction area / island area)</td></tr>
+<tr><td>Yencok yukseklik sutunu</td><td><code>HMAX_FIELD</code></td><td>Field</td><td>&mdash;</td><td>Maximum building height Hmax (m)</td></tr>
+<tr><td>Yapi yaklasma mesafesi</td><td><code>FIXED_SETBACK</code></td><td>Double</td><td>5.0</td><td>Fixed setback distance from island boundary (m)</td></tr>
+<tr><td>Ortalama kat yuksekligi</td><td><code>AVG_FLOOR_HEIGHT</code></td><td>Double</td><td>3.1</td><td>Average floor-to-floor height for Hmax &rarr; floor count</td></tr>
+<tr><td>Minimum bina derinligi</td><td><code>MIN_DEPTH</code></td><td>Double</td><td>9.0</td><td>Minimum building structural depth (m)</td></tr>
+<tr><td>Form secim modu</td><td><code>FORM_TYPE</code></td><td>Enum</td><td>0</td><td>0=Random mixed, 1=Specific forms</td></tr>
+<tr><td>Izin verilen formlar</td><td><code>ALLOWED_FORMS</code></td><td>Enum (multi)</td><td>All</td><td>12 procedural form types (Dikdortgen, L, Ters L, U, T, Ters T, Z, H, C, Avlulu, E, +)</td></tr>
+<tr><td>Form sayisi</td><td><code>NUM_FORMS</code></td><td>Integer</td><td>6</td><td>Target number of buildings per island (capacity-permitting)</td></tr>
+<tr><td>Rastgele tohum</td><td><code>RANDOM_SEED</code></td><td>Integer</td><td>0</td><td>Random seed (0=fully random, &gt;0=reproducible)</td></tr>
+</tbody>
+</table>
+
+<h3>Outputs</h3>
+<table>
+<thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td>(Original fields)</td><td>&mdash;</td><td>All input island fields preserved</td></tr>
+<tr><td><code>ada_katman_id</code></td><td>Int</td><td>Island feature ID</td></tr>
+<tr><td><code>form_tipi</code></td><td>String (30)</td><td>Procedural form type label</td></tr>
+<tr><td><code>bina_no</code></td><td>Int</td><td>Building sequence number within the island</td></tr>
+<tr><td><code>bina_sayisi</code></td><td>Int</td><td>Total buildings generated for this island</td></tr>
+<tr><td><code>kat_adedi</code></td><td>Int</td><td>Calculated floor count from Hmax</td></tr>
+<tr><td><code>min_bina_mesafesi</code></td><td>Double (20,2)</td><td>Minimum distance between adjacent buildings = 2 &times; side yard</td></tr>
+<tr><td><code>taks_hedef</code></td><td>Double (20,4)</td><td>Target Building Coverage Ratio from FAR/floor_count</td></tr>
+<tr><td><code>bina_alan_m2</code></td><td>Double (20,2)</td><td>Actual building footprint area (m&sup2;)</td></tr>
+</tbody>
+</table>
+
+<h3>Interpretation Guidance</h3>
+<div class="interpretation">
+<p><strong>FAR &gt; floor_count:</strong> When FAR exceeds the number of floors, TAKS_target is capped at 1.0 (100% coverage), meaning the entire buildable area is filled with building form. This represents a fully extruded block condition. Increase Hmax or reduce FAR to avoid this saturation.</p>
+<p><strong>FAR = 0:</strong> Features with FAR = 0 are skipped with a log message. This is expected for non-buildable islands (parks, infrastructure, etc.).</p>
+<p><strong>Fallback geometry:</strong> When the segmented perimeter approach fails to generate valid buildings (typically on very small or irregular islands), a fallback geometry scaled to the target area is created with the label "fallback". Review these features individually for manual adjustment.</p>
+<p><strong>Form diversity:</strong> The 12 procedural forms range from simple rectangles to complex courtyard and comb typologies. Smaller islands (w &lt; 20m or h &lt; 20m) are restricted to simpler forms (rectangle, L, T) to maintain structural plausibility.</p>
+</div>
+
+<h3>References</h3>
+<ol class="ref-list">
+<li>Barnett, J. (1982). <em>An Introduction to Urban Design</em>. Harper &amp; Row.</li>
+<li>Lehnerer, A. (2009). <em>Grand Urban Rules</em>. 010 Publishers. DOI: <a href="https://doi.org/10.5949/mitpress/9780262514781.001.0001">10.5949/mitpress/9780262514781.001.0001</a></li>
+<li>Beir&atilde;o, J.N., Duarte, J.P. &amp; Stouffs, R. (2012). Structuring a Generative Model for Urban Design. <em>Proceedings of eCAADe 2012</em>, pp. 323&ndash;332.</li>
+<li>Schumacher, P. (2009). Parametricism: A New Global Style for Architecture and Urban Design. <em>Architectural Design</em>, 79(4), 14&ndash;23. DOI: <a href="https://doi.org/10.1002/ad.912">10.1002/ad.912</a></li>
+<li>M&uuml;ller, P., Wonka, P., Haegler, S., Ulmer, A. &amp; Van Gool, L. (2006). Procedural Modeling of Buildings. <em>ACM Transactions on Graphics</em>, 25(3), 614&ndash;623. DOI: <a href="https://doi.org/10.1145/1141911.1141931">10.1145/1141911.1141931</a></li>
+<li>Batty, M. &amp; Longley, P. (1994). <em>Fractal Cities: A Geometry of Form and Function</em>. Academic Press.</li>
+<li>Duarte, J.P. (2005). A discursive grammar for customizing mass housing. <em>Automation in Construction</em>, 14(2), 265&ndash;275. DOI: <a href="https://doi.org/10.1016/j.autcon.2004.07.013">10.1016/j.autcon.2004.07.013</a></li>
+</ol>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     ALGORITHM 3.2: Detached Coverage (Ayr&#305;k Nizam)
+     ═══════════════════════════════════════════════════════ -->
+<section id="alg-step-3-detached" class="alg-section">
+<div class="alg-hero"><span class="alg-id">3.2</span><h2>3.2. Detached Building Coverage (Ayr&#305;k Nizam)</h2></div>
+<span class="badge badge-step">Step 3</span> <code>3_2_ayrik_nizam</code> &nbsp; Class: <code>CoverageFootprintAlgorithm</code>
+
+<h3>Theoretical Background</h3>
+<p>Detached order (<em>Ayr&#305;k Nizam</em>, abbreviated "A nizam" in Turkish planning codes) is the most common low-to-medium density residential building arrangement, characterised by free-standing buildings separated from all parcel boundaries by mandatory setbacks on all four sides. This typology dominates suburban morphologies globally and is the default zoning category for residential areas in most Turkish municipalities under the Planned Areas Zoning Regulation (Planli Alanlar Imar Yonetmeligi).</p>
+<p>The algorithm implements <strong>facade-conscious setback</strong>, where each parcel edge's setback distance is determined by its facade classification from Step 2: front edges receive the front setback (typically largest, for streetscape definition and traffic safety), side edges receive the lateral setback (for fire separation and daylight access), and back edges receive the rear setback (for privacy and service access). The remaining buildable polygon is then scaled to satisfy the TAKS constraint through a geometry-scaling operation that preserves centroid and orientation. The theoretical basis lies in <strong>morphological constraint satisfaction</strong> (Kropf 2017), where legal norms (setbacks, coverage ratio) interact with site geometry (parcel shape, orientation, facade classification) to produce the permissible building envelope.</p>
+
+<h3>Mathematical Formulation</h3>
+<div class="math-block">
+<strong>Edge-Specific Setback Assignment:</strong>
+$$s(e_i) = \begin{cases}
+s_{\text{front}}, & i \in F \quad \text{(front edges)} \\[4pt]
+s_{\text{side}},  & i \in S \quad \text{(side edges)} \\[4pt]
+s_{\text{back}},  & i \in B \quad \text{(back edges)}
+\end{cases}$$
+where $F, S, B$ are the facade index sets from Step 2.
+
+<strong>Buildable Polygon (Facade-Conscious Erosion):</strong>
+$$P_{\text{buildable}} = \text{ErodeFacade}(P, \{s(e_i)\}_{i=0}^{n-1})$$
+Implemented by the <code>fit_footprint_to_target_area</code> engine function with adjustable edge setback arrays.
+
+<strong>Area Scaling (Uniform Buffer Fallback):</strong>
+$$\bar{s} = \frac{s_{\text{front}} + s_{\text{side}} + s_{\text{back}}}{3}$$
+$$P'_{\text{buildable}} = P \ominus \bar{s}$$
+
+<strong>Target Area Satisfaction:</strong>
+$$A_{\text{building}} = A_P \times \text{TAKS}$$
+If $A(P_{\text{buildable}}) > A_{\text{building}}$, the geometry is scaled:
+$$P_{\text{final}} = \text{ScaleToArea}(P_{\text{buildable}},\, A_{\text{building}})$$
+
+<strong>TAKS Utilisation (Output):</strong>
+$$\text{TAKS}_{\text{use}} = \frac{A_{\text{building}}}{A_P}$$
+</div>
+
+<h3>Parameters</h3>
+<table>
+<thead><tr><th>Parameter</th><th>ID</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td>Parsel katman&#305;</td><td><code>INPUT</code></td><td>Polygon source</td><td>&mdash;</td><td>Step 2 output with facade fields</td></tr>
+<tr><td>TAKS sutunu</td><td><code>TAKS_FIELD</code></td><td>Field</td><td>&mdash;</td><td>Building coverage ratio (0.00&ndash;1.00)</td></tr>
+<tr><td>On bahce mesafesi sutunu</td><td><code>SETBACK_FRONT_FIELD</code></td><td>Field</td><td>&mdash;</td><td>Front setback (m)</td></tr>
+<tr><td>Yan bahce mesafesi sutunu</td><td><code>SETBACK_SIDE_FIELD</code></td><td>Field</td><td>&mdash;</td><td>Side setback (m)</td></tr>
+<tr><td>Arka bahce mesafesi sutunu</td><td><code>SETBACK_BACK_FIELD</code></td><td>Field</td><td>&mdash;</td><td>Rear setback (m)</td></tr>
+<tr><td>Cephe bilincli setback</td><td><code>USE_EDGE_SETBACK</code></td><td>Boolean</td><td>True</td><td>Use Step 2 facade data; when disabled, uniform average setback is applied</td></tr>
+</tbody>
+</table>
+
+<h3>Outputs</h3>
+<table>
+<thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td>(Original fields)</td><td>&mdash;</td><td>All input parcel fields preserved</td></tr>
+<tr><td><code>bina_alan_m2</code></td><td>Double (20,2)</td><td>Building footprint area (m&sup2;)</td></tr>
+<tr><td><code>taks_kullanim</code></td><td>Double (20,4)</td><td>Actual TAKS utilisation = building_area / parcel_area</td></tr>
+</tbody>
+</table>
+
+<h3>Interpretation Guidance</h3>
+<div class="interpretation">
+<p><strong>Text fields:</strong> All numeric parameters accept TEXT-format columns (commas converted to dots automatically). This is critical for working with data exported from CAD or municipal databases where numeric fields may be stored as text.</p>
+<p><strong>Facade data requirement:</strong> When <code>USE_EDGE_SETBACK = True</code>, the algorithm requires proper <code>facade_front</code>, <code>facade_side</code>, and <code>facade_back</code> fields populated by Step 2. If these are missing or incomplete, disable this option or re-run Step 2.</p>
+<p><strong>Empty building geometries:</strong> Parcels where the setback erosion eliminates all buildable area (e.g., very narrow parcels with large setbacks) produce no output feature. These are silently skipped and should be reviewed manually.</p>
+</div>
+
+<h3>References</h3>
+<ol class="ref-list">
+<li>Conzen, M.R.G. (1969). <em>Alnwick, Northumberland: A Study in Town-Plan Analysis</em>. 2nd ed. Institute of British Geologists.</li>
+<li>Kropf, K. (2017). <em>The Handbook of Urban Morphology</em>. Wiley. DOI: <a href="https://doi.org/10.1002/9781118747711">10.1002/9781118747711</a></li>
+<li>Martin, L. &amp; March, L. (1972). <em>Urban Space and Structures</em>. Cambridge University Press.</li>
+<li>Levy, A. (1999). Urban morphology and the problem of the modern urban fabric. <em>Urban Morphology</em>, 3(2), 79&ndash;89. DOI: <a href="https://doi.org/10.51347/jum.v3i2.3880">10.51347/jum.v3i2.3880</a></li>
+<li>Panerai, P., Castex, J., Depaule, J.C. &amp; Samuels, I. (2004). <em>Urban Forms: The Death and Life of the Urban Block</em>. Architectural Press. DOI: <a href="https://doi.org/10.4324/9780080472454">10.4324/9780080472454</a></li>
+<li>Berghauser Pont, M. &amp; Haupt, P. (2010). <em>Spacematrix: Space, Density and Urban Form</em>. NAi Publishers.</li>
+</ol>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     ALGORITHM 3.3: Block Coverage (Blok Nizam)
+     ═══════════════════════════════════════════════════════ -->
+<section id="alg-step-3-block" class="alg-section">
+<div class="alg-hero"><span class="alg-id">3.3</span><h2>3.3. Block Building Coverage (Blok Nizam)</h2></div>
+<span class="badge badge-step">Step 3</span> <code>3_3_blok_nizam</code> &nbsp; Class: <code>BlockCoverageFootprintAlgorithm</code>
+
+<h3>Theoretical Background</h3>
+<p>Block order (<em>Blok Nizam</em>) is a semi-detached arrangement where buildings on adjacent parcels share a common lateral wall, eliminating the side setback between paired parcels while maintaining setbacks on all other sides. This typology represents an intermediate density between detached and fully attached forms, commonly found in 20th-century garden-city and suburban planned developments across Europe and Turkey. The regulatory logic is: <em>internal</em> shared edges within a paired block group have zero setback, while <em>external</em> (free) side edges retain the full side-yard distance, creating a 2&times; side-yard gap between adjacent block groups.</p>
+<p>The algorithm introduces a novel <strong>two-layer neighbour detection</strong>: first, Step 2's facade classification identifies which edges are nominally "side" edges; second, geometric intersection testing against adjacent parcels determines which of these side edges are physically shared (touching a neighbour). Only edges that pass both tests are assigned zero setback. A graph-based row-neighbour matching algorithm uses oriented bounding box long-axis projection to distinguish genuine lateral (row) neighbours from front-to-back adjacencies, preventing false zero-setback assignments on rear boundaries&mdash;a critical safeguard against over-densification.</p>
+
+<h3>Mathematical Formulation</h3>
+<div class="math-block">
+<strong>Edge Setback for Block Order:</strong>
+$$s(e_i) = \begin{cases}
+s_{\text{front}}, & i \in F \\[4pt]
+0,               & i \text{ shares a lateral boundary with a paired neighbour} \\[4pt]
+s_{\text{side}}, & i \text{ is a free external side edge} \\[4pt]
+s_{\text{back}}, & i \in B \quad (\text{never zero})
+\end{cases}$$
+
+<strong>Row-Neighbour Test:</strong>
+Given two parcels with centroids $c_1, c_2$, and the island's long-axis direction $(dx_{\text{long}}, dy_{\text{long}})$:
+$$\vec{v} = (c_{2x} - c_{1x},\, c_{2y} - c_{1y})$$
+$$p_{\text{long}} = |\vec{v} \cdot (dx_{\text{long}},\, dy_{\text{long}})|$$
+$$p_{\text{short}} = |\vec{v} \cdot (-dy_{\text{long}},\, dx_{\text{long}})|$$
+The neighbour is a <em>row neighbour</em> (lateral) if $p_{\text{long}} > p_{\text{short}}$.
+
+<strong>Graph-Based Pairing:</strong>
+Parcels are sorted by projection onto the long axis:
+$$\text{proj}(f) = c_x \cdot dx_{\text{long}} + c_y \cdot dy_{\text{long}}$$
+Adjacent parcels in the sorted order whose centroids project more strongly along the long axis than the short axis are paired as block neighbours.
+
+<strong>Inter-Block Gap Guarantee:</strong>
+$$\text{gap}_{\text{effective}} = s_{\text{side}}^{(A)} + s_{\text{side}}^{(B)} \geq 2 \times s_{\text{side}}$$
+ensuring fire separation between independent block groups.
+</div>
+
+<h3>Parameters</h3>
+<table>
+<thead><tr><th>Parameter</th><th>ID</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td>Parsel katman&#305;</td><td><code>INPUT</code></td><td>Polygon source</td><td>&mdash;</td><td>Step 2 output</td></tr>
+<tr><td>Ada ID sutunu</td><td><code>ADA_ID_FIELD</code></td><td>Field (optional)</td><td>&mdash;</td><td>Island grouping field; auto-detected if empty</td></tr>
+<tr><td>TAKS sutunu</td><td><code>TAKS_FIELD</code></td><td>Field</td><td>&mdash;</td><td>Building coverage ratio (0.00&ndash;1.00)</td></tr>
+<tr><td>On bahce mesafesi sutunu</td><td><code>SETBACK_FRONT</code></td><td>Field</td><td>&mdash;</td><td>Front setback (m)</td></tr>
+<tr><td>Yan bahce mesafesi sutunu</td><td><code>SETBACK_SIDE</code></td><td>Field</td><td>&mdash;</td><td>Side setback for free external edges (m)</td></tr>
+<tr><td>Arka bahce mesafesi sutunu</td><td><code>SETBACK_BACK</code></td><td>Field</td><td>&mdash;</td><td>Rear setback (m)</td></tr>
+</tbody>
+</table>
+
+<h3>Outputs</h3>
+<table>
+<thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td>(Original fields)</td><td>&mdash;</td><td>All input parcel fields</td></tr>
+<tr><td><code>nizam_tip</code></td><td>String (20)</td><td>Fixed value: "blok"</td></tr>
+<tr><td><code>ic_kenar_adet</code></td><td>Int</td><td>Number of internal shared edges detected (0 = isolated, 1 = end-unit, 2+ = mid-block)</td></tr>
+<tr><td><code>bina_alan_m2</code></td><td>Double (20,2)</td><td>Building footprint area (m&sup2;)</td></tr>
+<tr><td><code>taks_kullanim</code></td><td>Double (20,4)</td><td>Actual TAKS utilisation</td></tr>
+</tbody>
+</table>
+
+<h3>Interpretation Guidance</h3>
+<div class="interpretation">
+<p><strong><code>ic_kenar_adet = 0</code>:</strong> The parcel has no shared lateral edges with neighbours. The building behaves essentially as detached. Check that the island grouping field correctly identifies parcels belonging to the same island.</p>
+<p><strong><code>ic_kenar_adet = 2+</code>:</strong> Mid-block parcel fully integrated into a continuous row. Both side edges are zero-setback. These parcels achieve the highest coverage utilisation.</p>
+<p><strong>Corner parcel handling:</strong> Corner parcels with multiple front facades have rear setbacks set to zero (building extends to rear boundary) as per Turkish planning code provisions for corner lots, which prioritise street frontage definition over rear-yard preservation.</p>
+</div>
+
+<h3>References</h3>
+<ol class="ref-list">
+<li>Panerai, P., Castex, J., Depaule, J.C. &amp; Samuels, I. (2004). <em>Urban Forms: The Death and Life of the Urban Block</em>. Architectural Press. DOI: <a href="https://doi.org/10.4324/9780080472454">10.4324/9780080472454</a></li>
+<li>Marshall, S. (2005). <em>Streets and Patterns</em>. Spon Press. DOI: <a href="https://doi.org/10.4324/9780203589397">10.4324/9780203589397</a></li>
+<li>Steadman, P. (2014). <em>Building Types and Built Forms</em>. Troubador Publishing.</li>
+<li>Jacobs, J. (1961). <em>The Death and Life of Great American Cities</em>. Random House.</li>
+<li>Kropf, K. (1996). Urban tissue and the character of towns. <em>Urban Design International</em>, 1(3), 247&ndash;263. DOI: <a href="https://doi.org/10.1057/udi.1996.32">10.1057/udi.1996.32</a></li>
+<li>Moudon, A.V. (1986). <em>Built for Change: Neighborhood Architecture in San Francisco</em>. MIT Press.</li>
+</ol>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     ALGORITHM 3.4: Attached Coverage (Biti&#351;ik Nizam)
+     ═══════════════════════════════════════════════════════ -->
+<section id="alg-step-3-attached" class="alg-section">
+<div class="alg-hero"><span class="alg-id">3.4</span><h2>3.4. Attached Building Coverage (Biti&#351;ik Nizam)</h2></div>
+<span class="badge badge-step">Step 3</span> <code>3_4_bitisik_nizam</code> &nbsp; Class: <code>AttachedCoverageFootprintAlgorithm</code>
+
+<h3>Theoretical Background</h3>
+<p>Attached order (<em>Biti&#351;ik Nizam</em>, "B nizam") represents the densest conventional building arrangement in Turkish planning, where buildings extend to both lateral parcel boundaries, forming a continuous street wall without side yards. This typology corresponds to the row-house, townhouse, and perimeter-block morphologies characteristic of historic urban cores and 19th-century expansion districts across Europe and the Mediterranean basin. The defining regulatory characteristic is the complete absence of lateral setbacks: the building may (and typically does) extend to the full width of the parcel between side boundaries.</p>
+<p>The algorithm reflects this with a simplified setback model containing only two non-zero distances: front setback (from the road-facing edge) and rear setback (from the back boundary). All lateral edges unconditionally receive zero setback. The corner-parcel exception mirrors that of the block-coverage algorithm: when a parcel has multiple front facades (a corner condition), the rear setback may be reduced to zero, recognising that corner buildings define two street frontages and the concept of a "rear" becomes ambiguous. The theoretical framework draws on <strong>urban block morphology</strong> as systematised by Panerai et al. (2004) and the <strong>streetscape continuity</strong> principle central to both classical urban design (Sitte 1889) and contemporary form-based codes (Parolek et al. 2008).</p>
+
+<h3>Mathematical Formulation</h3>
+<div class="math-block">
+<strong>Edge Setback for Attached Order:</strong>
+$$s(e_i) = \begin{cases}
+s_{\text{front}}, & i \in F \quad \text{(front edges)} \\[4pt]
+0,                & i \text{ is a lateral edge (by process of elimination)} \\[4pt]
+s_{\text{back}} \text{ or } 0, & i \in B \quad \text{(rear edge; zero if corner parcel)}
+\end{cases}$$
+
+<strong>Corner Parcel Exception:</strong>
+$$\text{is\_corner} \implies s_{\text{back}} = 0 \quad \text{for all rear edges}$$
+
+<strong>Lateral Edge Identification:</strong>
+$$L = \{0, 1, \ldots, n-1\} \setminus (F \cup B)$$
+All edges not classified as front or back are treated as lateral with zero setback.
+
+<strong>Front Facade Count (Output):</strong>
+$$n_{\text{front}} = |F|$$
+Recorded as <code>on_cephe_adet</code>, indicating whether the parcel is standard (1 front) or corner (2+ fronts).
+
+<strong>Coverage Constraint:</strong>
+$$A_{\text{building}} = A_P \times \text{TAKS}$$
+Scaled from the buildable polygon using <code>fit_footprint_to_target_area</code> with the attached-order edge setback vector.
+</div>
+
+<h3>Parameters</h3>
+<table>
+<thead><tr><th>Parameter</th><th>ID</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td>Parsel katman&#305;</td><td><code>INPUT</code></td><td>Polygon source</td><td>&mdash;</td><td>Step 2 output</td></tr>
+<tr><td>Ada ID sutunu</td><td><code>ADA_ID_FIELD</code></td><td>Field (optional)</td><td>&mdash;</td><td>Island grouping field; used for neighbour-aware axle detection</td></tr>
+<tr><td>TAKS sutunu</td><td><code>TAKS_FIELD</code></td><td>Field</td><td>&mdash;</td><td>Building coverage ratio (0.00&ndash;1.00)</td></tr>
+<tr><td>On bahce mesafesi sutunu</td><td><code>SETBACK_FRONT</code></td><td>Field</td><td>&mdash;</td><td>Front setback (m)</td></tr>
+<tr><td>Arka bahce mesafesi sutunu</td><td><code>SETBACK_BACK</code></td><td>Field</td><td>&mdash;</td><td>Rear setback (m)</td></tr>
+</tbody>
+</table>
+
+<h3>Outputs</h3>
+<table>
+<thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td>(Original fields)</td><td>&mdash;</td><td>All input parcel fields</td></tr>
+<tr><td><code>nizam_tip</code></td><td>String (20)</td><td>Fixed value: "bitisik"</td></tr>
+<tr><td><code>on_cephe_adet</code></td><td>Int</td><td>Number of front facades (1 = standard, 2+ = corner)</td></tr>
+<tr><td><code>bina_alan_m2</code></td><td>Double (20,2)</td><td>Building footprint area (m&sup2;)</td></tr>
+<tr><td><code>taks_kullanim</code></td><td>Double (20,4)</td><td>Actual TAKS utilisation</td></tr>
+</tbody>
+</table>
+
+<h3>Interpretation Guidance</h3>
+<div class="interpretation">
+<p><strong>No side setback parameter:</strong> Unlike the detached and block algorithms, this algorithm has no side setback field. This is by design&mdash;attached-order regulations permit zero lateral setback by definition. If your local code requires a minimum side setback even in attached zones, the detached-coverage algorithm with appropriate field values should be used instead.</p>
+<p><strong>Corner parcel intensity:</strong> Corner parcels with zero rear setback will maximise building coverage at the expense of rear open space. This reflects actual practice in dense urban cores where corner buildings define both street frontages. If this is undesirable, consider using the block-coverage algorithm which preserves rear setbacks even for corner parcels.</p>
+</div>
+
+<h3>References</h3>
+<ol class="ref-list">
+<li>Sitte, C. (1889/1965). <em>City Planning According to Artistic Principles</em>. Trans. G.R. Collins &amp; C.C. Collins. Random House.</li>
+<li>Parolek, D.G., Parolek, K. &amp; Crawford, P.C. (2008). <em>Form-Based Codes: A Guide for Planners, Urban Designers, Municipalities, and Developers</em>. Wiley.</li>
+<li>Panerai, P., Castex, J., Depaule, J.C. &amp; Samuels, I. (2004). <em>Urban Forms: The Death and Life of the Urban Block</em>. Architectural Press. DOI: <a href="https://doi.org/10.4324/9780080472454">10.4324/9780080472454</a></li>
+<li>Kostof, S. (1991). <em>The City Shaped: Urban Patterns and Meanings Through History</em>. Bulfinch Press.</li>
+<li>Lynch, K. (1981). <em>A Theory of Good City Form</em>. MIT Press.</li>
+<li>Krier, L. (2009). <em>The Architecture of Community</em>. Island Press. DOI: <a href="https://doi.org/10.5822/978-1-61091-124-5">10.5822/978-1-61091-124-5</a></li>
+<li>Steadman, P. (2014). <em>Building Types and Built Forms</em>. Troubador Publishing.</li>
+</ol>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     ALGORITHM 3B: Building Macroform
+     ═══════════════════════════════════════════════════════ -->
+<section id="alg-step-3b" class="alg-section">
+<div class="alg-hero"><span class="alg-id">3B</span><h2>3B. Building Macroform Placement</h2></div>
+<span class="badge badge-step">Step 3B</span> <code>4_1_bina_makroform</code> &nbsp; Class: <code>BuildingMacroformAlgorithm</code>
+
+<h3>Theoretical Background</h3>
+<p>While the coverage footprint algorithms (3.1&ndash;3.4) produce rectangular building envelopes satisfying regulatory constraints, real buildings exhibit formal variety&mdash;L-shaped wings, courtyard voids, articulated facades&mdash;that affect microclimate, daylight access, and architectural character. The macroform placement algorithm introduces <strong>template-based form substitution</strong>: a library of user-supplied building geometries (loaded from any open QGIS polygon layer) is matched to each building envelope based on aspect ratio compatibility, then fitted within the envelope through affine transformation (translation, rotation, uniform scaling).</p>
+<p>This approach echoes the <strong>shape grammar</strong> formalism (Stiny &amp; Gips 1972; Stiny 1980) where a vocabulary of primitive forms is recursively transformed and composed. The algorithm performs a simplified single-step grammar application: the building envelope acts as the spatial label constraining the transformation, and the template is the shape rule's replacement geometry. Aspect ratio matching (envelope width/height vs. template bounding box width/height) serves as the primary fitness criterion, reflecting the architectural principle that building form should respond to site proportions (Alexander et al. 1977, Pattern 106: "Positive Outdoor Space").</p>
+
+<h3>Mathematical Formulation</h3>
+<div class="math-block">
+<strong>Aspect Ratio of Building Envelope:</strong>
+$$r_{\text{bbox}} = \frac{\max(w_{\text{bbox}},\, h_{\text{bbox}})}{\min(w_{\text{bbox}},\, h_{\text{bbox}})}$$
+
+<strong>Aspect Ratio of Template $t$:</strong>
+$$r_t = \frac{\max(w_t,\, h_t)}{\min(w_t,\, h_t)}$$
+
+<strong>Compatibility Score:</strong>
+$$\Delta_t = |r_{\text{bbox}} - r_t|$$
+Lower $\Delta_t$ indicates better aspect ratio match.
+
+<strong>Template Selection (Diversity-Weighted):</strong>
+Given diversity level $D \in \{\text{Low}, \text{Medium}, \text{High}\}$, a subset of $k$ best-matching templates is selected:
+$$k = \begin{cases}
+1, & D = \text{Low} \\[4pt]
+\lfloor N/2 \rfloor, & D = \text{Medium} \\[4pt]
+N, & D = \text{High}
+\end{cases}$$
+where $N$ is the total number of templates. A random choice is made from the best $k$ using the LCG random number generator.
+
+<strong>Area Utilisation Constraint:</strong>
+Template is accepted only if after fitting:
+$$\frac{A_{\text{fitted}}}{A_{\text{bbox}}} \leq U_{\max}$$
+where $U_{\max}$ is the maximum utilisation rate (default 95%).
+</div>
+
+<h3>Parameters</h3>
+<table>
+<thead><tr><th>Parameter</th><th>ID</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td>Bina taban alan&#305; katman&#305;</td><td><code>INPUT_BUILDINGS</code></td><td>Polygon source</td><td>&mdash;</td><td>Step 3.x output building footprints</td></tr>
+<tr><td>Sablon bina formlar&#305; katman&#305;</td><td><code>TEMPLATE_LAYER</code></td><td>Vector layer</td><td>&mdash;</td><td>Any open polygon layer in QGIS serving as template library</td></tr>
+<tr><td>Yalnizca secili nesneler</td><td><code>SELECTED_ONLY</code></td><td>Boolean</td><td>False</td><td>Use only selected features from the template layer</td></tr>
+<tr><td>Form cesitlilik seviyesi</td><td><code>DIVERSITY</code></td><td>Enum</td><td>1 (Medium)</td><td>0=Low (best match only), 1=Medium (half-random), 2=High (fully random)</td></tr>
+<tr><td>Maks alan kullanimi</td><td><code>MAX_UTILIZATION</code></td><td>Double</td><td>95.0</td><td>Maximum bbox area utilisation (%)</td></tr>
+<tr><td>Sablonu dondur</td><td><code>ROTATE_TO_FIT</code></td><td>Boolean</td><td>True</td><td>Allow template rotation for best fit to envelope</td></tr>
+<tr><td>Rastgele tohum</td><td><code>RANDOM_SEED</code></td><td>Integer</td><td>0</td><td>Random seed</td></tr>
+</tbody>
+</table>
+
+<h3>Outputs</h3>
+<table>
+<thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td>(Original fields)</td><td>&mdash;</td><td>All input building fields preserved</td></tr>
+<tr><td><code>form_tipi</code></td><td>String (50)</td><td>Template form type (or "orijinal"/"fallback" if no match)</td></tr>
+<tr><td><code>macroform_alan_m2</code></td><td>Double (20,2)</td><td>Placed macroform area (m&sup2;)</td></tr>
+</tbody>
+</table>
+
+<h3>Interpretation Guidance</h3>
+<div class="interpretation">
+<p><strong>Template layer fields:</strong> Template features may optionally include <code>form_tipi</code> (string label), <code>min_alan_m2</code>, and <code>max_alan_m2</code> fields to constrain which templates are considered for a given building envelope. Templates with area constraints outside the envelope's target range are skipped.</p>
+<p><strong>Fallback geometries:</strong> Buildings labelled "orijinal" or "fallback" in <code>form_tipi</code> indicate that no template could be satisfactorily fitted. This is common when the template library is small or the envelopes have extreme aspect ratios. Expand the template library or adjust the utilisation threshold.</p>
+<p><strong>Optional step:</strong> This algorithm is entirely optional. If not used, the rectangular building footprints from Step 3 are the final building geometry.</p>
+</div>
+
+<h3>References</h3>
+<ol class="ref-list">
+<li>Stiny, G. &amp; Gips, J. (1972). Shape Grammars and the Generative Specification of Painting and Sculpture. <em>Information Processing 71</em>, pp. 1460&ndash;1465.</li>
+<li>Stiny, G. (1980). Introduction to shape and shape grammars. <em>Environment and Planning B</em>, 7(3), 343&ndash;351. DOI: <a href="https://doi.org/10.1068/b070343">10.1068/b070343</a></li>
+<li>Alexander, C., Ishikawa, S. &amp; Silverstein, M. (1977). <em>A Pattern Language</em>. Oxford University Press.</li>
+<li>Duarte, J.P. (2005). A discursive grammar for customizing mass housing. <em>Automation in Construction</em>, 14(2), 265&ndash;275. DOI: <a href="https://doi.org/10.1016/j.autcon.2004.07.013">10.1016/j.autcon.2004.07.013</a></li>
+<li>Koning, H. &amp; Eizenberg, J. (1981). The language of the prairie: Frank Lloyd Wright's prairie houses. <em>Environment and Planning B</em>, 8(3), 295&ndash;323. DOI: <a href="https://doi.org/10.1068/b080295">10.1068/b080295</a></li>
+<li>Mitchell, W.J. (1990). <em>The Logic of Architecture: Design, Computation, and Cognition</em>. MIT Press.</li>
+</ol>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     ALGORITHM 3C: Dynamic Macroform
+     ═══════════════════════════════════════════════════════ -->
+<section id="alg-step-3c" class="alg-section">
+<div class="alg-hero"><span class="alg-id">3C</span><h2>3C. Dynamic Macroform (Procedural Building Forms)</h2></div>
+<span class="badge badge-step">Step 3C</span> <code>4_2_dinamik_form</code> &nbsp; Class: <code>DynamicMacroformAlgorithm</code>
+
+<h3>Theoretical Background</h3>
+<p>Dynamic macroform generation implements a <strong>procedural building typology</strong> with 12 distinct architectural plan configurations, each governed by structural depth constraints (minimum wing depth 7m, minimum wing width 5m) derived from practical residential construction standards. Unlike the template-based macroform (Step 3B), which requires a pre-existing library of building geometries, the dynamic approach generates forms from parametric rules, offering greater flexibility and eliminating library maintenance overhead.</p>
+<p>The 12 form types span the morphological spectrum from simple rectangles (I-form) to complex articulations (E-form, H-form, courtyard), covering the majority of multi-family residential plan configurations documented in the architectural typology literature (Steadman 2014; Lehnerer 2009). The diversity parameter ensures that consecutive parcels receive different forms, creating the heterogeneous streetscape that characterises organic urban growth and avoids the visual monotony of purely repetitive generation. Form feasibility filtering prevents complex forms (O, H, E) from being applied to parcels below minimum dimensional thresholds (20m &times; 20m for courtyard and H-forms), maintaining architectural realism.</p>
+
+<h3>Mathematical Formulation</h3>
+<div class="math-block">
+<strong>Rectangular Form (I) &mdash; Width Shrink:</strong>
+$$b_w = \max(d_{\min},\; w \cdot \xi),\quad \xi \sim U(0.80, 0.95)$$
+$$x_0 = \frac{w - b_w}{2}$$
+
+<strong>L-Form &mdash; Main Body + Wing:</strong>
+$$w_{\text{main}} = \max(d_{\min},\; w \cdot U(0.35, 0.55))$$
+$$h_{\text{wing}} = \max(d_{\min},\; h \cdot U(0.30, 0.50))$$
+Mirror condition: random choice between left-anchored and right-anchored wing.
+
+<strong>U-Form &mdash; Two Arms + Base:</strong>
+$$w_{\text{arm}} = \max(d_{\min},\; w \cdot U(0.25, 0.38))$$
+$$h_{\text{base}} = \max(d_{\min},\; h \cdot U(0.25, 0.38))$$
+Gap check: If $w - 2 w_{\text{arm}} &lt; d_{\min}$, arms are narrowed to maintain minimum gap.
+
+<strong>Courtyard (O-Form) &mdash; Outer Shell minus Inner Void:</strong>
+$$w_{\text{wall}} = \max(d_{\min},\; \min(w, h) \cdot U(0.20, 0.30))$$
+$$w_{\text{inner}} = w - 2 w_{\text{wall}},\quad h_{\text{inner}} = h - 2 w_{\text{wall}}$$
+If $w_{\text{inner}} &lt; 3$ or $h_{\text{inner}} &lt; 3$, falls back to rectangular form.
+
+<strong>Bbox Fill Ratio (Output):</strong>
+$$\rho = \frac{A_{\text{form}}}{A_{\text{bbox}}},\quad \rho \in (0, 1]$$
+
+<strong>Arc</strong>: The 12 forms are: dikdortgen (Rectangle), L, L_Ters (Inverted L), U, T, T_Ters (Inverted T), Z (stepped), H, C (bracket), avlu (Courtyard), E (comb), arti (Cross/+).
+</div>
+
+<h3>Parameters</h3>
+<table>
+<thead><tr><th>Parameter</th><th>ID</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td>Bina taban alan&#305; katman&#305;</td><td><code>INPUT_BUILDINGS</code></td><td>Polygon source</td><td>&mdash;</td><td>Step 3 output building footprints serving as buildable bbox</td></tr>
+<tr><td>Form secim modu</td><td><code>FORM_TYPE</code></td><td>Enum</td><td>0</td><td>0=Random mixed, 1=Specific forms</td></tr>
+<tr><td>Izin verilen formlar</td><td><code>ALLOWED_FORMS</code></td><td>Enum (multi)</td><td>All 12</td><td>Multi-select: Dikdortgen, L, Ters L, U, T, Ters T, Z, H, C, Avlulu, E, +</td></tr>
+<tr><td>Cesitlilik</td><td><code>DIVERSITY</code></td><td>Integer</td><td>3</td><td>Consecutive parcel diversity (1&ndash;5); higher = fewer repeats</td></tr>
+<tr><td>Rastgele tohum</td><td><code>RANDOM_SEED</code></td><td>Integer</td><td>0</td><td>Random seed</td></tr>
+</tbody>
+</table>
+
+<h3>Outputs</h3>
+<table>
+<thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td>(Original fields)</td><td>&mdash;</td><td>All input building fields</td></tr>
+<tr><td><code>form_tipi</code></td><td>String (20)</td><td>Generated procedural form type label</td></tr>
+<tr><td><code>form_alan_m2</code></td><td>Double (20,2)</td><td>Generated form area (m&sup2;)</td></tr>
+<tr><td><code>bbox_doluluk</code></td><td>Double (20,4)</td><td>Fill ratio: form_area / bbox_area</td></tr>
+</tbody>
+</table>
+
+<h3>Interpretation Guidance</h3>
+<div class="interpretation">
+<p><strong>Form distribution feedback:</strong> The algorithm logs the distribution of generated form types in the Processing feedback panel. If certain forms are never generated, they may be systematically filtered out by the size-feasibility check (e.g., E-form requires large parcels &gt;30m in at least one dimension).</p>
+<p><strong>Fill ratio:</strong> The <code>bbox_doluluk</code> field typically ranges from 0.40 (L-forms with long wings) to 0.85 (compact rectangles). Ratios below 0.30 may indicate a mismatch between building envelope and generated form; consider reducing the diversity or restricting to simpler forms.</p>
+<p><strong>Wing depth constraint (7m):</strong> This architectural minimum ensures all generated forms have habitable room depths. It cannot be changed without modifying <code>MIN_WING_DEPTH</code> and <code>MIN_WING_WIDTH</code> in the source code.</p>
+</div>
+
+<h3>References</h3>
+<ol class="ref-list">
+<li>Steadman, P. (2014). <em>Building Types and Built Forms</em>. Troubador Publishing.</li>
+<li>Lehnerer, A. (2009). <em>Grand Urban Rules</em>. 010 Publishers. DOI: <a href="https://doi.org/10.5949/mitpress/9780262514781.001.0001">10.5949/mitpress/9780262514781.001.0001</a></li>
+<li>M&uuml;ller, P., Wonka, P., Haegler, S., Ulmer, A. &amp; Van Gool, L. (2006). Procedural Modeling of Buildings. <em>ACM Trans. Graph.</em>, 25(3), 614&ndash;623. DOI: <a href="https://doi.org/10.1145/1141911.1141931">10.1145/1141911.1141931</a></li>
+<li>Parish, Y.I.H. &amp; M&uuml;ller, P. (2001). Procedural Modeling of Cities. <em>Proc. SIGGRAPH 2001</em>, 301&ndash;308. DOI: <a href="https://doi.org/10.1145/383259.383292">10.1145/383259.383292</a></li>
+<li>Schumacher, P. (2009). Parametricism: A New Global Style for Architecture and Urban Design. <em>Architectural Design</em>, 79(4), 14&ndash;23. DOI: <a href="https://doi.org/10.1002/ad.912">10.1002/ad.912</a></li>
+<li>Wonka, P., Wimmer, M., Sillion, F. &amp; Ribarsky, W. (2003). Instant Architecture. <em>ACM Trans. Graph.</em>, 22(3), 669&ndash;677. DOI: <a href="https://doi.org/10.1145/882262.882324">10.1145/882262.882324</a></li>
+<li>Alexander, C. (1964). <em>Notes on the Synthesis of Form</em>. Harvard University Press.</li>
+</ol>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     ALGORITHM 4: Building Optimizer
+     ═══════════════════════════════════════════════════════ -->
+<section id="alg-step-4" class="alg-section">
+<div class="alg-hero"><span class="alg-id">04</span><h2>4. Building Optimizer &mdash; Parcel-Building Compliance Check</h2></div>
+<span class="badge badge-step">Step 4</span> <code>5_veri_kontrol</code> &nbsp; Class: <code>BuildingOptimizerAlgorithm</code>
+
+<h3>Theoretical Background</h3>
+<p>Quality assurance is a critical but often under-automated phase in computational planning workflows. The Building Optimizer performs a systematic <strong>compliance audit</strong> comparing generated building geometries against parcel-level regulatory constraints, analogous to the plan-checking process in municipal planning departments. It operationalises two verification criteria: (1) <strong>density compliance</strong>&mdash;the aggregate building area within each parcel must not exceed the TAKS-mandated maximum ($A_{\text{buildings}} \leq A_{\text{parcel}} \times \text{TAKS}$), with a 1% numerical tolerance; and (2) <strong>geometric validity</strong>&mdash;building geometries must pass the GEOS <code>isGeosValid()</code> check, which detects self-intersections, ring orientation errors, and other topology violations that would cause downstream processing failures.</p>
+<p>The algorithm employs a <strong>spatial index</strong> (QgsSpatialIndex) for efficient building-to-parcel matching, performing geometric intersection tests only for building-parcel pairs whose bounding boxes overlap. This $O(n \log n)$ approach scales to large datasets with thousands of parcels and buildings, and the boolean status flags (<code>taks_ok</code>, <code>geom_valid</code>) facilitate direct filtering in QGIS for targeted manual correction workflows.</p>
+
+<h3>Mathematical Formulation</h3>
+<div class="math-block">
+<strong>Aggregate Building Area within Parcel:</strong>
+$$A_{\text{bldg}}(p) = \sum_{b \in B} \text{Area}\!\left(p \cap b\right)$$
+where $B$ is the set of buildings whose bounding boxes intersect the parcel $p$.
+
+<strong>TAKS Compliance Check:</strong>
+$$\text{TAKS}_{\text{actual}} = \frac{A_{\text{bldg}}(p)}{A_p}$$
+$$\text{taks\_ok} = \begin{cases}
+\text{true}, & \text{TAKS}_{\text{actual}} \leq \text{TAKS}_{\text{target}} + 0.01 \\[4pt]
+\text{false}, & \text{otherwise}
+\end{cases}$$
+
+<strong>Geometric Validity:</strong>
+$$\text{geom\_valid} = \bigwedge_{b \in B(p)} \text{isGeosValid}(b)$$
+
+<strong>Composite Status:</strong>
+$$\text{status} = \begin{cases}
+\text{"OK"}, & \text{taks\_ok} \land \text{geom\_valid} \\[4pt]
+\text{"TAKS\_ASIM"}, & \lnot\text{taks\_ok} \land \text{geom\_valid} \\[4pt]
+\text{"GEOM\_HATALI"}, & \text{taks\_ok} \land \lnot\text{geom\_valid} \\[4pt]
+\text{"TAKS\_ASIM,GEOM\_HATALI"}, & \lnot\text{taks\_ok} \land \lnot\text{geom\_valid}
+\end{cases}$$
+</div>
+
+<h3>Parameters</h3>
+<table>
+<thead><tr><th>Parameter</th><th>ID</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td>Parsel katman&#305;</td><td><code>INPUT_PARCELS</code></td><td>Polygon source</td><td>&mdash;</td><td>Parcel layer for spatial context</td></tr>
+<tr><td>Bina katman&#305;</td><td><code>INPUT_BUILDINGS</code></td><td>Polygon source</td><td>&mdash;</td><td>Building footprint layer to check</td></tr>
+<tr><td>TAKS sutunu</td><td><code>TAKS_FIELD</code></td><td>Field (optional)</td><td>&mdash;</td><td>Target building coverage ratio; if empty, TAKS check is skipped (always OK)</td></tr>
+</tbody>
+</table>
+
+<h3>Outputs</h3>
+<table>
+<thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>parcel_fid</code></td><td>Int</td><td>Source parcel feature ID</td></tr>
+<tr><td><code>parcel_area_m2</code></td><td>Double (20,2)</td><td>Parcel area (m&sup2;)</td></tr>
+<tr><td><code>building_area_m2</code></td><td>Double (20,2)</td><td>Aggregate building area within parcel (m&sup2;)</td></tr>
+<tr><td><code>taks_actual</code></td><td>Double (20,4)</td><td>Actual building coverage ratio</td></tr>
+<tr><td><code>taks_target</code></td><td>Double (20,4)</td><td>Target TAKS from input field</td></tr>
+<tr><td><code>taks_ok</code></td><td>Bool</td><td>TAKS compliance flag</td></tr>
+<tr><td><code>geom_valid</code></td><td>Bool</td><td>All building geometries valid flag</td></tr>
+<tr><td><code>status</code></td><td>String (50)</td><td>Composite status label</td></tr>
+</tbody>
+</table>
+
+<h3>Interpretation Guidance</h3>
+<div class="interpretation">
+<p><strong>TAKS violation threshold:</strong> The 1% tolerance (<code>taks_target + 0.01</code>) accounts for floating-point arithmetic and minor intersection-area computation discrepancies. Adjust this in the source if stricter compliance is required.</p>
+<p><strong>Edge case &mdash; buildings extending beyond parcel:</strong> The intersection-based area computation (<code>pg.intersection(bg)</code>) means that portions of buildings outside the parcel are excluded from the area calculation. A building entirely outside its parcel contributes zero area, which may mask coverage violations. Consider pre-screening with a containment check if this is a concern.</p>
+<p><strong>Workflow diagnostics:</strong> This tool is a quality gate. Resolve all <code>TAKS_ASIM</code> and <code>GEOM_HATALI</code> parcels before proceeding to later steps, as invalid or oversize geometries will propagate errors through hard-surface, parking, and landscape generation.</p>
+</div>
+
+<h3>References</h3>
+<ol class="ref-list">
+<li>Longley, P.A., Goodchild, M.F., Maguire, D.J. &amp; Rhind, D.W. (2015). <em>Geographic Information Science and Systems</em>. 4th ed. Wiley.</li>
+<li>O'Sullivan, D. &amp; Unwin, D.J. (2010). <em>Geographic Information Analysis</em>. 2nd ed. Wiley. DOI: <a href="https://doi.org/10.1002/9780470549094">10.1002/9780470549094</a></li>
+<li>Burrough, P.A., McDonnell, R.A. &amp; Lloyd, C.D. (2015). <em>Principles of Geographical Information Systems</em>. 3rd ed. Oxford University Press.</li>
+<li>Rigaux, P., Scholl, M. &amp; Voisard, A. (2001). <em>Spatial Databases: With Application to GIS</em>. Morgan Kaufmann.</li>
+<li>Worboys, M.F. &amp; Duckham, M. (2004). <em>GIS: A Computing Perspective</em>. 2nd ed. CRC Press. DOI: <a href="https://doi.org/10.1201/9780367805777">10.1201/9780367805777</a></li>
+</ol>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     ALGORITHM 5: Hard Surface
+     ═══════════════════════════════════════════════════════ -->
+<section id="alg-step-5" class="alg-section">
+<div class="alg-hero"><span class="alg-id">05</span><h2>5. Hard Surface Generator (Yurume Alani)</h2></div>
+<span class="badge badge-step">Step 5</span> <code>6_hard_surface</code> &nbsp; Class: <code>HardSurfaceAlgorithm</code>
+
+<h3>Theoretical Background</h3>
+<p>Hard surfaces&mdash;pathways, service yards, terraces, and access routes surrounding buildings&mdash;constitute the connective tissue of settlement morphology, mediating between private building interiors and the public realm. In Turkish planning regulation, these are classified as <em>sert zemin</em> (impervious/hard ground), distinct from <em>yumusak zemin</em> (soft/landscaped ground), with minimum ratios specified in some municipal codes for stormwater management and urban heat island mitigation.</p>
+<p>The algorithm generates hard surfaces through a classical <strong>computational geometry pipeline</strong>: buffer (dilate) the building footprint by a specified walkway width, intersect the buffered polygon with the parcel boundary to ensure surfaces remain within the property, and subtract the original building footprint to avoid double-counting. This three-step Boolean operation pattern&mdash;buffer, intersect, difference&mdash;is a common idiom in GIS-based site analysis (Longley et al. 2015) and generates a clean topological result: a polygon (or multi-polygon) representing only the walkable area around the building, clipped to the parcel extent.</p>
+
+<h3>Mathematical Formulation</h3>
+<div class="math-block">
+<strong>Hard Surface Generation:</strong>
+$$S_{\text{hard}} = \bigl(B \oplus d\bigr) \cap P \setminus B$$
+where $B$ is the building footprint (or union of building footprints within a parcel), $d$ is the buffer distance, $\oplus$ denotes morphological dilation (buffer), $\cap$ is geometric intersection, $\setminus$ is geometric difference, and $P$ is the parcel polygon.
+
+<strong>Hard Surface Ratio:</strong>
+$$r_{\text{hard}} = \frac{A(S_{\text{hard}})}{A_P}$$
+
+<strong>Total Impervious Surface (Combined with Building):</strong>
+$$A_{\text{impervious}} = A_B + A(S_{\text{hard}})$$
+This can be compared against maximum impervious-surface ratio limits if present in local codes.
+</div>
+
+<h3>Parameters</h3>
+<table>
+<thead><tr><th>Parameter</th><th>ID</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td>Bina katman&#305;</td><td><code>INPUT_BUILDINGS</code></td><td>Polygon source</td><td>&mdash;</td><td>Building footprints from Step 3 or 3B</td></tr>
+<tr><td>Parsel katman&#305;</td><td><code>INPUT_PARCELS</code></td><td>Polygon source</td><td>&mdash;</td><td>Parcel boundaries (Step 2 output)</td></tr>
+<tr><td>Buffer mesafesi</td><td><code>BUFFER_DIST</code></td><td>Double</td><td>3.0</td><td>Walkway width around the building (m); range 1&ndash;6</td></tr>
+</tbody>
+</table>
+
+<h3>Outputs</h3>
+<table>
+<thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>parcel_fid</code></td><td>Int</td><td>Source parcel feature ID</td></tr>
+<tr><td><code>hs_area_m2</code></td><td>Double (20,2)</td><td>Hard surface area (m&sup2;)</td></tr>
+<tr><td><code>hs_ratio</code></td><td>Double (20,4)</td><td>Hard surface / parcel area ratio</td></tr>
+</tbody>
+</table>
+
+<h3>Interpretation Guidance</h3>
+<div class="interpretation">
+<p><strong>Buffer distance:</strong> 3&ndash;4m corresponds to typical residential walkway/service yard widths. Larger values (5&ndash;6m) may be appropriate for commercial or institutional buildings requiring loading zones and wider circulation.</p>
+<p><strong>Multi-building parcels:</strong> When multiple buildings exist within a single parcel, their geometries are combined (union) before the buffer-difference pipeline. The output is the aggregate hard surface for the entire parcel, not per-building.</p>
+<p><strong>Buffer segment count:</strong> The algorithm attempts 16-segment buffers first, falling back to 8-segment if the QGIS version does not support the higher parameter. This affects the smoothness (circularity) of the generated walkway corners.</p>
+</div>
+
+<h3>References</h3>
+<ol class="ref-list">
+<li>Longley, P.A., Goodchild, M.F., Maguire, D.J. &amp; Rhind, D.W. (2015). <em>Geographic Information Science and Systems</em>. 4th ed. Wiley.</li>
+<li>Forman, R.T.T. (2014). <em>Urban Ecology: Science of Cities</em>. Cambridge University Press. DOI: <a href="https://doi.org/10.1017/CBO9781139030472">10.1017/CBO9781139030472</a></li>
+<li>Lehmann, S. (2016). Sustainable urbanism: towards a framework for quality and optimal density? <em>Future Cities and Environment</em>, 2(1), 1&ndash;14. DOI: <a href="https://doi.org/10.1186/s40984-016-0021-3">10.1186/s40984-016-0021-3</a></li>
+<li>Gehl, J. (2011). <em>Life Between Buildings: Using Public Space</em>. Island Press.</li>
+<li>Whyte, W.H. (1980). <em>The Social Life of Small Urban Spaces</em>. Conservation Foundation.</li>
+</ol>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     ALGORITHM 6: Parking Generator
+     ═══════════════════════════════════════════════════════ -->
+<section id="alg-step-6" class="alg-section">
+<div class="alg-hero"><span class="alg-id">06</span><h2>6. Parametric Parking Generator (Ada Uyumlu)</h2></div>
+<span class="badge badge-step">Step 6</span> <code>7_parking_generator</code> &nbsp; Class: <code>ParkingGeneratorAlgorithm</code>
+
+<h3>Theoretical Background</h3>
+<p>Parking layout design is fundamentally a <strong>geometric packing problem</strong>: given a spatial container (the parking area polygon), maximise the number of regularly-shaped stalls while respecting manoeuvring aisle widths, edge margins, and vehicle entry corridors. The algorithm employs a <strong>concentric-ring tessellation</strong> strategy: parking stalls are placed along the perimeter of the parking area polygon, oriented parallel to each edge segment. After exhausting the perimeter, the polygon is shrunk inward by one stall depth plus one aisle width, and the process repeats&mdash;forming concentric "rings" of parking until no further stalls can be placed.</p>
+<p>This approach is structurally analogous to offset-polygon algorithms in computational geometry (Kallay 1984) and the morphological erosion used in the FAR coverage solver (Step 3.1). The vehicle entry point, when provided via the road layer, creates a 7m-wide corridor (3.5m radius from the nearest approach point on the road) that is excluded from stall placement, ensuring unimpeded vehicle access. The per-segment stall count follows a linear tessellation: $n = \lfloor L / (w + g) \rfloor$, where $L$ is the segment length, $w$ the stall width (default 2.5m, the Turkish standard), and $g$ the inter-stall gap.</p>
+
+<h3>Mathematical Formulation</h3>
+<div class="math-block">
+<strong>Stalls per Edge Segment:</strong>
+$$n_s = \left\lfloor \frac{L}{w + g} \right\rfloor,\quad n_s \geq 0$$
+where $L = \sqrt{(p_{2x} - p_{1x})^2 + (p_{2y} - p_{1y})^2}$.
+
+<strong>Stall Placement (Centre Coordinates):</strong>
+$$s_k = \frac{L - n_s(w + g)}{2} + \frac{w + g}{2} + k \cdot (w + g),\quad k = 0, 1, \ldots, n_s - 1$$
+$$c_x = p_{1x} + \frac{dx}{L} \cdot s_k + v_x \cdot \frac{d}{2}$$
+$$c_y = p_{1y} + \frac{dy}{L} \cdot s_k + v_y \cdot \frac{d}{2}$$
+where $(v_x, v_y)$ is the inward-pointing unit normal (determined by containment test).
+
+<strong>Stall Geometry (Rotated Rectangle):</strong>
+$$R_k = \{ (x, y) \mid (x, y) = c + R_{-\theta} \cdot (\pm w/2, \pm d/2) \}$$
+where $\theta = \text{atan2}(dy, dx)$ and $R_{-\theta}$ is the rotation to align with the edge direction.
+
+<strong>Concentric Ring Shrink Distance:</strong>
+$$s_{\text{ring}} = d + a$$
+where $d$ is stall depth (5.0m default) and $a$ is aisle width (6.0m default).
+
+<strong>Entry Corridor Exclusion:</strong>
+$$\text{dist}(c_k, \text{corridor}) \leq 3.5\text{m} \implies \text{stall rejected}$$
+where the corridor is the line segment from the nearest road point to the polygon centroid.
+</div>
+
+<h3>Parameters</h3>
+<table>
+<thead><tr><th>Parameter</th><th>ID</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td>Otopark alan&#305; katman&#305;</td><td><code>INPUT</code></td><td>Polygon source</td><td>&mdash;</td><td>Parking area polygons</td></tr>
+<tr><td>Yol Orta Cizgisi</td><td><code>ROAD_LAYER</code></td><td>Line source (opt.)</td><td>&mdash;</td><td>Road centreline for vehicle entry point detection</td></tr>
+<tr><td>Otopark yeri genisligi</td><td><code>STALL_WIDTH</code></td><td>Double</td><td>2.5</td><td>Stall width (m); Turkish standard for perpendicular parking</td></tr>
+<tr><td>Otopark yeri derinligi</td><td><code>STALL_DEPTH</code></td><td>Double</td><td>5.0</td><td>Stall depth (m)</td></tr>
+<tr><td>Arac Gecis/Manevra Yolu</td><td><code>AISLE_WIDTH</code></td><td>Double</td><td>6.0</td><td>Aisle width for inner rings (m)</td></tr>
+<tr><td>Stall arasi bosluk</td><td><code>STALL_GAP</code></td><td>Double</td><td>0.0</td><td>Gap between stalls (m)</td></tr>
+<tr><td>Kenar boslugu</td><td><code>EDGE_MARGIN</code></td><td>Double</td><td>0.5</td><td>Edge margin / road setback (m)</td></tr>
+</tbody>
+</table>
+
+<h3>Outputs</h3>
+<table>
+<thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>area_fid</code></td><td>Int</td><td>Source parking area feature ID</td></tr>
+<tr><td><code>stall_id</code></td><td>Int</td><td>Sequential stall number within the area</td></tr>
+<tr><td><code>stall_area_m2</code></td><td>Double (20,2)</td><td>Individual stall area (m&sup2;)</td></tr>
+</tbody>
+</table>
+
+<h3>Interpretation Guidance</h3>
+<div class="interpretation">
+<p><strong>Stall count per area:</strong> The feedback panel reports the number of stalls generated per polygon. Divide by the required parking count (from Step 8) to determine parking adequacy.</p>
+<p><strong>Concentric ring behaviour:</strong> Large polygons will generate multiple rings. Each ring's stalls are placed independently; overlap detection prevents stalls from different rings from intersecting. If inner rings produce zero stalls, the polygon is too narrow for additional rings and the algorithm terminates for that area.</p>
+<p><strong>Entry corridor:</strong> When the road layer is provided, stalls within 3.5m of the approach line are excluded. This ensures a 7m-wide vehicle access corridor. For parking areas with multiple access points, consider placing separate polygons or using the axis-based parking generator (Helper) for finer control.</p>
+</div>
+
+<h3>References</h3>
+<ol class="ref-list">
+<li>Shoup, D. (2005). <em>The High Cost of Free Parking</em>. APA Planners Press. DOI: <a href="https://doi.org/10.4324/9781351179560">10.4324/9781351179560</a></li>
+<li>ITE (Institute of Transportation Engineers). (2010). <em>Parking Generation</em>. 4th ed. ITE.</li>
+<li>Kallay, M. (1984). The geometry of offset curves. <em>Computer-Aided Design</em>, 16(6), 295&ndash;299. DOI: <a href="https://doi.org/10.1016/0010-4485(84)90165-9">10.1016/0010-4485(84)90165-9</a></li>
+<li>Litman, T. (2020). <em>Parking Management Best Practices</em>. 2nd ed. APA Planners Press. DOI: <a href="https://doi.org/10.4324/9781351179492">10.4324/9781351179492</a></li>
+<li>Manville, M. &amp; Shoup, D. (2005). Parking, People, and Cities. <em>Journal of Urban Planning and Development</em>, 131(4), 233&ndash;245. DOI: <a href="https://doi.org/10.1061/(ASCE)0733-9488(2005)131:4(233)">10.1061/(ASCE)0733-9488(2005)131:4(233)</a></li>
+<li>Ben-Joseph, E. (2012). <em>Rethinking a Lot: The Design and Culture of Parking</em>. MIT Press.</li>
+</ol>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     ALGORITHM 7: Landscape Generator
+     ═══════════════════════════════════════════════════════ -->
+<section id="alg-step-7" class="alg-section">
+<div class="alg-hero"><span class="alg-id">07</span><h2>7. Landscape Generator (Agac Yerlestirme)</h2></div>
+<span class="badge badge-step">Step 7</span> <code>8_landscape_generator</code> &nbsp; Class: <code>LandscapeGeneratorAlgorithm</code>
+
+<h3>Theoretical Background</h3>
+<p>The landscape generator implements a <strong>Poisson-disc-like point distribution</strong> within the softscape area of each parcel (total parcel area minus building footprints, optionally further restricted to designated green-space polygons). Trees are placed through rejection sampling within the axis-aligned bounding box of the available area, with each candidate point tested against two constraints: (1) it must fall within the available (non-building) area of the parcel, and (2) it must maintain a minimum distance $d_{\text{tree-tree}}$ from all previously placed trees. Each placement attempt is limited to 500 random trials per tree, after which the tree is abandoned if no valid location is found.</p>
+<p>The tree density parameter is expressed per 500m&sup2; of available area&mdash;a unit chosen because it corresponds approximately to a 22m &times; 22m garden zone, a typical Turkish residential garden parcel scale. The algorithm distinguishes between trees placed in parcel-level gardens (<code>source_type='parsel'</code>) and those placed in dedicated green/recreation areas (<code>source_type='yesil_alan'</code>), supporting differentiated styling and counting in later analysis stages.</p>
+
+<h3>Mathematical Formulation</h3>
+<div class="math-block">
+<strong>Available Planting Area:</strong>
+$$A_{\text{avail}} = P \setminus \bigl(B \oplus d_{\text{tb}}\bigr)$$
+where $P$ is the parcel polygon, $B$ is the union of all building footprints, and $d_{\text{tb}}$ is the minimum tree-to-building distance (default 2m).
+
+<strong>Target Tree Count:</strong>
+$$n_{\text{target}} = \max\!\left(1,\; \left\lfloor \rho \cdot \frac{A_{\text{avail}}}{500} \right\rfloor \right)$$
+where $\rho$ is the density parameter (trees per 500m&sup2;).
+
+<strong>Rejection Sampling (per candidate point $p$):</strong>
+$$p \in A_{\text{avail}} \quad \land \quad \forall p_i \in P_{\text{placed}} : \text{dist}(p, p_i) \geq d_{\text{tt}}$$
+where $d_{\text{tt}}$ is the minimum tree-to-tree distance (default 3m).
+
+<strong>Tree Height Assignment:</strong>
+$$h_i \sim U(h_{\min},\; h_{\max})$$
+</div>
+
+<h3>Parameters</h3>
+<table>
+<thead><tr><th>Parameter</th><th>ID</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td>Parsel katman&#305;</td><td><code>INPUT_PARCELS</code></td><td>Polygon source</td><td>&mdash;</td><td>Parcel layer for garden areas</td></tr>
+<tr><td>Bina katman&#305;</td><td><code>INPUT_BUILDINGS</code></td><td>Polygon source</td><td>&mdash;</td><td>Building layer for exclusion zones</td></tr>
+<tr><td>Yesil alan katman&#305;</td><td><code>INPUT_GREEN</code></td><td>Polygon source (opt.)</td><td>&mdash;</td><td>Optional dedicated green/recreation areas</td></tr>
+<tr><td>Agac yogunlugu</td><td><code>DENSITY</code></td><td>Integer</td><td>1</td><td>Trees per 500m&sup2;; range 1&ndash;10</td></tr>
+<tr><td>Min agac yuksekligi</td><td><code>MIN_HEIGHT</code></td><td>Double</td><td>1.0</td><td>Minimum tree height (m)</td></tr>
+<tr><td>Max agac yuksekligi</td><td><code>MAX_HEIGHT</code></td><td>Double</td><td>5.0</td><td>Maximum tree height (m)</td></tr>
+<tr><td>Min agac-bina mesafesi</td><td><code>MIN_TREE_BUILDING</code></td><td>Double</td><td>2.0</td><td>Minimum tree-to-building distance (m)</td></tr>
+<tr><td>Min agac-agac mesafesi</td><td><code>MIN_TREE_TREE</code></td><td>Double</td><td>3.0</td><td>Minimum tree-to-tree distance (m)</td></tr>
+</tbody>
+</table>
+
+<h3>Outputs</h3>
+<table>
+<thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>source_fid</code></td><td>Int</td><td>Parcel or green-area feature ID</td></tr>
+<tr><td><code>height</code></td><td>Double</td><td>Assigned tree height (m)</td></tr>
+<tr><td><code>source_type</code></td><td>String (20)</td><td>"parsel" (parcel garden) or "yesil_alan" (designated green area)</td></tr>
+</tbody>
+</table>
+
+<h3>Interpretation Guidance</h3>
+<div class="interpretation">
+<p><strong>Density calibration:</strong> At density=1, a 500m&sup2; garden receives one tree (approximately 1 tree per 22m &times; 22m). At density=10, the same area receives 10 trees. Adjust based on local landscaping ordinances: many Turkish municipalities require 1 tree per 200&ndash;500m&sup2; of open space for new developments.</p>
+<p><strong>Rejection sampling failures:</strong> If the target tree count cannot be achieved (500 failed attempts per tree), the algorithm silently produces fewer trees. Review parcels with unexpectedly low tree counts&mdash;they may have highly constrained available areas or may benefit from reduced tree-to-tree distance.</p>
+</div>
+
+<h3>References</h3>
+<ol class="ref-list">
+<li>Corner, J. (1999). <em>Recovering Landscape: Essays in Contemporary Landscape Architecture</em>. Princeton Architectural Press.</li>
+<li>Waldheim, C. (2006). <em>The Landscape Urbanism Reader</em>. Princeton Architectural Press. DOI: <a href="https://doi.org/10.1007/1-56898-672-6">10.1007/1-56898-672-6</a></li>
+<li>McHarg, I.L. (1969). <em>Design with Nature</em>. Natural History Press. DOI: <a href="https://doi.org/10.1016/0016-7185(70)90053-8">10.1016/0016-7185(70)90053-8</a></li>
+<li>Nowak, D.J. &amp; Dwyer, J.F. (2007). Understanding the Benefits and Costs of Urban Forest Ecosystems. In: Kuser, J.E. (ed.) <em>Urban and Community Forestry in the Northeast</em>. Springer, pp. 25&ndash;46. DOI: <a href="https://doi.org/10.1007/978-1-4020-4289-8_2">10.1007/978-1-4020-4289-8_2</a></li>
+<li>Jim, C.Y. &amp; Chen, W.Y. (2009). Ecosystem services and valuation of urban forests in China. <em>Cities</em>, 26(4), 187&ndash;194. DOI: <a href="https://doi.org/10.1016/j.cities.2009.03.003">10.1016/j.cities.2009.03.003</a></li>
+<li>Cook, E.A. (2002). Landscape structure indices for assessing urban ecological networks. <em>Landscape and Urban Planning</em>, 58(2&ndash;4), 269&ndash;280. DOI: <a href="https://doi.org/10.1016/S0169-2046(01)00226-2">10.1016/S0169-2046(01)00226-2</a></li>
+</ol>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     ALGORITHM 8: Settlement Finalizer
+     ═══════════════════════════════════════════════════════ -->
+<section id="alg-step-8" class="alg-section">
+<div class="alg-hero"><span class="alg-id">08</span><h2>8. Settlement Finalizer &mdash; Statistics and Parking Adequacy</h2></div>
+<span class="badge badge-step">Step 8</span> <code>9_settlement_finalizer</code> &nbsp; Class: <code>SettlementFinalizerAlgorithm</code>
+
+<h3>Theoretical Background</h3>
+<p>The settlement finalizer synthesises the outputs of all preceding steps into quantitative planning metrics that directly inform regulatory review and decision-making. It implements what urban analytics literature terms a <strong>planning support system (PSS)</strong> function (Geertman &amp; Stillwell 2009): the automated calculation of density indicators (TAKS, FAR/emission), population estimates, and infrastructure adequacy ratios from spatial data. The algorithm's two-output design separates <strong>aggregate statistics</strong> (attribute-only table, no geometry) from <strong>parcel-level diagnostics</strong> (spatial polygon layer with per-parcel parking adequacy), supporting both high-level reporting and targeted intervention.</p>
+<p>Population estimation uses the standard density formula common to Turkish planning practice: total construction area divided by average dwelling size yields estimated dwelling count; dwellings multiplied by average household size yields estimated population. The default values&mdash;120m&sup2; average dwelling size and 2.77 persons per household&mdash;reflect 2026 Turkish Statistical Institute (TUIK) data and Izmir regional planning norms. The parking adequacy check applies the 2026 Turkish Parking Regulation (<em>Otopark Yonetmeligi</em>) standard of one parking space per dwelling unit for residential uses.</p>
+
+<h3>Mathematical Formulation</h3>
+<div class="math-block">
+<strong>Total Construction Area (per parcel):</strong>
+$$A_{\text{total}} = A_P \times \text{KAKS},\quad \text{if KAKS} > 0$$
+
+<strong>Estimated Dwelling Count:</strong>
+$$n_{\text{dwell}} = \left\lfloor \frac{A_{\text{total}}}{A_{\text{flat}}} \right\rfloor$$
+where $A_{\text{flat}}$ is the average dwelling size (default 120m&sup2;).
+
+<strong>Estimated Population:</strong>
+$$P_{\text{est}} = n_{\text{dwell}} \times H$$
+where $H$ is average household size (default 2.77).
+
+<strong>Required Parking (Residential, 2026 Regulation):</strong>
+$$n_{\text{park,req}} = n_{\text{dwell}}$$
+
+<strong>Parking Adequacy:</strong>
+$$\text{yeterli} = n_{\text{park,exist}} \geq n_{\text{park,req}}$$
+$$\Delta = n_{\text{park,exist}} - n_{\text{park,req}}$$
+
+<strong>Mean Site TAKS:</strong>
+$$\overline{\text{TAKS}} = \frac{\sum A_{\text{building}}}{\sum A_{\text{parcel}}}$$
+</div>
+
+<h3>Parameters</h3>
+<table>
+<thead><tr><th>Parameter</th><th>ID</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td>Parsel katman&#305;</td><td><code>INPUT_PARCELS</code></td><td>Polygon source</td><td>&mdash;</td><td>Parcel layer</td></tr>
+<tr><td>Bina katman&#305;</td><td><code>INPUT_BUILDINGS</code></td><td>Polygon source</td><td>&mdash;</td><td>Building footprint layer</td></tr>
+<tr><td>Agac katman&#305;</td><td><code>INPUT_TREES</code></td><td>Point source (opt.)</td><td>&mdash;</td><td>Tree points from Step 7</td></tr>
+<tr><td>Sert zemin katman&#305;</td><td><code>INPUT_HARDSURFACE</code></td><td>Polygon source (opt.)</td><td>&mdash;</td><td>Hard surface from Step 5</td></tr>
+<tr><td>Otopark stall katman&#305;</td><td><code>INPUT_PARKING</code></td><td>Polygon source (opt.)</td><td>&mdash;</td><td>Parking stalls from Step 6</td></tr>
+<tr><td>TAKS sutunu</td><td><code>TAKS_FIELD</code></td><td>Field (opt.)</td><td>&mdash;</td><td>Target TAKS</td></tr>
+<tr><td>KAKS/Emsal sutunu</td><td><code>KAKS_FIELD</code></td><td>Field (opt.)</td><td>&mdash;</td><td>FAR/Emsal for construction area calculation</td></tr>
+<tr><td>Ortalama daire buyuklugu</td><td><code>FLAT_SIZE</code></td><td>Double</td><td>120.0</td><td>Average dwelling size (m&sup2;)</td></tr>
+<tr><td>Ortalama hane halki buyuklugu</td><td><code>HOUSEHOLD_SIZE</code></td><td>Double</td><td>2.77</td><td>Average household size (persons)</td></tr>
+</tbody>
+</table>
+
+<h3>Outputs</h3>
+<p><strong>Output 1 &mdash; General Statistics (OUTPUT_STATS):</strong></p>
+<table>
+<thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>metric</code></td><td>String (100)</td><td>Statistic name (e.g., "parsel_sayisi")</td></tr>
+<tr><td><code>value</code></td><td>Double (20,2)</td><td>Numeric value</td></tr>
+<tr><td><code>unit</code></td><td>String (20)</td><td>Unit of measurement</td></tr>
+</tbody>
+</table>
+<p>Statistics produced: <code>parsel_sayisi</code>, <code>bina_sayisi</code>, <code>toplam_parsel_alan_m2</code>, <code>toplam_bina_alan_m2</code>, <code>ortalama_taks</code>, <code>tahmini_toplam_daire</code>, <code>tahmini_toplam_nufus</code>, <code>gerekli_otopark_toplam</code>, <code>mevcut_otopark_toplam</code>, <code>otopark_fark</code>, and optionally <code>agac_sayisi</code> and <code>sert_zemin_alan_m2</code>.</p>
+
+<p><strong>Output 2 &mdash; Parking Adequacy Report (OUTPUT_PARKING_REPORT):</strong></p>
+<table>
+<thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>parcel_fid</code></td><td>Int</td><td>Parcel feature ID</td></tr>
+<tr><td><code>parcel_area_m2</code></td><td>Double (20,2)</td><td>Parcel area</td></tr>
+<tr><td><code>kaks_emsal</code></td><td>Double (20,4)</td><td>FAR value from input</td></tr>
+<tr><td><code>toplam_insaat_m2</code></td><td>Double (20,2)</td><td>Total construction area (m&sup2;)</td></tr>
+<tr><td><code>tahmini_daire</code></td><td>Int</td><td>Estimated dwelling count</td></tr>
+<tr><td><code>tahmini_nufus</code></td><td>Double (20,1)</td><td>Estimated population</td></tr>
+<tr><td><code>gerekli_otopark</code></td><td>Int</td><td>Required parking spaces</td></tr>
+<tr><td><code>mevcut_otopark</code></td><td>Int</td><td>Existing parking stall count</td></tr>
+<tr><td><code>otopark_yeterli</code></td><td>Bool</td><td>Parking adequacy flag</td></tr>
+<tr><td><code>otopark_fazla_eksik</code></td><td>Int</td><td>Surplus (+) or deficit (&minus;) parking spaces</td></tr>
+</tbody>
+</table>
+
+<h3>Interpretation Guidance</h3>
+<div class="interpretation">
+<p><strong>Parking deficit:</strong> Sort the parking report by <code>otopark_fazla_eksik</code> ascending to identify parcels with the greatest parking shortfall. These parcels may need additional off-street parking areas or reduced dwelling counts.</p>
+<p><strong>Population density:</strong> Divide <code>tahmini_toplam_nufus</code> by total parcel area (in hectares) to obtain gross population density (persons/hectare). Typical Turkish residential densities range from 50 p/ha (low-density detached) to 400+ p/ha (high-density attached blocks).</p>
+<p><strong>KAKS-dependent calculations:</strong> If the KAKS field is empty, toplam_insaat_m2 will be zero and all derived estimates (dwellings, population, parking requirement) will also be zero. Ensure KAKS data is available for meaningful reporting.</p>
+</div>
+
+<h3>References</h3>
+<ol class="ref-list">
+<li>Geertman, S. &amp; Stillwell, J. (eds.). (2009). <em>Planning Support Systems: Best Practice and New Methods</em>. Springer. DOI: <a href="https://doi.org/10.1007/978-1-4020-8952-7">10.1007/978-1-4020-8952-7</a></li>
+<li>Batty, M. (2013). <em>The New Science of Cities</em>. MIT Press. DOI: <a href="https://doi.org/10.7551/mitpress/9399.001.0001">10.7551/mitpress/9399.001.0001</a></li>
+<li>Berghauser Pont, M. &amp; Haupt, P. (2010). <em>Spacematrix: Space, Density and Urban Form</em>. NAi Publishers.</li>
+<li>Shoup, D. (2005). <em>The High Cost of Free Parking</em>. APA Planners Press. DOI: <a href="https://doi.org/10.4324/9781351179560">10.4324/9781351179560</a></li>
+<li>Ewing, R. &amp; Cervero, R. (2010). Travel and the Built Environment: A Meta-Analysis. <em>Journal of the American Planning Association</em>, 76(3), 265&ndash;294. DOI: <a href="https://doi.org/10.1080/01944361003766766">10.1080/01944361003766766</a></li>
+<li>Brail, R.K. &amp; Klosterman, R.E. (eds.). (2001). <em>Planning Support Systems: Integrating Geographic Information Systems, Models, and Visualization Tools</em>. ESRI Press.</li>
+<li>TUIK (Turkish Statistical Institute). (2026). <em>Address-Based Population Registration System Results</em>. Ankara.</li>
+</ol>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     HELPER 1: Urban Furniture
+     ═══════════════════════════════════════════════════════ -->
+<section id="alg-helper-furniture" class="alg-section">
+<div class="alg-hero"><span class="alg-id">H1</span><h2>H1. Urban Furniture Creator (Kentsel Donati)</h2></div>
+<span class="badge badge-helper">Helper</span> <code>urban_furniture</code> &nbsp; Class: <code>UrbanFurnitureAlgorithm</code>
+
+<h3>Theoretical Background</h3>
+<p>Urban furniture&mdash;benches, lighting, waste receptacles, signage, fountains, and play equipment&mdash;constitutes the "micro-architecture" of public space that significantly influences perceived quality, safety, and usability (Whyte 1980; Gehl 2011). This algorithm creates a stylised point layer pre-populated with 12 furniture types as template features (all located at the coordinate origin), each configured with SVG icon symbology, categorised rendering, and ValueMap-driven attribute forms. It functions as a <strong>digital catalogue</strong> that students and planners populate manually by copying template features to desired locations on the map.</p>
+<p>The post-processing phase (<code>postProcessAlgorithm</code>) automatically applies a <code>QgsCategorizedSymbolRenderer</code> with SVG marker symbols and configures the attribute form to use dropdown (<code>ValueMap</code>) widgets for furniture type selection, hiding internal metadata fields. This represents a pedagogical design pattern for QGIS-based planning education, where the tool provides the structured framework and the user provides the site-specific placement decisions&mdash;an instance of <strong>scaffolded computational support</strong> in planning pedagogy.</p>
+
+<h3>Parameters</h3>
+<table>
+<thead><tr><th>Parameter</th><th>ID</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td>Koordinat sistemi</td><td><code>CRS</code></td><td>CRS</td><td>EPSG:5253</td><td>CRS for the output layer (should match project)</td></tr>
+</tbody>
+</table>
+
+<h3>Furniture Catalogue</h3>
+<table>
+<thead><tr><th>ID</th><th>Name (Turkish)</th><th>Category</th><th>Size (map units)</th><th>Colour</th></tr></thead>
+<tbody>
+<tr><td><code>bank</code></td><td>Oturma Bank&#305;</td><td>oturma (seating)</td><td>5.0</td><td>#8B7355</td></tr>
+<tr><td><code>aydinlatma</code></td><td>Ayd&#305;nlatma Diregi</td><td>aydinlatma (lighting)</td><td>4.0</td><td>#FFD700</td></tr>
+<tr><td><code>cop_kovasi</code></td><td>C&#246;p Kovas&#305;</td><td>temizlik (sanitation)</td><td>3.5</td><td>#4A5568</td></tr>
+<tr><td><code>yangin_muslubu</code></td><td>Yang&#305;n Muslu&#287;u</td><td>guvenlik (safety)</td><td>4.0</td><td>#E53E3E</td></tr>
+<tr><td><code>agac_donati</code></td><td>S&#252;s A&#287;ac&#305;</td><td>peyzaj (landscape)</td><td>6.0</td><td>#38A169</td></tr>
+<tr><td><code>bilgi_panosu</code></td><td>Bilgi Panosu</td><td>bilgilendirme (information)</td><td>4.0</td><td>#4A5568</td></tr>
+<tr><td><code>cesme</code></td><td>Cesme / Su Ogesi</td><td>peyzaj (landscape)</td><td>5.0</td><td>#3182CE</td></tr>
+<tr><td><code>bisiklet_park</code></td><td>Bisiklet Park&#305;</td><td>ulasim (transport)</td><td>4.5</td><td>#DD6B20</td></tr>
+<tr><td><code>elektrik_sarj</code></td><td>EV Sarj Istasyonu</td><td>ulasim (transport)</td><td>4.5</td><td>#38B2AC</td></tr>
+<tr><td><code>oyun_alani</code></td><td>Cocuk Oyun Alan&#305;</td><td>rekreasyon (recreation)</td><td>7.0</td><td>#ED8936</td></tr>
+<tr><td><code>araba</code></td><td>Araba</td><td>ulasim (transport)</td><td>15.0</td><td>#607D8B</td></tr>
+<tr><td><code>trafik_isigi</code></td><td>Trafik Isigi</td><td>ulasim (transport)</td><td>3.0</td><td>#333333</td></tr>
+</tbody>
+</table>
+
+<h3>Outputs</h3>
+<table>
+<thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>donati_id</code></td><td>String (30)</td><td>Furniture type identifier (from catalogue)</td></tr>
+<tr><td><code>donati_adi</code></td><td>String (60)</td><td>Furniture display name (hidden in form)</td></tr>
+<tr><td><code>kategori</code></td><td>String (30)</td><td>Functional category (hidden)</td></tr>
+<tr><td><code>svg_dosya</code></td><td>String (255)</td><td>SVG icon file path (hidden)</td></tr>
+<tr><td><code>renk</code></td><td>String (10)</td><td>Hex colour (hidden)</td></tr>
+<tr><td><code>boyut_mm</code></td><td>Double</td><td>Symbol size in map units (hidden)</td></tr>
+<tr><td><code>aciklama</code></td><td>String (200)</td><td>Usage description</td></tr>
+</tbody>
+</table>
+
+<h3>Interpretation Guidance</h3>
+<div class="interpretation">
+<p><strong>Usage workflow:</strong> (1) Run the algorithm to create the template layer with 12 features at the origin. (2) Toggle editing mode (pencil icon). (3) Copy a template feature and paste at the desired location. (4) Set the <code>donati_id</code> field via dropdown&mdash;the SVG symbol updates automatically. This workflow eliminates manual symbology configuration and ensures consistent cartographic representation across projects.</p>
+</div>
+
+<h3>References</h3>
+<ol class="ref-list">
+<li>Whyte, W.H. (1980). <em>The Social Life of Small Urban Spaces</em>. Conservation Foundation.</li>
+<li>Gehl, J. (2011). <em>Life Between Buildings: Using Public Space</em>. Island Press.</li>
+<li>Marcus, C.C. &amp; Francis, C. (eds.). (1997). <em>People Places: Design Guidelines for Urban Open Space</em>. 2nd ed. Wiley.</li>
+<li>Carmona, M., Heath, T., Oc, T. &amp; Tiesdell, S. (2010). <em>Public Places, Urban Spaces: The Dimensions of Urban Design</em>. 2nd ed. Routledge. DOI: <a href="https://doi.org/10.4324/9780080515427">10.4324/9780080515427</a></li>
+<li>Mehta, V. (2013). <em>The Street: A Quintessential Social Public Space</em>. Routledge. DOI: <a href="https://doi.org/10.4324/9780203067635">10.4324/9780203067635</a></li>
+</ol>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     HELPER 2: Stairs Generator
+     ═══════════════════════════════════════════════════════ -->
+<section id="alg-helper-stairs" class="alg-section">
+<div class="alg-hero"><span class="alg-id">H2</span><h2>H2. Stairs Generator (Merdiven)</h2></div>
+<span class="badge badge-helper">Helper</span> <code>helper_stairs</code> &nbsp; Class: <code>GenerateStairsAlgorithm</code>
+
+<h3>Theoretical Background</h3>
+<p>Staircase geometry in two-dimensional plan representation follows standardised dimensional conventions derived from building codes and ergonomic research. The <strong>rise-run relationship</strong> (Blondel's formula) governs comfortable stair proportions: $2h_{\text{rise}} + g_{\text{going}} \approx 63\text{cm}$ (Neufert &amp; Neufert 2012). In plan view, a staircase is represented as a rectangular projection whose length equals the total going ($n_{\text{steps}} \times \text{tread depth}$) and whose width equals the stair flight width. The algorithm generates this rectangular projection oriented along the direction of the input line geometry, with optional hatch-pattern symbology applied in post-processing to indicate tread lines.</p>
+<p>This computational representation abstracts the staircase to its <strong>planimetric envelope</strong>, suitable for settlement-plan scale drawings (1:200 to 1:1000) rather than detailed construction documents. The simplification is consistent with the geometric level of detail (LOD) taxonomy proposed by Biljecki et al. (2016) for 3D city models, adapted here to 2D plan representation.</p>
+
+<h3>Mathematical Formulation</h3>
+<div class="math-block">
+<strong>Total Going (Stair Length):</strong>
+$$L = t \times n$$
+where $t$ is the tread depth (basar, default 0.30m) and $n$ is the number of steps.
+
+<strong>Orientation Angle (from Line Geometry):</strong>
+$$\theta = \text{atan2}(p_{2y} - p_{1y},\; p_{2x} - p_{1x})$$
+
+<strong>Envelope Corner Points:</strong>
+$$c_1 = s + \frac{w}{2} \cdot (-\sin\theta,\; \cos\theta)$$
+$$c_2 = s - \frac{w}{2} \cdot (-\sin\theta,\; \cos\theta)$$
+$$c_3 = c_2 + L \cdot (\cos\theta,\; \sin\theta)$$
+$$c_4 = c_1 + L \cdot (\cos\theta,\; \sin\theta)$$
+where $s$ is the start point and $w$ is the stair width.
+
+<strong>Blondel's Rule (Implied):</strong>
+$$2 h_{\text{rise}} + t \approx 0.63\text{m}$$
+</div>
+
+<h3>Parameters</h3>
+<table>
+<thead><tr><th>Parameter</th><th>ID</th><th>Type</th><th>Default</th><th>Range</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td>Iz/Dogrultu Katmani</td><td><code>INPUT</code></td><td>Any geometry</td><td>&mdash;</td><td>&mdash;</td><td>Line or polygon indicating stair direction and start point</td></tr>
+<tr><td>Merdiven Genisligi</td><td><code>STAIR_WIDTH</code></td><td>Double</td><td>2.0</td><td>0.5+</td><td>Stair flight width (m)</td></tr>
+<tr><td>Basamak Derinligi/Basar</td><td><code>STAIR_TREAD</code></td><td>Double</td><td>0.3</td><td>0.15+</td><td>Tread depth per step (m)</td></tr>
+<tr><td>Basamak Sayisi</td><td><code>STAIR_COUNT</code></td><td>Integer</td><td>10</td><td>1+</td><td>Number of steps</td></tr>
+</tbody>
+</table>
+
+<h3>Outputs</h3>
+<table>
+<thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>tip</code></td><td>String (20)</td><td>Fixed value: "Merdiven"</td></tr>
+<tr><td><code>genislik</code></td><td>Double</td><td>Stair width (m)</td></tr>
+<tr><td><code>uzunluk</code></td><td>Double</td><td>Total going length (m)</td></tr>
+<tr><td><code>basamak_sayisi</code></td><td>Int</td><td>Step count</td></tr>
+</tbody>
+</table>
+
+<h3>References</h3>
+<ol class="ref-list">
+<li>Neufert, E. &amp; Neufert, P. (2012). <em>Architects' Data</em>. 4th ed. Wiley-Blackwell. DOI: <a href="https://doi.org/10.1002/9781118255346">10.1002/9781118255346</a></li>
+<li>Biljecki, F., Ledoux, H. &amp; Stoter, J. (2016). An improved LOD specification for 3D building models. <em>Computers, Environment and Urban Systems</em>, 59, 25&ndash;37. DOI: <a href="https://doi.org/10.1016/j.compenvurbsys.2016.04.005">10.1016/j.compenvurbsys.2016.04.005</a></li>
+<li>Templer, J. (1992). <em>The Staircase: Studies of Hazards, Falls, and Safer Design</em>. MIT Press.</li>
+<li>Preiser, W.F.E. &amp; Ostroff, E. (eds.). (2001). <em>Universal Design Handbook</em>. McGraw-Hill.</li>
+</ol>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     HELPER 3: Ramps Generator
+     ═══════════════════════════════════════════════════════ -->
+<section id="alg-helper-ramps" class="alg-section">
+<div class="alg-hero"><span class="alg-id">H3</span><h2>H3. Ramps Generator (Rampa)</h2></div>
+<span class="badge badge-helper">Helper</span> <code>helper_ramps</code> &nbsp; Class: <code>GenerateRampsAlgorithm</code>
+
+<h3>Theoretical Background</h3>
+<p>Accessibility ramps are mandatory elements of inclusive urban design, governed by strict slope and dimensional requirements. International standards (ADA Standards for Accessible Design 2010; TS 12576 in Turkey) specify a maximum running slope of 1:12 (8.33%) for ramps, with a minimum clear width of 0.90m for single-direction travel and 1.50m for bidirectional. The ramp generator creates a rectangular plan projection oriented along the input geometry direction, with a gradient-fill symbol applied in post-processing to visually distinguish ramps from stairs and level surfaces.</p>
+<p>The ramp length and width parameters, together with the implied rise, determine the effective slope. Users must independently verify that the resulting slope ratio complies with applicable accessibility codes. The algorithm provides the geometric envelope; regulatory compliance verification remains the planner's responsibility.</p>
+
+<h3>Mathematical Formulation</h3>
+<div class="math-block">
+<strong>Ramp Plan Envelope:</strong>
+Identical corner-point construction to the stairs generator, parameterised by width $w$ and length $L$:
+$$c_1 = s + \frac{w}{2} \cdot (-\sin\theta,\; \cos\theta)$$
+$$c_2 = s - \frac{w}{2} \cdot (-\sin\theta,\; \cos\theta)$$
+$$c_3 = c_2 + L \cdot (\cos\theta,\; \sin\theta)$$
+$$c_4 = c_1 + L \cdot (\cos\theta,\; \sin\theta)$$
+
+<strong>Effective Slope (Designer's Check):</strong>
+$$m = \frac{h_{\text{rise}}}{L} \times 100\%$$
+Accessibility threshold: $m \leq 8.33\%$ (1:12).
+</div>
+
+<h3>Parameters</h3>
+<table>
+<thead><tr><th>Parameter</th><th>ID</th><th>Type</th><th>Default</th><th>Range</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td>Iz/Dogrultu Katmani</td><td><code>INPUT</code></td><td>Any geometry</td><td>&mdash;</td><td>&mdash;</td><td>Line or polygon indicating ramp direction</td></tr>
+<tr><td>Rampa Genisligi</td><td><code>RAMP_WIDTH</code></td><td>Double</td><td>2.0</td><td>0.5+</td><td>Ramp width (m); min 0.9m for single-direction ADA compliance</td></tr>
+<tr><td>Rampa Uzunlugu</td><td><code>RAMP_LENGTH</code></td><td>Double</td><td>5.0</td><td>1.0+</td><td>Ramp length (m)</td></tr>
+</tbody>
+</table>
+
+<h3>Outputs</h3>
+<table>
+<thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>tip</code></td><td>String (20)</td><td>Fixed value: "Rampa"</td></tr>
+<tr><td><code>genislik</code></td><td>Double</td><td>Ramp width (m)</td></tr>
+<tr><td><code>uzunluk</code></td><td>Double</td><td>Ramp length (m)</td></tr>
+</tbody>
+</table>
+
+<h3>References</h3>
+<ol class="ref-list">
+<li>ADA (Americans with Disabilities Act). (2010). <em>ADA Standards for Accessible Design</em>. U.S. Department of Justice.</li>
+<li>Iwarsson, S. &amp; St&aring;hl, A. (2003). Accessibility, usability and universal design. <em>Disability and Rehabilitation</em>, 25(2), 57&ndash;66. DOI: <a href="https://doi.org/10.1080/0963828021000007965">10.1080/0963828021000007965</a></li>
+<li>Preiser, W.F.E. &amp; Ostroff, E. (eds.). (2001). <em>Universal Design Handbook</em>. McGraw-Hill.</li>
+<li>Imrie, R. &amp; Hall, P. (2001). <em>Inclusive Design: Designing and Developing Accessible Environments</em>. Spon Press. DOI: <a href="https://doi.org/10.4324/9780203362501">10.4324/9780203362501</a></li>
+<li>Neufert, E. &amp; Neufert, P. (2012). <em>Architects' Data</em>. 4th ed. Wiley-Blackwell. DOI: <a href="https://doi.org/10.1002/9781118255346">10.1002/9781118255346</a></li>
+</ol>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     HELPER 4: Pedestrian Crossing
+     ═══════════════════════════════════════════════════════ -->
+<section id="alg-helper-crossing" class="alg-section">
+<div class="alg-hero"><span class="alg-id">H4</span><h2>H4. Pedestrian Crossing Generator (Yaya Gecidi)</h2></div>
+<span class="badge badge-helper">Helper</span> <code>helper_pedestrian_crossing</code> &nbsp; Class: <code>PedestrianCrossingAlgorithm</code>
+
+<h3>Theoretical Background</h3>
+<p>Pedestrian crossings are critical nodes in the multimodal transportation network, representing the formalised intersection of pedestrian desire lines with vehicular carriageways. Their geometric representation in settlement plans follows cartographic conventions that prioritise visual legibility: a transverse line (or polygon) spanning the carriageway width, rendered with a distinctive zebra-stripe or dashed pattern. The algorithm functions primarily as a <strong>symbology pass-through</strong>, copying the input line geometry to the output while applying map-unit-based dashed-line rendering that creates the characteristic crossing pattern at any scale.</p>
+<p>The post-processing symbology applies a dashed line style (<code>dash pattern 3:3</code>) with a line width set in map units (metres), ensuring that the crossing symbol scales correctly with the plan&mdash;a cartographic design principle documented in Slocum et al. (2009) for thematic mapping.</p>
+
+<h3>Parameters</h3>
+<table>
+<thead><tr><th>Parameter</th><th>ID</th><th>Type</th><th>Default</th><th>Range</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td>Yol Cizgisi</td><td><code>INPUT</code></td><td>Line source</td><td>&mdash;</td><td>&mdash;</td><td>Road or intersection line marking the crossing</td></tr>
+<tr><td>Yaya Gecidi Genisligi</td><td><code>CROSSING_WIDTH</code></td><td>Double</td><td>5.0</td><td>2.0+</td><td>Crossing width for dash-line symbology (m)</td></tr>
+</tbody>
+</table>
+
+<h3>Outputs</h3>
+<table>
+<thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>tip</code></td><td>String (20)</td><td>Fixed value: "Yaya Gecidi"</td></tr>
+<tr><td><code>genislik</code></td><td>Double</td><td>Crossing width (m)</td></tr>
+</tbody>
+</table>
+
+<h3>Interpretation Guidance</h3>
+<div class="interpretation">
+<p><strong>Symbology only:</strong> This algorithm does not modify geometry&mdash;it is a symbology and metadata tool. The input line is passed through unchanged. To achieve the correct visual result, ensure the output layer's symbology settings are preserved (they are applied automatically by <code>postProcessAlgorithm</code>).</p>
+</div>
+
+<h3>References</h3>
+<ol class="ref-list">
+<li>Slocum, T.A., McMaster, R.B., Kessler, F.C. &amp; Howard, H.H. (2009). <em>Thematic Cartography and Geovisualization</em>. 3rd ed. Pearson.</li>
+<li>ITE (Institute of Transportation Engineers). (2010). <em>Designing Walkable Urban Thoroughfares: A Context Sensitive Approach</em>. ITE/CNU.</li>
+<li>Gehl, J. (2010). <em>Cities for People</em>. Island Press.</li>
+</ol>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     HELPER 5: Parking Axis Layer
+     ═══════════════════════════════════════════════════════ -->
+<section id="alg-helper-axis-layer" class="alg-section">
+<div class="alg-hero"><span class="alg-id">H5</span><h2>H5. Parking Axis Layer (Cizgi Otopark Aks Katmani)</h2></div>
+<span class="badge badge-helper">Helper</span> <code>helper_parking_axis_layer</code> &nbsp; Class: <code>HelperParkingAxisLayerAlgorithm</code>
+
+<h3>Theoretical Background</h3>
+<p>Axis-based parking generation represents a <strong>sketch-and-generate</strong> paradigm where the designer draws a spatial control line (the parking axis) and a subsequent algorithm (H6) populates parking stalls along it according to configurable geometric rules. This two-step approach separates creative spatial judgment (where should parking go?) from mechanical tessellation (how should stalls be laid out?)&mdash;a design pattern that echoes the <strong>separation of concerns</strong> principle in parametric design workflows (Woodbury 2010).</p>
+<p>This algorithm creates the scratch (in-memory) line layer with preconfigured attribute fields and ValueMap widgets, making it a <strong>configuration tool</strong> rather than a geometry generator. The output layer has no features initially; the user draws them interactively in QGIS, selecting parking angle (90&deg;, 60&deg;, 45&deg;, 0&deg;/parallel), generation side (right, left, both), stall gap, and axis offset for each drawn axis line via dropdown forms. This interactive parametric approach has roots in <strong>direct manipulation interfaces</strong> for spatial design.</p>
+
+<h3>Scratch Layer Schema</h3>
+<table>
+<thead><tr><th>Field</th><th>Type</th><th>Widget Type</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>aks_id</code></td><td>Int</td><td>Default</td><td>Axis identifier</td></tr>
+<tr><td><code>park_acisi</code></td><td>String (50)</td><td>ValueMap</td><td>Parking angle: 0=90&deg;, 1=60&deg;, 2=45&deg;, 3=0&deg; (parallel)</td></tr>
+<tr><td><code>olusturma_yonu</code></td><td>String (50)</td><td>ValueMap</td><td>Generation side: 0=Right, 1=Left, 2=Both</td></tr>
+<tr><td><code>h&uuml;cre_bosluk</code></td><td>Double (10,2)</td><td>Default</td><td>Inter-stall gap (m)</td></tr>
+<tr><td><code>aks_mesafesi</code></td><td>Double (10,2)</td><td>Range (0&ndash;5)</td><td>Axis-to-stall offset distance (m)</td></tr>
+</tbody>
+</table>
+
+<h3>References</h3>
+<ol class="ref-list">
+<li>Woodbury, R. (2010). <em>Elements of Parametric Design</em>. Routledge. DOI: <a href="https://doi.org/10.4324/9780203800201">10.4324/9780203800201</a></li>
+<li>Shoup, D. (2005). <em>The High Cost of Free Parking</em>. APA Planners Press. DOI: <a href="https://doi.org/10.4324/9781351179560">10.4324/9781351179560</a></li>
+</ol>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     HELPER 6: Axis Parking Generator
+     ═══════════════════════════════════════════════════════ -->
+<section id="alg-helper-axis-gen" class="alg-section">
+<div class="alg-hero"><span class="alg-id">H6</span><h2>H6. Axis-Based Parking Generator (Cizgi Cercevesinde Otopark)</h2></div>
+<span class="badge badge-helper">Helper</span> <code>helper_axis_parking_generator</code> &nbsp; Class: <code>HelperAxisParkingGeneratorAlgorithm</code>
+
+<h3>Theoretical Background</h3>
+<p>Axis-based parking generation solves the problem of <strong>directed, geometry-controlled stall placement</strong> along a user-defined control line&mdash;a common requirement when parking layout must conform to irregular site boundaries, curved roads, or specific access patterns that the polygon-based perimeter algorithm (Step 6) cannot express. The algorithm processes each axis line segment independently, computing the effective stall width and depth based on the parking angle, then placing stalls at regular intervals along the segment, offset perpendicularly by the axis distance and stall depth.</p>
+<p>The parking angle transformation uses trigonometric decomposition derived from standard traffic engineering design guidelines (ITE 2010; Neufert &amp; Neufert 2012). For angled parking (60&deg; or 45&deg;), the effective width along the axis is the stall width divided by the cosine of the complement angle: $w_{\text{eff}} = w / \cos(90&deg; - \alpha)$. The effective depth (perpendicular projection) is $d_{\text{eff}} = d \cos(90&deg; - \alpha) + w \sin(90&deg; - \alpha)$, accounting for the angular geometry.</p>
+
+<h3>Mathematical Formulation</h3>
+<div class="math-block">
+<strong>Parking Angle Decomposition (for $\alpha = 60^\circ$):</strong>
+$$\beta = 90^\circ - \alpha = 30^\circ$$
+$$w_{\text{eff}} = \frac{w}{\cos\beta},\quad d_{\text{eff}} = d \cos\beta + w \sin\beta$$
+
+<strong>For 90&deg; (Perpendicular):</strong>
+$$w_{\text{eff}} = w,\quad d_{\text{eff}} = d$$
+
+<strong>For 0&deg; (Parallel):</strong>
+$$w_{\text{eff}} = d,\quad d_{\text{eff}} = w$$
+(stall width and depth are swapped).
+
+<strong>Stalls per Segment:</strong>
+$$n = \left\lfloor \frac{L}{w_{\text{eff}} + g} \right\rfloor$$
+$$s_k = \frac{L - n(w_{\text{eff}} + g)}{2} + \frac{w_{\text{eff}} + g}{2} + k(w_{\text{eff}} + g)$$
+
+<strong>Stall Centre Offset (Right Side):</strong>
+$$c_x = p_{1x} + \frac{dx}{L} s_k + u_y \cdot \left(\frac{d_{\text{eff}}}{2} + a_{\text{off}}\right)$$
+$$c_y = p_{1y} + \frac{dy}{L} s_k - u_x \cdot \left(\frac{d_{\text{eff}}}{2} + a_{\text{off}}\right)$$
+where $(u_x, u_y)$ is the unit direction vector of the segment and $a_{\text{off}}$ is the axis offset distance.
+</div>
+
+<h3>Parameters</h3>
+<table>
+<thead><tr><th>Parameter</th><th>ID</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td>Otopark Cizim Ak&#305;s&#305;</td><td><code>INPUT</code></td><td>Line source</td><td>&mdash;</td><td>Parking axis lines (typically from H5 scratch layer)</td></tr>
+<tr><td>Otopark yeri genisligi</td><td><code>STALL_WIDTH</code></td><td>Double</td><td>2.5</td><td>Stall width (m)</td></tr>
+<tr><td>Otopark yeri derinligi</td><td><code>STALL_DEPTH</code></td><td>Double</td><td>5.0</td><td>Stall depth (m)</td></tr>
+<tr><td>Park acisi</td><td><code>PARKING_ANGLE</code></td><td>Enum</td><td>0</td><td>0=90&deg;, 1=60&deg;, 2=45&deg;, 3=0&deg; (parallel)</td></tr>
+<tr><td>Olusturma Yonu</td><td><code>SIDE</code></td><td>Enum</td><td>0</td><td>0=Right, 1=Left, 2=Both sides</td></tr>
+<tr><td>Hucreler arasi bosluk</td><td><code>STALL_GAP</code></td><td>Double</td><td>0.0</td><td>Gap between stalls (m)</td></tr>
+<tr><td>Akstan uzaklik</td><td><code>AXIS_OFFSET</code></td><td>Double</td><td>0.0</td><td>Axis offset distance (m)</td></tr>
+</tbody>
+</table>
+
+<h3>Outputs</h3>
+<table>
+<thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td><code>aks_id</code></td><td>Int</td><td>Source axis feature ID</td></tr>
+<tr><td><code>stall_no</code></td><td>Int</td><td>Sequential stall number (global counter)</td></tr>
+<tr><td><code>alan_m2</code></td><td>Double (20,2)</td><td>Stall area (m&sup2;)</td></tr>
+</tbody>
+</table>
+
+<h3>Interpretation Guidance</h3>
+<div class="interpretation">
+<p><strong>Feature-level vs. global parameters:</strong> Individual axis features may override the global parking angle, side, gap, and offset settings via their attribute fields. When these fields are present and contain valid values, they take precedence over the algorithm dialog values, enabling mixed-angle parking layouts within a single layer.</p>
+<p><strong>Stall rotation:</strong> The stall rotation angle for angled parking is computed as <code>line_angle - &beta;</code> for the right side. For the left side and non-perpendicular/non-parallel angles, the rotation is recomputed to maintain consistent stall orientation relative to the axis direction.</p>
+</div>
+
+<h3>References</h3>
+<ol class="ref-list">
+<li>ITE (Institute of Transportation Engineers). (2010). <em>Parking Generation</em>. 4th ed. ITE.</li>
+<li>Neufert, E. &amp; Neufert, P. (2012). <em>Architects' Data</em>. 4th ed. Wiley-Blackwell. DOI: <a href="https://doi.org/10.1002/9781118255346">10.1002/9781118255346</a></li>
+<li>Shoup, D. (2005). <em>The High Cost of Free Parking</em>. APA Planners Press. DOI: <a href="https://doi.org/10.4324/9781351179560">10.4324/9781351179560</a></li>
+<li>Litman, T. (2020). <em>Parking Management Best Practices</em>. 2nd ed. APA Planners Press. DOI: <a href="https://doi.org/10.4324/9781351179492">10.4324/9781351179492</a></li>
+<li>Ben-Joseph, E. (2012). <em>Rethinking a Lot: The Design and Culture of Parking</em>. MIT Press.</li>
+</ol>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     APPENDIX A: Glossary
+     ═══════════════════════════════════════════════════════ -->
+<section id="appendix-terms" class="card">
+<h2>Appendix A: Glossary of Turkish Planning Terms</h2>
+<table>
+<thead><tr><th>Turkish Term</th><th>Abbreviation</th><th>English Equivalent</th><th>Description</th></tr></thead>
+<tbody>
+<tr><td>Ada</td><td>&mdash;</td><td>Island / Block</td><td>A development island bounded by roads or natural features; the primary unit of subdivision</td></tr>
+<tr><td>Parsel</td><td>&mdash;</td><td>Parcel / Plot</td><td>An individual cadastral unit within an island; the basic unit of property and development control</td></tr>
+<tr><td>Nizam</td><td>&mdash;</td><td>Building Order / Zoning Typology</td><td>The legally prescribed building arrangement on a parcel: Ayr&#305;k (detached), Blok (block/semi-detached), Biti&#351;ik (attached)</td></tr>
+<tr><td>TAKS</td><td>Taban Alan&#305; Katsay&#305;s&#305;</td><td>Building Coverage Ratio (BCR)</td><td>Building footprint area / parcel area; range 0.00&ndash;1.00</td></tr>
+<tr><td>KAKS / Emsal</td><td>Kat Alan&#305; Katsay&#305;s&#305;</td><td>Floor Area Ratio (FAR)</td><td>Total floor area / parcel area; controls built volume</td></tr>
+<tr><td>Yen&ccedil;ok / Hmax</td><td>$H_{\max}$</td><td>Maximum Building Height</td><td>Maximum permitted building height in metres</td></tr>
+<tr><td>&Ouml;n Bah&ccedil;e</td><td>&mdash;</td><td>Front Yard / Front Setback</td><td>Setback distance from the parcel front (road-facing) edge</td></tr>
+<tr><td>Yan Bah&ccedil;e</td><td>&mdash;</td><td>Side Yard / Side Setback</td><td>Setback distance from parcel lateral edges</td></tr>
+<tr><td>Arka Bah&ccedil;e</td><td>&mdash;</td><td>Rear Yard / Back Setback</td><td>Setback from the parcel rear boundary</td></tr>
+<tr><td>Yap&#305; Yakla&#351;ma Mesafesi</td><td>&mdash;</td><td>Building Approach Distance</td><td>Minimum distance from the island boundary (often 5m)</td></tr>
+<tr><td>Cephe</td><td>&mdash;</td><td>Facade</td><td>A parcel edge classified by its orientation relative to roads</td></tr>
+<tr><td>K&ouml;&#351;e Parsel</td><td>&mdash;</td><td>Corner Parcel</td><td>A parcel with two or more front facades (at a street intersection)</td></tr>
+<tr><td>Sert Zemin</td><td>&mdash;</td><td>Hard Surface</td><td>Impervious ground: walkways, service yards, paved areas</td></tr>
+<tr><td>Yaya Ge&ccedil;idi</td><td>&mdash;</td><td>Pedestrian Crossing</td><td>A marked crossing point across a vehicular carriageway</td></tr>
+<tr><td>Otopark</td><td>&mdash;</td><td>Parking / Car Park</td><td>Vehicle parking area</td></tr>
+<tr><td>Merdiven</td><td>&mdash;</td><td>Stairs / Staircase</td><td>A vertical circulation element with steps</td></tr>
+<tr><td>Rampa</td><td>&mdash;</td><td>Ramp</td><td>An inclined accessible circulation element</td></tr>
+<tr><td>Donat&#305;</td><td>&mdash;</td><td>Urban Furniture / Street Furniture</td><td>Benches, lighting, bins, signage, and other public-space elements</td></tr>
+</tbody>
+</table>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     APPENDIX B: Turkish Planning Controls
+     ═══════════════════════════════════════════════════════ -->
+<section id="appendix-planning" class="card">
+<h2>Appendix B: Turkish Planning Control Framework</h2>
+<p>The algorithms in this toolset operationalise provisions from the following regulatory instruments:</p>
+<ul style="padding-left:20px;">
+  <li><strong>Imar Kanunu (Zoning Law) No. 3194</strong> (1985, as amended): The primary legal framework for physical planning in Turkey, defining the hierarchy of plans (spatial strategy plans, environmental plans, master plans, implementation plans) and establishing the development permit system.</li>
+  <li><strong>Planli Alanlar Imar Yonetmeligi (Planned Areas Zoning Regulation)</strong> (2017, as amended): Defines the detailed rules for building placement (<em>nizam</em> types), setbacks, TAKS/KAKS calculation, and parcel dimensions. The four <em>nizam</em> types used in Step 3 algorithms are defined in Article 19 of this regulation.</li>
+  <li><strong>Otopark Yonetmeligi (Parking Regulation)</strong> (2018, as amended): Specifies minimum parking requirements by use type. For residential uses: 1 parking space per dwelling unit (the default in Step 8). For commercial uses, the ratio varies by floor area and retail typology.</li>
+  <li><strong>TS 12576</strong> (Turkish Standards Institution): Accessibility standards for urban spaces, specifying maximum ramp slopes (8% for permanent ramps, 5% preferred), minimum clear widths, and stair dimensional requirements aligned with international ISO standards.</li>
+  <li><strong>TUIK 2026 Data:</strong> Average household size of 2.77 persons is the official Turkish Statistical Institute figure, used for population estimation in Step 8.</li>
+</ul>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     APPENDIX C: Collected References
+     ═══════════════════════════════════════════════════════ -->
+<section id="appendix-refs" class="card">
+<h2>Appendix C: Collected References</h2>
+<ol class="ref-list">
+<li>Alexander, C. (1964). <em>Notes on the Synthesis of Form</em>. Harvard University Press.</li>
+<li>Alexander, C., Ishikawa, S. &amp; Silverstein, M. (1977). <em>A Pattern Language</em>. Oxford University Press.</li>
+<li>Barnett, J. (1982). <em>An Introduction to Urban Design</em>. Harper &amp; Row.</li>
+<li>Batty, M. (2013). <em>The New Science of Cities</em>. MIT Press. DOI: <a href="https://doi.org/10.7551/mitpress/9399.001.0001">10.7551/mitpress/9399.001.0001</a></li>
+<li>Batty, M. &amp; Longley, P. (1994). <em>Fractal Cities: A Geometry of Form and Function</em>. Academic Press.</li>
+<li>Beir&atilde;o, J.N., Duarte, J.P. &amp; Stouffs, R. (2012). Structuring a Generative Model for Urban Design. <em>Proceedings of eCAADe 2012</em>, 323&ndash;332.</li>
+<li>Ben-Joseph, E. (2012). <em>Rethinking a Lot: The Design and Culture of Parking</em>. MIT Press.</li>
+<li>Berghauser Pont, M. &amp; Haupt, P. (2010). <em>Spacematrix: Space, Density and Urban Form</em>. NAi Publishers.</li>
+<li>Biljecki, F., Ledoux, H. &amp; Stoter, J. (2016). An improved LOD specification for 3D building models. <em>Computers, Environment and Urban Systems</em>, 59, 25&ndash;37. DOI: <a href="https://doi.org/10.1016/j.compenvurbsys.2016.04.005">10.1016/j.compenvurbsys.2016.04.005</a></li>
+<li>Carmona, M., Heath, T., Oc, T. &amp; Tiesdell, S. (2010). <em>Public Places, Urban Spaces</em>. 2nd ed. Routledge. DOI: <a href="https://doi.org/10.4324/9780080515427">10.4324/9780080515427</a></li>
+<li>Conzen, M.R.G. (1960/1969). <em>Alnwick, Northumberland: A Study in Town-Plan Analysis</em>. Institute of British Geographers. DOI: <a href="https://doi.org/10.2307/621094">10.2307/621094</a></li>
+<li>Corner, J. (1999). <em>Recovering Landscape: Essays in Contemporary Landscape Architecture</em>. Princeton Architectural Press.</li>
+<li>Duarte, J.P. (2005). A discursive grammar for customizing mass housing. <em>Automation in Construction</em>, 14(2), 265&ndash;275. DOI: <a href="https://doi.org/10.1016/j.autcon.2004.07.013">10.1016/j.autcon.2004.07.013</a></li>
+<li>Ewing, R. &amp; Cervero, R. (2010). Travel and the Built Environment. <em>Journal of the American Planning Association</em>, 76(3), 265&ndash;294. DOI: <a href="https://doi.org/10.1080/01944361003766766">10.1080/01944361003766766</a></li>
+<li>Geertman, S. &amp; Stillwell, J. (eds.) (2009). <em>Planning Support Systems</em>. Springer. DOI: <a href="https://doi.org/10.1007/978-1-4020-8952-7">10.1007/978-1-4020-8952-7</a></li>
+<li>Gehl, J. (2010/2011). <em>Cities for People</em> / <em>Life Between Buildings</em>. Island Press.</li>
+<li>Hillier, B. (1996). <em>Space is the Machine</em>. Cambridge University Press.</li>
+<li>Hillier, B. &amp; Hanson, J. (1984). <em>The Social Logic of Space</em>. Cambridge University Press. DOI: <a href="https://doi.org/10.1017/CBO9780511597237">10.1017/CBO9780511597237</a></li>
+<li>Imrie, R. &amp; Hall, P. (2001). <em>Inclusive Design</em>. Spon Press. DOI: <a href="https://doi.org/10.4324/9780203362501">10.4324/9780203362501</a></li>
+<li>ITE. (2010). <em>Parking Generation</em>. 4th ed. Institute of Transportation Engineers.</li>
+<li>Iwarsson, S. &amp; St&aring;hl, A. (2003). Accessibility, usability and universal design. <em>Disability and Rehabilitation</em>, 25(2), 57&ndash;66. DOI: <a href="https://doi.org/10.1080/0963828021000007965">10.1080/0963828021000007965</a></li>
+<li>Kallay, M. (1984). The geometry of offset curves. <em>Computer-Aided Design</em>, 16(6), 295&ndash;299. DOI: <a href="https://doi.org/10.1016/0010-4485(84)90165-9">10.1016/0010-4485(84)90165-9</a></li>
+<li>Kropf, K. (1996/2017). Urban tissue and the character of towns / <em>The Handbook of Urban Morphology</em>. Wiley. DOI: <a href="https://doi.org/10.1002/9781118747711">10.1002/9781118747711</a></li>
+<li>Lehnerer, A. (2009). <em>Grand Urban Rules</em>. 010 Publishers. DOI: <a href="https://doi.org/10.5949/mitpress/9780262514781.001.0001">10.5949/mitpress/9780262514781.001.0001</a></li>
+<li>Litman, T. (2020). <em>Parking Management Best Practices</em>. 2nd ed. APA Planners Press. DOI: <a href="https://doi.org/10.4324/9781351179492">10.4324/9781351179492</a></li>
+<li>Longley, P.A. et al. (2015). <em>Geographic Information Science and Systems</em>. 4th ed. Wiley.</li>
+<li>Lynch, K. (1981). <em>A Theory of Good City Form</em>. MIT Press.</li>
+<li>Marshall, S. (2005/2009). <em>Streets and Patterns</em> / <em>Cities, Design and Evolution</em>. Routledge. DOI: <a href="https://doi.org/10.4324/9780203589397">10.4324/9780203589397</a></li>
+<li>Martin, L. &amp; March, L. (1972). <em>Urban Space and Structures</em>. Cambridge University Press.</li>
+<li>McHarg, I.L. (1969). <em>Design with Nature</em>. Natural History Press. DOI: <a href="https://doi.org/10.1016/0016-7185(70)90053-8">10.1016/0016-7185(70)90053-8</a></li>
+<li>Mitchell, W.J. (1990). <em>The Logic of Architecture</em>. MIT Press.</li>
+<li>Moudon, A.V. (1986/1997). <em>Built for Change</em> / Urban morphology as an emerging interdisciplinary field. <em>Urban Morphology</em>, 1(1), 3&ndash;10. DOI: <a href="https://doi.org/10.51347/jum.v1i1.4047">10.51347/jum.v1i1.4047</a></li>
+<li>M&uuml;ller, P. et al. (2006). Procedural Modeling of Buildings. <em>ACM Trans. Graph.</em>, 25(3), 614&ndash;623. DOI: <a href="https://doi.org/10.1145/1141911.1141931">10.1145/1141911.1141931</a></li>
+<li>Neufert, E. &amp; Neufert, P. (2012). <em>Architects' Data</em>. 4th ed. Wiley-Blackwell. DOI: <a href="https://doi.org/10.1002/9781118255346">10.1002/9781118255346</a></li>
+<li>Oliveira, V. (2016). <em>Urban Morphology: An Introduction</em>. Springer. DOI: <a href="https://doi.org/10.1007/978-3-319-32083-0">10.1007/978-3-319-32083-0</a></li>
+<li>Panerai, P. et al. (2004). <em>Urban Forms: The Death and Life of the Urban Block</em>. Architectural Press. DOI: <a href="https://doi.org/10.4324/9780080472454">10.4324/9780080472454</a></li>
+<li>Parish, Y.I.H. &amp; M&uuml;ller, P. (2001). Procedural Modeling of Cities. <em>Proc. SIGGRAPH 2001</em>, 301&ndash;308. DOI: <a href="https://doi.org/10.1145/383259.383292">10.1145/383259.383292</a></li>
+<li>Parolek, D.G. et al. (2008). <em>Form-Based Codes</em>. Wiley.</li>
+<li>Preiser, W.F.E. &amp; Ostroff, E. (eds.) (2001). <em>Universal Design Handbook</em>. McGraw-Hill.</li>
+<li>Schumacher, P. (2009). Parametricism. <em>Architectural Design</em>, 79(4), 14&ndash;23. DOI: <a href="https://doi.org/10.1002/ad.912">10.1002/ad.912</a></li>
+<li>Shoup, D. (2005). <em>The High Cost of Free Parking</em>. APA Planners Press. DOI: <a href="https://doi.org/10.4324/9781351179560">10.4324/9781351179560</a></li>
+<li>Sitte, C. (1889/1965). <em>City Planning According to Artistic Principles</em>. Random House.</li>
+<li>Slocum, T.A. et al. (2009). <em>Thematic Cartography and Geovisualization</em>. 3rd ed. Pearson.</li>
+<li>Steadman, P. (2014). <em>Building Types and Built Forms</em>. Troubador Publishing.</li>
+<li>Stiny, G. (1980). Introduction to shape and shape grammars. <em>Environment and Planning B</em>, 7(3), 343&ndash;351. DOI: <a href="https://doi.org/10.1068/b070343">10.1068/b070343</a></li>
+<li>Templer, J. (1992). <em>The Staircase</em>. MIT Press.</li>
+<li>Waldheim, C. (2006). <em>The Landscape Urbanism Reader</em>. Princeton Architectural Press. DOI: <a href="https://doi.org/10.1007/1-56898-672-6">10.1007/1-56898-672-6</a></li>
+<li>Whyte, W.H. (1980). <em>The Social Life of Small Urban Spaces</em>. Conservation Foundation.</li>
+<li>Wonka, P. et al. (2003). Instant Architecture. <em>ACM Trans. Graph.</em>, 22(3), 669&ndash;677. DOI: <a href="https://doi.org/10.1145/882262.882324">10.1145/882262.882324</a></li>
+<li>Woodbury, R. (2010). <em>Elements of Parametric Design</em>. Routledge. DOI: <a href="https://doi.org/10.4324/9780203800201">10.4324/9780203800201</a></li>
+</ol>
+</section>
+
+</main>
+
+<!-- ═══════════════════════════════════════════════════════
+     JavaScript: Theme, Sidebar, Search
+     ═══════════════════════════════════════════════════════ -->
+<script>
+// ── Dark/Light Mode Toggle ─────────────────────────────
+function toggleTheme() {
+  const html = document.documentElement;
+  const current = html.getAttribute('data-theme');
+  const next = (current === 'dark') ? 'light' : 'dark';
+  html.setAttribute('data-theme', next);
+  localStorage.setItem('planx-manual-theme', next);
+  document.getElementById('themeBtn').innerHTML = (next === 'dark') ? '&#9789;' : '&#9788;';
+}
+(function() {
+  const saved = localStorage.getItem('planx-manual-theme');
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  if (saved === 'dark' || (!saved && prefersDark)) {
+    document.documentElement.setAttribute('data-theme', 'dark');
+    document.getElementById('themeBtn').innerHTML = '&#9789;';
+  }
+})();
+
+// ── Sidebar Toggle ─────────────────────────────────────
+function toggleSidebar() {
+  document.body.classList.toggle('sidebar-collapsed');
+  localStorage.setItem('planx-manual-sidebar', document.body.classList.contains('sidebar-collapsed') ? 'collapsed' : 'open');
+}
+(function() {
+  if (localStorage.getItem('planx-manual-sidebar') === 'collapsed') {
+    document.body.classList.add('sidebar-collapsed');
+  }
+})();
+
+// ── Active TOC Link Highlighting ───────────────────────
+(function() {
+  const links = document.querySelectorAll('.sidebar a[href^="#"]');
+  const sections = [];
+  links.forEach(a => {
+    const id = a.getAttribute('href').slice(1);
+    const el = document.getElementById(id);
+    if (el) sections.push({link: a, el});
+  });
+  function onScroll() {
+    let current = null;
+    const scrollY = window.scrollY + 120;
+    for (let i = sections.length - 1; i >= 0; i--) {
+      if (sections[i].el.offsetTop <= scrollY) {
+        current = sections[i]; break;
+      }
+    }
+    links.forEach(l => l.classList.remove('active'));
+    if (current) current.link.classList.add('active');
+  }
+  window.addEventListener('scroll', onScroll, {passive: true});
+  onScroll();
+})();
+
+// ── Full-Text Search ───────────────────────────────────
+function searchManual() {
+  const query = document.getElementById('searchBox').value.trim().toLowerCase();
+  const sections = document.querySelectorAll('.alg-section, .card');
+  const statsEl = document.getElementById('searchStats');
+  let visibleCount = 0;
+
+  if (query.length < 2) {
+    sections.forEach(s => s.classList.remove('search-hidden'));
+    statsEl.textContent = '';
+    return;
+  }
+
+  sections.forEach(s => {
+    const text = s.textContent.toLowerCase();
+    if (text.includes(query)) {
+      s.classList.remove('search-hidden');
+      visibleCount++;
+    } else {
+      s.classList.add('search-hidden');
+    }
+  });
+
+  statsEl.textContent = visibleCount > 0 ? `${visibleCount} match${visibleCount !== 1 ? 'es' : ''}` : 'No matches';
+}
+
+// Keyboard shortcut: Ctrl+K / Cmd+K for search focus
+document.addEventListener('keydown', function(e) {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+    e.preventDefault();
+    document.getElementById('searchBox').focus();
+  }
+});
+</script>
+
+</body>
+</html>
