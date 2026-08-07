@@ -7,6 +7,7 @@
 **9-stage parametric settlement-plan pipeline for QGIS — blocks, parcels, building footprints, parking and landscape (Processing).**
 
 [![QGIS](https://img.shields.io/badge/QGIS-3.28%2B-93b023?logo=qgis&logoColor=white)](https://plugins.qgis.org/plugins/planx_yerlesim_plani_arac_seti/)
+[![Documentation](https://img.shields.io/badge/📖_Reference_Manual-13a0a0)](https://yusufeminoglu.github.io/PlanX-Settlement/)
 [![Version](https://img.shields.io/github/v/tag/YusufEminoglu/PlanX-Settlement?label=version&color=blue)](https://github.com/YusufEminoglu/PlanX-Settlement/releases)
 [![License](https://img.shields.io/badge/license-GPL--3.0-orange)](LICENSE)
 [![QGIS Plugin Hub](https://img.shields.io/badge/QGIS%20Hub-install-589632?logo=qgis&logoColor=white)](https://plugins.qgis.org/plugins/planx_yerlesim_plani_arac_seti/)
