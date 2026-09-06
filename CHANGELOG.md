@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.5.13] - 2026-09-06
+
+- Migrate repository and documentation URLs to GitLab and Cloudflare Pages.
+
 ## [0.5.12] - 2026-08-07
 
 - Added online user manual link (https://yusufeminoglu.github.io/PlanX-Settlement/) and GitHub repository star call-to-action.
