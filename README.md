@@ -7,7 +7,7 @@
 **9-stage parametric settlement-plan pipeline for QGIS — blocks, parcels, building footprints, parking and landscape (Processing).**
 
 [![QGIS](https://img.shields.io/badge/QGIS-3.28%2B-93b023?logo=qgis&logoColor=white)](https://plugins.qgis.org/plugins/planx_yerlesim_plani_arac_seti/)
-[![Documentation](https://img.shields.io/badge/📖_Reference_Manual-13a0a0)](https://geophilo.pages.dev/planx_yerlesim_plani_arac_seti/)
+[![Documentation](https://img.shields.io/badge/📖_Reference_Manual-13a0a0)](https://geophilo.com/planx_yerlesim_plani_arac_seti/)
 [![Version](https://img.shields.io/github/v/tag/YusufEminoglu/PlanX-Settlement?label=version&color=blue)](https://gitlab.com/geospacephilo/EasyFillet/releases)
 [![License](https://img.shields.io/badge/license-GPL--3.0-orange)](LICENSE)
 [![QGIS Plugin Hub](https://img.shields.io/badge/QGIS%20Hub-install-589632?logo=qgis&logoColor=white)](https://plugins.qgis.org/plugins/planx_yerlesim_plani_arac_seti/)
@@ -18,7 +18,7 @@
 
 ## 📖 Documentation
 
-**[Comprehensive Academic Reference Manual](https://geophilo.pages.dev/planx_yerlesim_plani_arac_seti/)** — complete documentation of every feature, parameter, and workflow. Hosted on Web Documentation.
+**[Comprehensive Academic Reference Manual](https://geophilo.com/planx_yerlesim_plani_arac_seti/)** — complete documentation of every feature, parameter, and workflow. Hosted on Web Documentation.
 
 
 ## Why this toolset?
