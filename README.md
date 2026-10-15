@@ -8,7 +8,7 @@
 
 [![QGIS](https://img.shields.io/badge/QGIS-3.28%2B-93b023?logo=qgis&logoColor=white)](https://plugins.qgis.org/plugins/planx_yerlesim_plani_arac_seti/)
 [![Documentation](https://img.shields.io/badge/📖_Reference_Manual-13a0a0)](https://geophilo.com/planx_yerlesim_plani_arac_seti/)
-[![Version](https://img.shields.io/github/v/tag/YusufEminoglu/PlanX-Settlement?label=version&color=blue)](https://gitlab.com/geospacephilo/planx_yerlesim_plani_arac_seti/releases)
+[![Version](https://img.shields.io/github/v/tag/YusufEminoglu/PlanX-Settlement?label=version&color=blue)](https://gitlab.com/geophilo1/planx_yerlesim_plani_arac_seti/releases)
 [![License](https://img.shields.io/badge/license-GPL--3.0-orange)](LICENSE)
 [![QGIS Plugin Hub](https://img.shields.io/badge/QGIS%20Hub-install-589632?logo=qgis&logoColor=white)](https://plugins.qgis.org/plugins/planx_yerlesim_plani_arac_seti/)
 
@@ -38,7 +38,7 @@ Producing a complete settlement plan by hand — subdividing blocks, placing foo
 
 **From the QGIS Plugin Hub (recommended):** `Plugins → Manage and Install Plugins…` → search for **"PlanX Settlement"** → *Install*.
 
-**From a release zip:** download the latest zip from [Releases](https://gitlab.com/geospacephilo/planx_yerlesim_plani_arac_seti/releases) → `Plugins → Install from ZIP`.
+**From a release zip:** download the latest zip from [Releases](https://gitlab.com/geophilo1/planx_yerlesim_plani_arac_seti/releases) → `Plugins → Install from ZIP`.
 
 Requires QGIS 3.28 or newer (3.40/3.44 LTR recommended). No external Python dependencies.
 
@@ -75,12 +75,12 @@ This plugin is one of 15 open-source QGIS plugins for urban planning by the same
 
 | Planning & analysis | CAD & production | 3D & visualization |
 |---|---|---|
-| [PlanX](https://gitlab.com/geospacephilo/planx_yerlesim_plani_arac_seti) — spatial-planning suite | [PlanX CAD Toolset](https://gitlab.com/geospacephilo/planx_yerlesim_plani_arac_seti) — drafting-grade CAD | [PlanX 3D City](https://gitlab.com/geospacephilo/planx_yerlesim_plani_arac_seti) — Three.js city viewer |
-| [GeoStats Lab](https://gitlab.com/geospacephilo/planx_yerlesim_plani_arac_seti) — spatial statistics | [EasyFillet](https://gitlab.com/geospacephilo/planx_yerlesim_plani_arac_seti) — tangent-arc fillet | [3D OSM Model](https://gitlab.com/geospacephilo/planx_yerlesim_plani_arac_seti) — OSM → 3D city in browser |
-| [Suitability Lab](https://gitlab.com/geospacephilo/planx_yerlesim_plani_arac_seti) — raster MCDA | [Settlement Toolset](https://gitlab.com/geospacephilo/planx_yerlesim_plani_arac_seti) — 9-stage settlement plans | [OSM Quick 3D](https://gitlab.com/geospacephilo/planx_yerlesim_plani_arac_seti) — OSM → native QGIS 3D |
-| [DataCube Lab](https://gitlab.com/geospacephilo/planx_yerlesim_plani_arac_seti) — spatiotemporal cubes | [UIP Toolset](https://gitlab.com/geospacephilo/planx_yerlesim_plani_arac_seti) — Turkish master-plan automation | [Urban Procedural 3D](https://gitlab.com/geospacephilo/planx_yerlesim_plani_arac_seti) — parametric zoning lab |
-| [Urban Resilience](https://gitlab.com/geospacephilo/planx_yerlesim_plani_arac_seti) — 28 resilience tools | [ParcelFlux](https://gitlab.com/geospacephilo/planx_yerlesim_plani_arac_seti) — parcel subdivision | [CartoLab](https://gitlab.com/geospacephilo/planx_yerlesim_plani_arac_seti) — publication cartography |
+| [PlanX](https://gitlab.com/geophilo1/planx_yerlesim_plani_arac_seti) — spatial-planning suite | [PlanX CAD Toolset](https://gitlab.com/geophilo1/planx_yerlesim_plani_arac_seti) — drafting-grade CAD | [PlanX 3D City](https://gitlab.com/geophilo1/planx_yerlesim_plani_arac_seti) — Three.js city viewer |
+| [GeoStats Lab](https://gitlab.com/geophilo1/planx_yerlesim_plani_arac_seti) — spatial statistics | [EasyFillet](https://gitlab.com/geophilo1/planx_yerlesim_plani_arac_seti) — tangent-arc fillet | [3D OSM Model](https://gitlab.com/geophilo1/planx_yerlesim_plani_arac_seti) — OSM → 3D city in browser |
+| [Suitability Lab](https://gitlab.com/geophilo1/planx_yerlesim_plani_arac_seti) — raster MCDA | [Settlement Toolset](https://gitlab.com/geophilo1/planx_yerlesim_plani_arac_seti) — 9-stage settlement plans | [OSM Quick 3D](https://gitlab.com/geophilo1/planx_yerlesim_plani_arac_seti) — OSM → native QGIS 3D |
+| [DataCube Lab](https://gitlab.com/geophilo1/planx_yerlesim_plani_arac_seti) — spatiotemporal cubes | [UIP Toolset](https://gitlab.com/geophilo1/planx_yerlesim_plani_arac_seti) — Turkish master-plan automation | [Urban Procedural 3D](https://gitlab.com/geophilo1/planx_yerlesim_plani_arac_seti) — parametric zoning lab |
+| [Urban Resilience](https://gitlab.com/geophilo1/planx_yerlesim_plani_arac_seti) — 28 resilience tools | [ParcelFlux](https://gitlab.com/geophilo1/planx_yerlesim_plani_arac_seti) — parcel subdivision | [CartoLab](https://gitlab.com/geophilo1/planx_yerlesim_plani_arac_seti) — publication cartography |
 
 ## 📜 License & author
 
-GPL-3.0 © [Yusuf Eminoğlu](https://github.com/YusufEminoglu) — Dokuz Eylül University, Department of City and Regional Planning. Bug reports and feature requests welcome in [Issues](https://gitlab.com/geospacephilo/planx_yerlesim_plani_arac_seti/-/issues).
+GPL-3.0 © [Yusuf Eminoğlu](https://github.com/YusufEminoglu) — Dokuz Eylül University, Department of City and Regional Planning. Bug reports and feature requests welcome in [Issues](https://gitlab.com/geophilo1/planx_yerlesim_plani_arac_seti/-/issues).
