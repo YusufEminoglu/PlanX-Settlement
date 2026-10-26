@@ -11,6 +11,7 @@ repository=https://gitlab.com/geophilo1/planx_yerlesim_plani_arac_seti
 category=Processing
 hasProcessingProvider=yes
 homepage=https://geophilo.com/planx_yerlesim_plani_arac_seti/
+license=GPL-3.0-or-later
 tags=planx,urban planning,settlement plan,parcel,building footprint,parking,landscape,QGIS,processing
 icon=icons/icon_main.svg
 qgisMaximumVersion=4.99
