@@ -2,7 +2,7 @@
 name=Settlement Planning Toolset
 qgisMinimumVersion=3.28
 description=Turkish-language Processing workflow for settlement-plan design in Turkey: nine steps from block-to-parcel subdivision and building footprints to parking, landscape and a plan report.
-version=0.5.13
+version=0.5.14
 author=Geophilo
 email=yusuf.eminoglu@deu.edu.tr
 about=Settlement Planning Toolset, imar adasından yerleşim planı raporuna uzanan tasarım hattını dokuz sıralı Processing adımına böler.
