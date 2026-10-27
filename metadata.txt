@@ -21,6 +21,7 @@ qgisMaximumVersion=4.99
 experimental=False
 deprecated=False
 changelog=
+    0.5.14 - Hub listing text rewritten; author Geophilo; university affiliation removed; documentation links use the standard geophilo.com pages (manual.html, guide/); manual HTML no longer ships in the plugin package.
     PlanX Settlement Planning Toolset 0.5.2 - Released the current local workflow updates, Step 3 footprint variants, parking-axis helpers, standardized Plugin Hub metadata, and refreshed the stable release package.
     PlanX Settlement Planning Toolset 0.5.1 - Renumbered the workflow as 3.1 FAR, 3.2 Detached, 3.3 Block, 3.4 Attached, 4.1 Macroform, 4.2 DynamicForm, 5 Data Check, and 6-9 remaining stages.
         - Step 4.1 Macroform: TEMPLATE_FILE replaced by TEMPLATE_LAYER (open layer selector) + SELECTED_ONLY checkbox
