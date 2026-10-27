@@ -1,7 +1,7 @@
 # Mimari (Architecture)
 
 ## Genel Mimari
-Eklenti QGIS'in yerleşik `Processing Toolbox` (İşlem Kutusu) ekosistemini kullanır. Tüm algoritmalar `QgsProcessingAlgorithm` sınıfından miras alarak yazılmıştır ve birbirini zincirleme takip eden geometrik/mekansal işlemler bütünü olarak dizayn edilmiştir. Geliştirici imzası (`Yusuf Eminoglu - planX Geospatial Advanced Tools`) ile tüm algoritmalarda merkezi kimlik sağlanmıştır.
+Eklenti QGIS'in yerleşik `Processing Toolbox` (İşlem Kutusu) ekosistemini kullanır. Tüm algoritmalar `QgsProcessingAlgorithm` sınıfından miras alarak yazılmıştır ve birbirini zincirleme takip eden geometrik/mekansal işlemler bütünü olarak dizayn edilmiştir. Geliştirici imzası (`Geophilo - planX Geospatial Advanced Tools`) ile tüm algoritmalarda merkezi kimlik sağlanmıştır.
 
 ## Klasör Yapısı
 - `algorithms/` — 9 aşamalı Processing algoritmaları ve genel donatı (urban furniture) üretim araçları

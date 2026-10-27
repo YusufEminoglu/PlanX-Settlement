@@ -83,4 +83,4 @@ This plugin is one of 15 open-source QGIS plugins for urban planning by the same
 
 ## 📜 License & author
 
-GPL-3.0-or-later © [Yusuf Eminoğlu](https://github.com/YusufEminoglu) — Dokuz Eylül University, Department of City and Regional Planning. Bug reports and feature requests welcome in [Issues](https://gitlab.com/geophilo1/planx_yerlesim_plani_arac_seti/-/issues).
+GPL-3.0-or-later © [Yusuf Eminoğlu](https://github.com/YusufEminoglu) — bug reports and feature requests welcome in [Issues](https://gitlab.com/geophilo1/planx_yerlesim_plani_arac_seti/-/issues).

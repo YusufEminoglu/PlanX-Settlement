@@ -6,7 +6,7 @@ için QGIS sembol kütüphanesi oluşturur.
 
 Kullanıcı bu nokta katmanından elemanları seçerek harita üzerine konumlandırır.
 
-Geliştirici: Yusuf Eminoglu
+Geliştirici: Geophilo
 planX Geospatial Advanced Tools — Yerleşim Planı Araç Seti
 """
 

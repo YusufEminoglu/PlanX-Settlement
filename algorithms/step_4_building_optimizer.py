@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Adım 4: BuildingOptimizer — Bina-parsel uyum kontrolü ve kalite raporu.
 
-Geliştirici: Yusuf Eminoglu
+Geliştirici: Geophilo
 planX Geospatial Advanced Tools — Yerleşim Planı Araç Seti
 """
 import os, sys
@@ -129,7 +129,7 @@ class BuildingOptimizerAlgorithm(QgsProcessingAlgorithm):
     def shortHelpString(self):
         return self.tr(
             "━━━ planX — Yerleşim Planı Araç Seti ━━━\n"
-            "Geliştirici: Yusuf Eminoglu\n\n"
+            "Geliştirici: Geophilo\n\n"
             "TAKS aşımı, geometri geçerliliği ve uyum kontrolu yapar.\n\n"
             "Kontroller:\n"
             "• bina_alan / parsel_alan ≤ TAKS\n"

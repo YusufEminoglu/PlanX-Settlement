@@ -2,7 +2,7 @@
 """
 Helper: Yaya Geçidi Üretici
 
-Geliştirici: Yusuf Eminoglu
+Geliştirici: Geophilo
 planX Geospatial Advanced Tools — Yerleşim Planı Araç Seti
 """
 from qgis.PyQt.QtCore import QCoreApplication, QVariant

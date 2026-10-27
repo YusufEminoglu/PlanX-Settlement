@@ -13,7 +13,7 @@ Parametrik kentsel kütle yaklaşımı:
 
 Yençok (Hmax) → kat adedi → TAKS = E / kat adedi (≤ 1.0)
 
-Geliştirici: Yusuf Eminoglu
+Geliştirici: Geophilo
 planX Geospatial Advanced Tools — Yerleşim Planı Araç Seti
 """
 import os, sys, math
@@ -360,7 +360,7 @@ class CoverageFootprintFarAlgorithm(QgsProcessingAlgorithm):
     def shortHelpString(self):
         return self.tr(
             '━━━ planX — Yerleşim Planı Araç Seti ━━━\n'
-            'Geliştirici: Yusuf Eminoglu\n\n'
+            'Geliştirici: Geophilo\n\n'
             'Emsal (FAR) değerinden ada / parsel çevre-blok kütlesi üretir.\n\n'
             'Parametrik Kentsel Kütle Modeli (Dinamik Segmentasyon):\n'
             '• Ada çevresinde yapı yaklaşma mesafesi sınırı tespit edilir.\n'

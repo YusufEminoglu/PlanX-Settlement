@@ -10,7 +10,7 @@ Mevzuat:
 • Köşe parsellerde birden fazla ön cephe olabilir — tümüne ön bahçe
 • Sınıflandırılmamış kenarlar → arka bahçe varsayımı (güvenli taraf)
 
-Geliştirici: Yusuf Eminoglu
+Geliştirici: Geophilo
 planX Geospatial Advanced Tools — Yerleşim Planı Araç Seti
 """
 import os, sys
@@ -234,7 +234,7 @@ class AttachedCoverageFootprintAlgorithm(QgsProcessingAlgorithm):
     def shortHelpString(self):
         return self.tr(
             '━━━ planX — Yerleşim Planı Araç Seti ━━━\n'
-            'Geliştirici: Yusuf Eminoglu\n\n'
+            'Geliştirici: Geophilo\n\n'
             'Bitişik Nizam (B nizam) kurallarına göre bina taban alanı üretir.\n\n'
             'Setback Kuralı — Öncelik Sırası:\n'
             '1. Ön cephe(ler)     → ön bahçe mesafesi (yola bakan)\n'

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Adım 7: LandscapeGenerator — Ağaç ve peyzaj elemanları üretimi.
 
-Geliştirici: Yusuf Eminoglu
+Geliştirici: Geophilo
 planX Geospatial Advanced Tools — Yerleşim Planı Araç Seti
 """
 import os, sys
@@ -166,7 +166,7 @@ class LandscapeGeneratorAlgorithm(QgsProcessingAlgorithm):
     def shortHelpString(self):
         return self.tr(
             "━━━ planX — Yerleşim Planı Araç Seti ━━━\n"
-            "Geliştirici: Yusuf Eminoglu\n\n"
+            "Geliştirici: Geophilo\n\n"
             "Parsellerin yeşil alanlarına ve park alanlarına ağaç noktaları üretir.\n\n"
             "Parametreler:\n"
             "• Parsel katmanı: Bahçe alanları için\n"

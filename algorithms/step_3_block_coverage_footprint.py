@@ -15,7 +15,7 @@ Ortak kenar tespiti — iki katmanlı:
   2. Bu sınıflandırma içinde fiziksel komşu paylaşımı kontrol edilir
   Böylece facade_back yanlışlıkla 0 almaz.
 
-Geliştirici: Yusuf Eminoglu
+Geliştirici: Geophilo
 planX Geospatial Advanced Tools — Yerleşim Planı Araç Seti
 """
 import os, sys
@@ -336,7 +336,7 @@ class BlockCoverageFootprintAlgorithm(QgsProcessingAlgorithm):
     def shortHelpString(self):
         return self.tr(
             '━━━ planX — Yerleşim Planı Araç Seti ━━━\n'
-            'Geliştirici: Yusuf Eminoglu\n\n'
+            'Geliştirici: Geophilo\n\n'
             'Blok Nizam (BL nizam) kurallarına göre her parselde bağımsız bina taban alanı üretir.\n\n'
             'Setback Kuralı — Öncelik Sırası:\n'
             '1. Ön cephe(ler)            → ön bahçe mesafesi (yoll yüzü)\n'

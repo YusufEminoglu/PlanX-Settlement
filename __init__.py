@@ -6,7 +6,7 @@ QGIS Processing Plugin
 Ada → Parsel → Bina (Makroform) → Sert Zemin → Otopark → Peyzaj
 sıralı iş akışı ile yerleşim planı üretimi.
 
-Author: Yusuf Eminoglu
+Author: Geophilo
 """
 
 

@@ -2,7 +2,7 @@
 """
 Helper: Rampa Üretici
 
-Geliştirici: Yusuf Eminoglu
+Geliştirici: Geophilo
 planX Geospatial Advanced Tools — Yerleşim Planı Araç Seti
 """
 import math

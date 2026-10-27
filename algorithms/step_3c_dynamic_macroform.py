@@ -8,7 +8,7 @@ Gerçekçi mimari kısıtlar:
 • Aspect ratio kontrollü
 • Dropdown ile çoklu form seçimi (tiklenebilir)
 
-Geliştirici: Yusuf Eminoglu
+Geliştirici: Geophilo
 planX Geospatial Advanced Tools — Yerleşim Planı Araç Seti
 """
 import os, sys, math
@@ -424,7 +424,7 @@ class DynamicMacroformAlgorithm(QgsProcessingAlgorithm):
     def shortHelpString(self):
         return self.tr(
             "━━━ planX — Yerleşim Planı Araç Seti ━━━\n"
-            "Geliştirici: Yusuf Eminoglu\n\n"
+            "Geliştirici: Geophilo\n\n"
             "Prosedürel bina formu üretici.\n"
             "Minimum kanat derinliği: 7m (mimari zorunluluk)\n\n"
             "12 form tipi (tiklenebilir):\n"

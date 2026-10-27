@@ -5,7 +5,7 @@ Adım 1: ParcelFlux — Ada → Parsel Bölme
 Geliştirilmiş parsel üretici: genişlik varyasyonu, tek sıra algılama,
 artık parçaları komşuya birleştirme.
 
-Geliştirici: Yusuf Eminoglu
+Geliştirici: Geophilo
 planX Geospatial Advanced Tools — Yerleşim Planı Araç Seti
 """
 
@@ -563,7 +563,7 @@ class ParcelFluxAlgorithm(QgsProcessingAlgorithm):
     def shortHelpString(self):
         return self.tr(
             "━━━ planX — Yerleşim Planı Araç Seti ━━━\n"
-            "Geliştirici: Yusuf Eminoglu\n\n"
+            "Geliştirici: Geophilo\n\n"
             "İmar adalarını belirtilen genişlikte parsellere böler.\n\n"
             "Parametreler:\n"
             "• Hedef parsel genişliği: Konut alanlarında genellikle 14-20m\n"

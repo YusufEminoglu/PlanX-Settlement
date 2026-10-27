@@ -6,7 +6,7 @@ Kenar bazlı (cephe bilinçli) setback + TAKS kısıtı ile ayrık nizam bina fo
 Her parsel için bağımsız bir bina taban alanı üretilir.
 Ön, yan ve arka bahçe mesafeleri adım 2'de hesaplanan cephe kenarlarına uygulanır.
 
-Geliştirici: Yusuf Eminoglu
+Geliştirici: Geophilo
 planX Geospatial Advanced Tools — Yerleşim Planı Araç Seti
 """
 import os, sys
@@ -166,7 +166,7 @@ class CoverageFootprintAlgorithm(QgsProcessingAlgorithm):
     def shortHelpString(self):
         return self.tr(
             "━━━ planX — Yerleşim Planı Araç Seti ━━━\n"
-            "Geliştirici: Yusuf Eminoglu\n\n"
+            "Geliştirici: Geophilo\n\n"
             "Ayrık nizam (A nizam) için kenar-bilinçli bahçe mesafesi ve TAKS kısıtı\n"
             "uygulayarak her parselde bağımsız bir bina taban alanı üretir.\n\n"
             "Önkoşul:\n"

@@ -3,7 +3,7 @@
 Adım 8: SettlementFinalizer — Yerleşim planı birleştirme ve rapor
 Otopark yeterliliği + nüfus yoğunluğu + genel istatistik
 
-Geliştirici: Yusuf Eminoglu
+Geliştirici: Geophilo
 planX Geospatial Advanced Tools — Yerleşim Planı Araç Seti
 """
 import math
@@ -229,7 +229,7 @@ class SettlementFinalizerAlgorithm(QgsProcessingAlgorithm):
     def shortHelpString(self):
         return self.tr(
             "━━━ planX — Yerleşim Planı Araç Seti ━━━\n"
-            "Geliştirici: Yusuf Eminoglu\n\n"
+            "Geliştirici: Geophilo\n\n"
             "Tüm katmanları değerlendirip istatistik rapor üretir.\n\n"
             "İki ayrı çıktı:\n"
             "1. Genel İstatistik: Parsel/bina sayısı, alan, TAKS, nüfus\n"

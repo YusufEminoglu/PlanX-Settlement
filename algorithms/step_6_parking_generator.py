@@ -2,7 +2,7 @@
 """
 Adım 6: ParkingGenerator — Parametrik otopark düzeni
 Bu versiyon, ada dış formuna (çevresine) uyumlu "perimeter" otopark üretir.
-Geliştirici: Yusuf Eminoglu
+Geliştirici: Geophilo
 planX Geospatial Advanced Tools — Yerleşim Planı Araç Seti
 """
 import os, sys, math
@@ -239,7 +239,7 @@ class ParkingGeneratorAlgorithm(QgsProcessingAlgorithm):
     def shortHelpString(self):
         return self.tr(
             "━━━ planX — Yerleşim Planı Araç Seti ━━━\n"
-            "Geliştirici: Yusuf Eminoglu\n\n"
+            "Geliştirici: Geophilo\n\n"
             "Tasarımsal Güncelleme: Otopark hücreleri artık sabit gridler yerine,\n"
             "aynı Emsal çözümünde olduğu gibi ADA FORMUNA ve ÇEVRESİNE uyumlu olarak\n"
             "dizilmektedir. Her 10 otoparkta 1 adet peyzaj/ağaç boşluğu bırakılır!\n\n"

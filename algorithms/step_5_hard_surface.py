@@ -2,7 +2,7 @@
 """
 Adım 5: Hard Surface — Sert zemin (yürüme alanı) üretimi
 
-Geliştirici: Yusuf Eminoglu
+Geliştirici: Geophilo
 planX Geospatial Advanced Tools — Yerleşim Planı Araç Seti
 """
 import os, sys
@@ -135,7 +135,7 @@ class HardSurfaceAlgorithm(QgsProcessingAlgorithm):
     def shortHelpString(self):
         return self.tr(
             "━━━ planX — Yerleşim Planı Araç Seti ━━━\n"
-            "Geliştirici: Yusuf Eminoglu\n\n"
+            "Geliştirici: Geophilo\n\n"
             "Bina taban alanı etrafında sert zemin (yürüme/servis alanı) üretir.\n\n"
             "Formül: sert_zemin = buffer(bina, mesafe) ∩ parsel − bina\n\n"
             "Parametreler:\n"

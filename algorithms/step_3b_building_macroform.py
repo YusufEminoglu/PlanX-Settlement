@@ -2,7 +2,7 @@
 """
 Adım 4.1: Bina Makroform Yerleştirme — Şablon katmandan bina formu sığdırma
 
-Geliştirici: Yusuf Eminoglu
+Geliştirici: Geophilo
 planX Geospatial Advanced Tools — Yerleşim Planı Araç Seti
 """
 import os, sys
@@ -235,7 +235,7 @@ class BuildingMacroformAlgorithm(QgsProcessingAlgorithm):
     def shortHelpString(self):
         return self.tr(
             "━━━ planX — Yerleşim Planı Araç Seti ━━━\n"
-            "Geliştirici: Yusuf Eminoglu\n\n"
+            "Geliştirici: Geophilo\n\n"
             "Şablon bina formlarını (L, U, T, I vb.) buildable bbox'a sığdırır.\n\n"
             "Şablon Katmanı:\n"
             "• QGIS'te açık herhangi bir polygon katmanını şablon olarak seçin\n"

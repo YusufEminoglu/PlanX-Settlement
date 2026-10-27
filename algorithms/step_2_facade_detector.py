@@ -3,7 +3,7 @@
 Adım 2: FacadeDetector — Parsel cephe tespiti
 Network tabanlı ön/yan/arka cephe sınıflandırması.
 
-Geliştirici: Yusuf Eminoglu
+Geliştirici: Geophilo
 planX Geospatial Advanced Tools — Yerleşim Planı Araç Seti
 """
 
@@ -225,7 +225,7 @@ class FacadeDetectorAlgorithm(QgsProcessingAlgorithm):
     def shortHelpString(self):
         return self.tr(
             "━━━ planX — Yerleşim Planı Araç Seti ━━━\n"
-            "Geliştirici: Yusuf Eminoglu\n\n"
+            "Geliştirici: Geophilo\n\n"
             "Parsel kenarlarını yol ağına göre ön/yan/arka cephe olarak sınıflandırır.\n\n"
             "Parametreler:\n"
             "• Parsel katmanı: Adım 1 çıktısı (facade sütunları boş)\n"
