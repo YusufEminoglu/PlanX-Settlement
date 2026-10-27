@@ -1,18 +1,21 @@
 [general]
 name=Settlement Planning Toolset
 qgisMinimumVersion=3.28
-description=PlanX Settlement Planning Tools. A 9-stage sequential workflow toolset capable of generating blocks, parcels, building footprints, parking, and landscapes.
+description=Turkish-language Processing workflow for settlement-plan design in Turkey: nine steps from block-to-parcel subdivision and building footprints to parking, landscape and a plan report.
 version=0.5.13
 author=Geophilo
 email=yusuf.eminoglu@deu.edu.tr
-about=Built with a vision of urban resilience, spatial analysis, and optimization-based planning, this toolset automates Settlement Plan generation. It spans 9 consecutive processes, allowing for complete production lines starting from basic block sub-division all the way to building placement, parking layout design, and landscape generation. Online User Manual & Documentation: https://geophilo.com/planx_yerlesim_plani_arac_seti/ | If you find this plugin helpful, please consider starring the repository on GitLab (https://gitlab.com/geophilo1/planx_yerlesim_plani_arac_seti)!
+about=Settlement Planning Toolset, imar adasından yerleşim planı raporuna uzanan tasarım hattını dokuz sıralı Processing adımına böler.
+    1. ParcelFlux ile ada→parsel bölme. 2. Parsel cephelerinin (ön, yan, arka) tespiti. 3. Emsal (FAR), ayrık nizam (çekme mesafesi ve TAKS), blok ve bitişik nizam çözümleri. 4. Bina makroformu yerleştirme ve prosedürel dinamik bina formu. 5. Bina–parsel uyum denetimi. 6. Sert zemin ve yürüme alanları. 7. Adaya uyumlu parametrik otopark düzeni. 8. Peyzaj ve ağaç yerleştirme. 9. Otopark yeterliliğini içeren yerleşim planı raporu.
+    Yardımcı araçlar merdiven, rampa, yaya geçidi, çizgi boyunca otopark ve kentsel donatı katmanı üretir. Her adımın çıktısı bir sonrakinin girdisidir. Türkiye imar pratiğine göre hazırlanmıştır, arayüz Türkçedir.
+    Kılavuz: https://geophilo.com/planx_yerlesim_plani_arac_seti/manual.html
 tracker=https://gitlab.com/geophilo1/planx_yerlesim_plani_arac_seti/-/issues
 repository=https://gitlab.com/geophilo1/planx_yerlesim_plani_arac_seti
 category=Processing
 hasProcessingProvider=yes
 homepage=https://geophilo.com/planx_yerlesim_plani_arac_seti/
 license=GPL-3.0-or-later
-tags=planx,urban planning,settlement plan,parcel,building footprint,parking,landscape,QGIS,processing
+tags=planx,urban planning,settlement plan,parcel,building footprint,parking,landscape,processing,subdivision,site planning,far,setback,turkey,turkish,geophilo
 icon=icons/icon_main.svg
 qgisMaximumVersion=4.99
 experimental=False
